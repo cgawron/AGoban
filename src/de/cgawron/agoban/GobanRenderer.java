@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 The Android Open Source Project
+ * Copyright (C) 2010 Christian Gawron
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,10 +34,9 @@ import de.cgawron.agoban.R;
 
 
 /**
- * Example of how to write a custom subclass of View. LabelView
- * is used to draw simple text views. Note that it does not handle
- * styled text or right-to-left writing systems.
+ * A {@code GobanRenderer} can render a {@link Goban} on a {@link Canvas}.
  *
+ * @author Christian Gawron
  */
 public class GobanRenderer 
 {
