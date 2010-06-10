@@ -85,7 +85,7 @@ public class GobanView extends View implements MultiTouchObjectCanvas<Object>
 
     private final void initGobanView() {
 	// Create MultiTouch controller.
-	multiTouchController = new MultiTouchController<Object>(this, getResources());
+	multiTouchController = new GobanMultiTouchController<Object>(this, getResources());
 
 	renderer = new GobanRenderer();
     }
@@ -162,8 +162,8 @@ public class GobanView extends View implements MultiTouchObjectCanvas<Object>
     
     @Override
     public Object getDraggableObjectAtPoint(PointInfo pt) {
-	// Just return something non-null, we don't need to keep track of which specific object is being dragged
-	return this;
+	// We do not support dragging on a goban
+	return null;
     }
 
     @Override
