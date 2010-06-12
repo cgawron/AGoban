@@ -85,7 +85,7 @@ public class GobanView extends View implements MultiTouchObjectCanvas<Object>
 
     private final void initGobanView() {
 	// Create MultiTouch controller.
-	multiTouchController = new GobanMultiTouchController<Object>(this, getResources());
+	multiTouchController = new GobanMultiTouchController(this, getResources());
 
 	renderer = new GobanRenderer();
     }
@@ -207,5 +207,10 @@ public class GobanView extends View implements MultiTouchObjectCanvas<Object>
     public Point getSelection()
     {
 	return selection;
+    }
+
+    public int getBoardSize()
+    {
+	return goban.getBoardSize();
     }
 }

@@ -34,29 +34,28 @@ import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
 import de.cgawron.agoban.R;
 
-import demo.multitouch.controller.MultiTouchController;
-import demo.multitouch.controller.MultiTouchController.MultiTouchObjectCanvas;
-import demo.multitouch.controller.MultiTouchController.PointInfo;
-import demo.multitouch.controller.MultiTouchController.PositionAndScale;
-
-public class GobanMultiTouchController extends MultiTouchController<Object>
+public class GobanEvent
 {
+    private MotionEvent motionEvent;
     private GobanView gobanView;
+    private Point point;
 
-    public GobanMultiTouchController(GobanView gobanView, Resources res) {
-	super(gobanView, res, false);
+    public GobanEvent(GobanView gobanView, MotionEvent motionEvent) 
+    {
+	this.motionEvent = motionEvent;
 	this.gobanView = gobanView;
+	initialize();
     }
 
 
-    public boolean onTouchEvent(MotionEvent event) 
+    public void initialize() 
     {
-	if (!super.onTouchEvent(event)) {
-	    Log.d("GobanMultiTouchController", "onTouchEvent: " + event);
-	    GobanEvent gobanEvent = new GobanEvent(gobanView, event);
-	    Log.d("GobanMultiTouchController", "gobanEvent: " + gobanEvent);
-
-	}
-	return true;
+	int width = gobanView.getWidth();
+	int height = gobanView.getHeight();
+	int size = gobanView.getBoardSize();
+	
+	int bx = (int) (size*motionEvent.getX()/width);
+	int by = (int) (size*motionEvent.getY()/height);
+	Log.d("GobanEvent", String.format("initialize: (%d, %d)", bx, by));
     }
 }
