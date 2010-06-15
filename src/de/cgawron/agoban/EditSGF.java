@@ -20,27 +20,54 @@ import de.cgawron.go.Goban;
 import static de.cgawron.go.Goban.BoardType.WHITE;
 import static de.cgawron.go.Goban.BoardType.BLACK;
 import de.cgawron.go.SimpleGoban;
+import de.cgawron.go.sgf.GameTree;
+import de.cgawron.go.sgf.MarkupModel;
+import de.cgawron.go.sgf.Node;
+
+import java.util.List;
+import java.io.StringReader;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 
 /**
  * Provides an sgf editor.
  */
 public class EditSGF extends Activity
 {
+    public static Resources resources;
+    private GobanView gobanView;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+	resources = getResources();
         setContentView(R.layout.main);
 
-	GobanView gobanView = (GobanView) findViewById(R.id.goban);
-	Goban goban = new SimpleGoban();
-
-	goban.move(3, 3, WHITE); 
-	goban.move(3, 10, BLACK); 
-	gobanView.setGoban(goban);
+	gobanView = (GobanView) findViewById(R.id.goban);
     }
+    
+    @Override
+    public void onStart() {
+	super.onStart();
+	GameTree gameTree = null;
+
+	try {
+	    gameTree = new GameTree(new StringReader("(;FF[4]DT[2004-12-06]EV[Nikolaus Meschede]HA[0]KM[1,5]RE[B+5]RO[3]SZ[9]GM[1]FF[4];B[cc];W[gf];B[dg];W[ce];B[de];W[df];B[cf];W[ef];B[dd];W[cg];B[bf];W[bg];B[be];W[ec];B[ee];W[fe];B[dc];W[eb];B[db];W[ed];B[eg];W[ff];B[fg];W[gh];B[gg];W[hg];B[fh];W[hh];B[ch];W[fi];B[ei];W[dh];B[gi];W[hi];B[di];W[bh];B[eh];W[fi];B[bi];W[da];B[ca];W[ea];B[hc];W[gc];B[gb];W[gd];B[he];W[hd];B[ic];W[id];B[ha];W[ib];B[fc];W[fd];B[fb];W[hb];B[gi];W[ai];B[ah];W[fi];B[];W[gi])"));
+	    Node leaf = gameTree.getLeafs().get(0);
+	    Goban goban = (MarkupModel) leaf.getGoban();
+	    
+	    gobanView.setGoban(goban);
+	}
+	catch (Exception ex) {
+	    Log.e("EditSGF", "Exception while parsing SGF", ex);
+	}
+
+    }
+
 }

@@ -11,8 +11,9 @@
  *
  */
 
-package de.cgawron.go;
+package de.cgawron.go.sgf;
 
+import de.cgawron.go.Goban;
 import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
 import java.util.Map;
@@ -345,9 +346,9 @@ public interface MarkupModel extends Goban
 
     void setMarkup(short x, short y, Markup m);
 
-    // Region getRegion();
+    Region getRegion();
 
-    // void setRegion(Region region);
+    void setRegion(Region region);
 
     String getToolTipText(Point p);
 

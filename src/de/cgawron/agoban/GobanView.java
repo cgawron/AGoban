@@ -19,6 +19,7 @@ package de.cgawron.agoban;
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;

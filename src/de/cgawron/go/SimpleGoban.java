@@ -40,7 +40,7 @@ public class SimpleGoban extends AbstractGoban implements Serializable
     private int whiteCaptured;
     private int blackCaptured;
 
-    private Collection<GobanListener> listeners = new java.util.ArrayList<GobanListener>();
+    protected Collection<GobanListener> listeners = new java.util.ArrayList<GobanListener>();
 
     private static Logger logger = Logger.getLogger(SimpleGoban.class.getName());
 

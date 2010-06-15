@@ -20,19 +20,19 @@ public interface GobanListener extends EventListener
 {
     /**
      * Insert the method's description here. Creation date: (04/11/00 10:18:51)
-     * @param e gawron.go.goban.GobanModelEvent
+     * @param event GobanEvent
      */
-    void modelChanged(GobanEvent e);
+    void modelChanged(GobanEvent event);
 
     /**
      * Insert the method's description here. Creation date: (03/23/00 23:40:43)
-     * @param event goban.GobanModelEvent
+     * @param event GobanEvent
      */
     void stoneAdded(GobanEvent event);
 
     /**
      * Insert the method's description here. Creation date: (03/23/00 23:40:43)
-     * @param event goban.GobanModelEvent
+     * @param event GobanEvent
      */
     void stonesRemoved(GobanEvent event);
 }

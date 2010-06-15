@@ -38,10 +38,10 @@ containing a value of this type.
         public static final int textSize=0x7f010002;
     }
     public static final class color {
-        public static final int solid_blue=0x7f040001;
-        public static final int solid_green=0x7f040002;
-        public static final int solid_red=0x7f040000;
-        public static final int solid_yellow=0x7f040003;
+        public static final int solid_blue=0x7f050001;
+        public static final int solid_green=0x7f050002;
+        public static final int solid_red=0x7f050000;
+        public static final int solid_yellow=0x7f050003;
     }
     public static final class drawable {
         public static final int blue=0x7f020002;
@@ -54,18 +54,21 @@ containing a value of this type.
         public static final int yellow=0x7f020004;
     }
     public static final class id {
-        public static final int goban=0x7f070000;
+        public static final int goban=0x7f080000;
     }
     public static final class layout {
         public static final int main=0x7f030000;
     }
+    public static final class raw {
+        public static final int sgf=0x7f040000;
+    }
     public static final class string {
-        public static final int app_name=0x7f050000;
+        public static final int app_name=0x7f060000;
     }
     public static final class style {
-        public static final int ActionButton=0x7f060000;
-        public static final int TextAppearance=0x7f060001;
-        public static final int TextAppearance_ActionButton=0x7f060002;
+        public static final int ActionButton=0x7f070000;
+        public static final int TextAppearance=0x7f070001;
+        public static final int TextAppearance_ActionButton=0x7f070002;
     }
     public static final class styleable {
         /** Attributes that can be used with a GobanView.

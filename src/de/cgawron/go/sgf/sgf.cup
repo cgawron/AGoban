@@ -1,0 +1,143 @@
+/**
+ *
+ * $Id: sgf.cup,v 1.3.2.5 2003/01/06 12:35:37 cgawron Exp $
+ *
+ * © 2001 Christian Gawron. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ * 
+ */
+import java_cup.runtime.*;
+
+import java.util.*;
+import org.apache.log4j.Logger;
+
+/* Preliminaries to set up and use the scanner.  */
+
+parser code 
+{:
+    private static Logger logger = Logger.getLogger(Parser.class);
+
+    public void report_error(String message, Symbol info)
+    {
+	java_cup.runtime.Scanner scanner = getScanner();
+
+	if (scanner instanceof InputPosition) 
+	   throw new ParseError(message, (InputPosition) scanner, info);
+	else 
+	   throw new ParseError(message, info);
+
+        /*
+        System.err.print(message);
+        if (info instanceof Symbol)
+	   if (((Symbol)info).left != -1)
+	   System.err.println(" at character " + ((Symbol)info).left + 
+			      " of input");
+	   else System.err.println("");
+        else System.err.println("");
+        */
+    }
+
+    public void syntax_error(Symbol cur_token)
+    {
+	logger.warn("Syntax error at " + cur_token);
+	report_error("Syntax error", cur_token);
+    }
+
+    public void debug_message(String mess)
+    {
+	//logger.info(mess);
+    }
+
+    public Symbol scan() throws java.lang.Exception 
+    {
+        Symbol sym = getScanner().next_token();
+        sym =  (sym!=null) ? sym : new Symbol(EOF_sym());
+	//logger.debug("Token is " + sym);
+	return sym;
+    }
+
+:};
+
+//init with {: scanner.init();              :};
+//scan with {: return scanner.next_token(); :};
+
+/* Terminals (tokens returned by the scanner). */
+terminal           Open, Close, Semi, Property, Value;
+
+/* Non-terminals */
+non terminal            Collection, GameTree, GameTreeList, Sequence, Node, PropertyList, ValueList;
+
+/* Precedences */
+
+/* The grammar */
+Collection   ::= GameTree:gt
+                 {:
+	            Collection c = new LinkedList();
+	            c.add(new GameTree((Node) gt));
+	            RESULT = c;
+                 :}
+
+	       | Collection:c GameTree:gt
+                 {:
+	            RESULT = c;
+	            GameTree gameTree = new GameTree((Node) gt);
+	            ((Collection) c).add(gameTree);
+                 :}
+;
+
+GameTree     ::= Open Sequence:s GameTreeList:v Close
+                 {:
+                    ((Sequence) s).addAll((List) v);
+                    RESULT = s;
+                 :}
+;
+
+GameTreeList ::= GameTreeList:l GameTree:gt
+	         {:
+	            ((List) l).add((Sequence) gt);
+                    RESULT = l; 
+                 :}
+               | 
+                 {:
+	            RESULT = new LinkedList();
+                 :}
+;
+
+Sequence     ::= Sequence:s Node:n 
+                 {: 
+                    ((Sequence) s).append((Node) n);
+	            RESULT = s;
+                 :}
+               | Node:n
+                 {:
+	            RESULT = new Sequence((Node) n);
+                 :}
+;
+
+Node ::= Semi PropertyList:pl
+	         {: RESULT = new Node((PropertyList) pl); :}
+;
+
+
+
+
+
+PropertyList ::= PropertyList:pl Property:p  ValueList:vl 
+	         {: ((Property) p).setValue((Value) vl); 
+                    ((PropertyList) pl).add((Property) p);
+	            RESULT = pl; :}
+	       | Property:p  ValueList:vl
+	         {: ((Property) p).setValue((Value) vl); 
+                    RESULT = new PropertyList((Property) p); :}
+;
+
+ValueList    ::= ValueList:vl Value:v 
+	         {: ((Value.ValueList)vl).add((Value) v); 
+	            RESULT = vl; :} 
+	       | Value:v
+	         {: RESULT = AbstractValue.createValueList((Value) v); :} 
+;
