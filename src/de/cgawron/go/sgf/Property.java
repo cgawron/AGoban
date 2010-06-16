@@ -16,7 +16,7 @@ package de.cgawron.go.sgf;
 import de.cgawron.go.Goban;
 import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
-import de.cgawron.go.MarkupModel;
+import de.cgawron.go.sgf.MarkupModel;
 
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;

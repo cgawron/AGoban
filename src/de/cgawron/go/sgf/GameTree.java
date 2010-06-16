@@ -1,8 +1,6 @@
 /*
  *
- * $Id: GameTree.java 369 2006-04-14 17:04:02Z cgawron $
- *
- * © 2001 Christian Gawron. All rights reserved.
+ * © 2010 Christian Gawron. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +14,8 @@ package de.cgawron.go.sgf;
 import de.cgawron.go.Goban;
 import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Symmetry;
-import de.cgawron.go.MarkupModel;
 import de.cgawron.go.SimpleGoban;
+import de.cgawron.go.sgf.MarkupModel;
 import de.cgawron.go.sgf.SimpleMarkupModel;
 
 import de.cgawron.util.MiscEncodingReader;
@@ -767,11 +765,9 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
     {
 	Node node = root;
 	int currentMoveNo = 0;
-	while (node != null) {
+	while (node != null && currentMoveNo != moveNo) {
 	    if (node.isMove()) {
 		currentMoveNo++;
-		if (currentMoveNo == moveNo)
-		    break;
 	    }
 	    node = (Node) node.getChildAt(0);
 	}
