@@ -17,9 +17,11 @@
       app:text="Hello World, EditSGF"
     />
  
-    <Button 
-      android:text="Test" 
-      style="@style/ActionButton"
-      android:textColor="@drawable/red" />
+    <SeekBar 
+      android:text="move" 
+      android:id="@+id/seekBar"  
+      android:layout_width="fill_parent" 
+      android:layout_height="wrap_content" 
+    />
 </LinearLayout>
 
