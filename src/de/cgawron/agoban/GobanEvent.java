@@ -56,6 +56,16 @@ public class GobanEvent
 	
 	int bx = (int) (size*motionEvent.getX()/width);
 	int by = (int) (size*motionEvent.getY()/height);
+	point = new Point(bx, by);
 	Log.d("GobanEvent", String.format("initialize: (%d, %d)", bx, by));
+    }
+
+    @Override
+    public String toString() {
+	return "GobanEvent p=" + point;
+    }
+
+    public Point getPoint() {
+	return point;
     }
 }

@@ -1,6 +1,5 @@
 /*
  *
- * $Id: SimpleGobanModel.java 289 2005-08-15 09:44:31Z cgawron $
  *
  * (c) 2001 Christian Gawron. All rights reserved.
  *
@@ -26,7 +25,6 @@ import java.util.logging.Logger;
 /**
  * A simple implementation of a GobanModel, using a two-dimensional array to represent the board.
  * Creation date: (03/23/00 21:36:30)
- * @version $Id: SimpleGobanModel.java 289 2005-08-15 09:44:31Z cgawron $
  */
 public class SimpleGoban extends AbstractGoban implements Serializable
 {
@@ -37,6 +35,7 @@ public class SimpleGoban extends AbstractGoban implements Serializable
 
     private int visited;
     int numStones = 0;
+    private Point lastMove;
     private int whiteCaptured;
     private int blackCaptured;
 
@@ -349,9 +348,10 @@ public class SimpleGoban extends AbstractGoban implements Serializable
 
         setStone(x, y, color);
 
-        NeighborhoodEnumeration ne = new NeighborhoodEnumeration(this, new Point(x, y));
+        Point p = new Point(x, y);
+	lastMove = p;
+        NeighborhoodEnumeration ne = new NeighborhoodEnumeration(this, p);
         Vector removed = new Vector();
-        Point p;
         while (ne.hasMoreElements())
         {
             p = (Point)ne.nextElement();
@@ -369,6 +369,10 @@ public class SimpleGoban extends AbstractGoban implements Serializable
         }
         fireStonesRemoved(removed);
         fireStoneAdded(x, y, color);
+    }
+
+    public Point getLastMove() {
+	return lastMove;
     }
 
     /** putStone method comment. */

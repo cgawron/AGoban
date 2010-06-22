@@ -26,8 +26,8 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
 import android.view.MotionEvent;
+import android.view.View;
 
 import de.cgawron.go.Goban;
 import de.cgawron.go.Goban.BoardType;
@@ -53,9 +53,11 @@ public class GobanMultiTouchController extends MultiTouchController<Object>
     {
 	if (!super.onTouchEvent(event)) {
 	    Log.d("GobanMultiTouchController", "onTouchEvent: " + event);
-	    GobanEvent gobanEvent = new GobanEvent(gobanView, event);
-	    Log.d("GobanMultiTouchController", "gobanEvent: " + gobanEvent);
-
+	    if (event.getAction() == event.ACTION_UP) {
+		GobanEvent gobanEvent = new GobanEvent(gobanView, event);
+		Log.d("GobanMultiTouchController", "gobanEvent: " + gobanEvent);
+		gobanView.fireGobanEvent(gobanEvent);
+	    }
 	}
 	return true;
     }

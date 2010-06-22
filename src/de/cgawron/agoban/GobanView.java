@@ -34,6 +34,9 @@ import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
 import de.cgawron.agoban.R;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import demo.multitouch.controller.MultiTouchController;
 import demo.multitouch.controller.MultiTouchController.MultiTouchObjectCanvas;
 import demo.multitouch.controller.MultiTouchController.PointInfo;
@@ -47,6 +50,7 @@ public class GobanView extends View implements MultiTouchObjectCanvas<Object>
 {
     private Goban goban;
     private GobanRenderer renderer;
+    private List<GobanEventListener> listeners = new ArrayList<GobanEventListener>();
     private MultiTouchController<Object> multiTouchController;
     private Point selection;
 
@@ -213,5 +217,16 @@ public class GobanView extends View implements MultiTouchObjectCanvas<Object>
     public int getBoardSize()
     {
 	return goban.getBoardSize();
+    }
+
+    public void addGobanEventListener(GobanEventListener listener) {
+	listeners.add(listener);
+    }
+
+    public void fireGobanEvent(GobanEvent gobanEvent) 
+    {
+	for (GobanEventListener listener : listeners) {
+	    listener.onGobanEvent(gobanEvent);
+	}
     }
 }

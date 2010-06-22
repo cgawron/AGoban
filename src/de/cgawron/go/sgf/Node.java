@@ -995,13 +995,13 @@ public class Node
      */
     public void move(Point p) throws UnsupportedOperationException
     {
-	if (isMove() || isBoardSetup())
+	if (isMove() || isBoardSetup() || this instanceof RootNode)
 	    throw new UnsupportedOperationException();
 	if (contains(Property.MOVE_NO)) {
 	    Value.Number no = (Value.Number) ((Property) get(Property.MOVE_NO)).getValue();
 	    setMoveNo(no.intValue());
 	}
-	else
+	else if (parent != null)
 	    setMoveNo(parent.getMoveNo() + 1);
 	
 	Node parentMove = parent;

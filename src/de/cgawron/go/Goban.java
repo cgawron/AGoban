@@ -173,6 +173,12 @@ public interface Goban extends Cloneable
     void move(int x, int y, BoardType color);
 
     /**
+     * Get the last move or null if there was no move.
+     * @return the <code>Point</code> of the last move
+     */
+    Point getLastMove();
+
+    /**
      * Put a stone of <code>color</code> at the specified coordinates.
      * This method does not capture any stones but just adds stone. Use the {@link move} method to play a move.
      * @param x a <code>int</code> value

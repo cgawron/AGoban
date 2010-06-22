@@ -7,6 +7,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
+
     <de.cgawron.agoban.GobanView 
       android:id="@+id/goban"  
       android:layout_width="fill_parent" 
@@ -20,6 +21,7 @@
     <SeekBar 
       android:text="move" 
       android:id="@+id/seekBar"  
+      android:focusable="true"
       android:layout_width="fill_parent" 
       android:layout_height="wrap_content" 
     />

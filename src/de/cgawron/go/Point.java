@@ -108,6 +108,17 @@ public class Point implements Comparable<Point>
 	}
     }
 
+    /**
+     * Compares this Point to coordinates.  
+     * @param x - the x coordinate
+     * @param y - the y coordinate
+     * @return true if (x, y) represents the same point on a goban.
+     */
+    public boolean equals(int x, int y) 
+    {
+	return (x == this.x) && (y == this.y);
+    }
+
 
     /*
      * Insert the method's description here.
