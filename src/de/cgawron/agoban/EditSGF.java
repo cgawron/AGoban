@@ -25,9 +25,11 @@ import de.cgawron.go.sgf.MarkupModel;
 import de.cgawron.go.sgf.Node;
 
 import java.util.List;
+import java.util.UUID;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringReader;
+import java.io.OutputStream;
 
 import android.app.Activity;
 import android.content.Context;
@@ -35,11 +37,13 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.SeekBar;
 
@@ -53,6 +57,7 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
     private SeekBar seekBar;
     private GameTree gameTree;
     private Node currentNode;
+    private Uri data;
 
     /** Called when the activity is first created. */
     @Override
@@ -69,16 +74,40 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	seekBar = (SeekBar) findViewById(R.id.seekBar);
 	seekBar.setOnSeekBarChangeListener(this);
 	seekBar.requestFocus();
+
+	Intent intent = getIntent();
+	data = intent.getData();
+
+	gameTree = null;
+	if (data == null) {
+	    File file = getNewFile();
+	    Uri.Builder ub = new Uri.Builder();
+	    ub.path(file.getAbsolutePath());
+	    ub.scheme("file");
+	    data = ub.build();
+	}
+	Log.d("EditSGF", "OnCreate: data=" + data);
+    }
+
+    @Override
+    public File getFileStreamPath(String name) {
+	File directory = Environment.getExternalStorageDirectory();
+	directory = new File(directory, "sgf");
+	
+	if (!directory.exists())
+	    directory.mkdir();
+
+	return new File(directory, name);
+    }
+    
+    public File getNewFile() {
+	return getFileStreamPath(UUID.randomUUID().toString() + ".sgf");
     }
     
     @Override
     public void onStart() {
 	super.onStart();
-
-	Intent intent = getIntent();
-	Uri data = intent.getData();
-	Log.d("EditSGF", "Data: " + data);
-	gameTree = null;
+	Log.d("EditSGF", "OnStart: data=" + data);
 
 	if (data != null)
 	{
@@ -88,6 +117,7 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	    }
 	    catch (Exception ex) {
 		Log.e("EditSGF", "Exception while parsing SGF", ex);
+		gameTree = new GameTree();
 	    }
 	    
 	}
@@ -107,6 +137,16 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	MenuInflater inflater = getMenuInflater();
 	inflater.inflate(R.menu.options_menu, menu);
 	return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+	switch (item.getItemId()) {
+	case R.id.save:
+	    save();
+	    return true;
+	}
+	return false;
     }
 
     @Override
@@ -144,6 +184,15 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
     @Override
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
 	Log.d("EditSGF", "onCreateContextMenu");
+	MenuInflater inflater = getMenuInflater();
+	inflater.inflate(R.menu.stone_context_menu, menu);
+    }
+
+    @Override
+    protected void onStop() {
+       super.onStop();
+
+       save();
     }
 
     public void setCurrentNode(Node node) {
@@ -152,5 +201,25 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	    Goban goban = (MarkupModel) currentNode.getGoban();
 	    gobanView.setGoban(goban);
 	}
+    }
+
+    public void save() {
+	if (data == null) {
+	    File file = getFileStreamPath("test.sgf");
+	    Uri.Builder ub = new Uri.Builder();
+	    ub.path(file.getAbsolutePath());
+	    ub.scheme("file");
+	    data = ub.build();
+	}
+	
+	Log.d("EditSGF", "saving " + data);
+	try {
+	    OutputStream os = getContentResolver().openOutputStream(data);
+	    gameTree.save(os);
+	    os.close();
+	}
+	catch (Exception ex) {
+	    Log.e("EditSGF", "Exception while saving SGF", ex);
+       }
     }
 }

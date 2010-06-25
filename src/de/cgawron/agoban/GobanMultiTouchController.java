@@ -57,8 +57,10 @@ public class GobanMultiTouchController extends MultiTouchController<Object>
 		GobanEvent gobanEvent = new GobanEvent(gobanView, event);
 		Log.d("GobanMultiTouchController", "gobanEvent: " + gobanEvent);
 		gobanView.fireGobanEvent(gobanEvent);
+		return true;
 	    }
+	    return false;
 	}
-	return true;
+	else return true;
     }
 }

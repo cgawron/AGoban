@@ -155,13 +155,17 @@ public class GobanView extends View implements MultiTouchObjectCanvas<Object>
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-	return multiTouchController.onTouchEvent(event);
+	if (!multiTouchController.onTouchEvent(event))
+	    return super.onTouchEvent(event);
+	else
+	    return true;
     }
 
     @Override
     public boolean onTrackballEvent(MotionEvent event) {
 	Log.d("Goban", "onTrackballEvent: " + event);
-	return multiTouchController.onTouchEvent(event);
+	//if (multiTouchController.onTrackballEvent(event))
+	    return super.onTrackballEvent(event);
     }
     
     

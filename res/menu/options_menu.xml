@@ -1,4 +1,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/save"
+          android:title="Save" />
+    <item android:id="@+id/open"
+          android:title="Open" />
     <item android:id="@+id/new_game"
           android:title="New Game" />
     <item android:id="@+id/game_info"
