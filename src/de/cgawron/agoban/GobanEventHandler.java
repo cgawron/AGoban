@@ -39,11 +39,11 @@ import demo.multitouch.controller.MultiTouchController.MultiTouchObjectCanvas;
 import demo.multitouch.controller.MultiTouchController.PointInfo;
 import demo.multitouch.controller.MultiTouchController.PositionAndScale;
 
-public class GobanMultiTouchController extends MultiTouchController<Object>
+public class GobanEventHandler extends MultiTouchController<Object>
 {
     private GobanView gobanView;
 
-    public GobanMultiTouchController(GobanView gobanView, Resources res) {
+    public GobanEventHandler(GobanView gobanView, Resources res) {
 	super(gobanView, res, false);
 	this.gobanView = gobanView;
     }
@@ -52,10 +52,10 @@ public class GobanMultiTouchController extends MultiTouchController<Object>
     public boolean onTouchEvent(MotionEvent event) 
     {
 	if (!super.onTouchEvent(event)) {
-	    Log.d("GobanMultiTouchController", "onTouchEvent: " + event);
+	    Log.d("GobanEventHandler", "onTouchEvent: " + event);
 	    if (event.getAction() == event.ACTION_UP) {
 		GobanEvent gobanEvent = new GobanEvent(gobanView, event);
-		Log.d("GobanMultiTouchController", "gobanEvent: " + gobanEvent);
+		Log.d("GobanEventHandler", "gobanEvent: " + gobanEvent);
 		gobanView.fireGobanEvent(gobanEvent);
 		return true;
 	    }
