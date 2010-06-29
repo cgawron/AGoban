@@ -21,6 +21,7 @@ package de.cgawron.agoban.view;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -45,6 +46,8 @@ public class GobanRenderer
     private float HIGHLIGHT_RADIUS = 0.2f;
     private float HIGHLIGHT_STROKEWIDTH = 0.06f;
     private float STONE_STROKEWIDTH = 0.03f;
+    private float SELECTION_STROKEWIDTH = 0.03f;
+    private int   SELECTION_COLOR = Color.RED;
 
     public GobanRenderer()
     {
@@ -164,7 +167,16 @@ public class GobanRenderer
 	    canvas.drawCircle(boardSize-h, h+1, HOSHI_RADIUS, paint);
 	    canvas.drawCircle(boardSize-h, boardSize-h, HOSHI_RADIUS, paint);
         }
+    }
 
+    void drawSelection(int i, int j, Canvas canvas)
+    {
+	Paint paint = new Paint();
+	paint.setAntiAlias(true);
+	paint.setStrokeWidth(SELECTION_STROKEWIDTH);
+	paint.setColor(SELECTION_COLOR);
+	paint.setStyle(Paint.Style.STROKE);
+	canvas.drawRect(i, j, i+1.0f, j+1.0f, paint);
     }
 
 }
