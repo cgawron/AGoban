@@ -32,7 +32,9 @@ import android.view.MotionEvent;
 import de.cgawron.go.Goban;
 import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
+
 import de.cgawron.agoban.R;
+import de.cgawron.agoban.view.GobanView;
 
 public class GobanEvent
 {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.cgawron.agoban;
+package de.cgawron.agoban.view;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.

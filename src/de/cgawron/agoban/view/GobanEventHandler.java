@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.cgawron.agoban;
+package de.cgawron.agoban.view;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
@@ -32,7 +32,9 @@ import android.view.View;
 import de.cgawron.go.Goban;
 import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
+
 import de.cgawron.agoban.R;
+import de.cgawron.agoban.GobanEvent;
 
 import demo.multitouch.controller.MultiTouchController;
 import demo.multitouch.controller.MultiTouchController.MultiTouchObjectCanvas;
@@ -57,10 +59,16 @@ public class GobanEventHandler extends MultiTouchController<Object>
 		GobanEvent gobanEvent = new GobanEvent(gobanView, event);
 		Log.d("GobanEventHandler", "gobanEvent: " + gobanEvent);
 		gobanView.fireGobanEvent(gobanEvent);
-		return true;
+		return false;
 	    }
 	    return false;
 	}
 	else return true;
+    }
+
+    public boolean onTrackballEvent(MotionEvent event) 
+    {
+	Log.d("GobanEventHandler", "onTrackballEvent: " + event);
+	return false;
     }
 }
