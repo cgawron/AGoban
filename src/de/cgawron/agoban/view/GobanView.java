@@ -94,7 +94,7 @@ public class GobanView extends View implements MultiTouchObjectCanvas<Object>
 	// Create Event handler
 	gobanEventHandler = new GobanEventHandler(this, getResources());
 
-	renderer = new GobanRenderer();
+	renderer = new GobanRenderer(this);
     }
 
     /**
@@ -235,5 +235,11 @@ public class GobanView extends View implements MultiTouchObjectCanvas<Object>
 	for (GobanEventListener listener : listeners) {
 	    listener.onGobanEvent(gobanEvent);
 	}
+    }
+
+    public boolean isSelected(int i, int j)
+    {
+	// Just a test
+	return (i==9) && (j==9);
     }
 }

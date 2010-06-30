@@ -41,16 +41,19 @@ import de.cgawron.agoban.R;
  */
 public class GobanRenderer 
 {
-    private float STONE_RADIUS = 0.47f;
-    private float HOSHI_RADIUS = 0.15f;
-    private float HIGHLIGHT_RADIUS = 0.2f;
-    private float HIGHLIGHT_STROKEWIDTH = 0.06f;
-    private float STONE_STROKEWIDTH = 0.03f;
-    private float SELECTION_STROKEWIDTH = 0.03f;
-    private int   SELECTION_COLOR = Color.RED;
+    private static float STONE_RADIUS = 0.47f;
+    private static float HOSHI_RADIUS = 0.15f;
+    private static float HIGHLIGHT_RADIUS = 0.2f;
+    private static float HIGHLIGHT_STROKEWIDTH = 0.06f;
+    private static float STONE_STROKEWIDTH = 0.03f;
+    private static float SELECTION_STROKEWIDTH = 0.03f;
+    private static int   SELECTION_COLOR = Color.RED;
 
-    public GobanRenderer()
+    private GobanView view;
+
+    public GobanRenderer(GobanView view)
     {
+	this.view = view;
     }
 
     public void render(Goban goban, Canvas canvas)
@@ -85,6 +88,8 @@ public class GobanRenderer
 		    case EMPTY:
 			break;
 		    }
+		    if (view.isSelected(i, j))
+			drawSelection(i, j, canvas);
 		}
 	    }
 	}

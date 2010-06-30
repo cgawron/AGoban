@@ -24,6 +24,8 @@ import de.cgawron.go.sgf.GameTree;
 import de.cgawron.go.sgf.MarkupModel;
 import de.cgawron.go.sgf.Node;
 
+import de.cgawron.agoban.view.GobanView;
+
 import java.util.List;
 import java.util.UUID;
 import java.io.File;
