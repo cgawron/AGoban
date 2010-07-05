@@ -65,6 +65,7 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
     private Uri data;
 
 
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
