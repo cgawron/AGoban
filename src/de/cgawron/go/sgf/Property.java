@@ -1,7 +1,5 @@
 /*
  *
- * $Id: Property.java 342 2005-10-16 12:09:00Z cgawron $
- *
  * © 2001 Christian Gawron. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify

@@ -27,8 +27,10 @@ import de.cgawron.go.sgf.Node;
 import de.cgawron.agoban.view.GobanView;
 
 import java.util.List;
+import java.util.Properties;
 import java.util.UUID;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -55,16 +57,13 @@ import android.widget.SeekBar;
 public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener, GobanEventListener
 {
     public static Resources resources;
-    private static String gitId = "$Id$";
-
 
     private GobanView gobanView;
     private SeekBar seekBar;
     private GameTree gameTree;
     private Node currentNode;
     private Uri data;
-
-
+    private Properties properties;
 
     /** Called when the activity is first created. */
     @Override
@@ -72,6 +71,16 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
     {
         super.onCreate(savedInstanceState);
 	resources = getResources();
+	properties = new Properties();
+	try {
+	    properties.load(de.cgawron.agoban.EditSGF.resources.openRawResource(de.cgawron.agoban.R.raw.git));
+	}
+	catch (Exception e)
+	{
+	    throw new RuntimeException("git.properties", e);
+	}
+	Log.d("EditSGF", "git-id: " + properties.get("git.id"));
+
         setContentView(R.layout.main);
 
 	gobanView = (GobanView) findViewById(R.id.goban);
