@@ -285,7 +285,7 @@
     </target>
 
     <!-- Compiles this project's .java files into .class files. -->
-    <target name="compile" depends="-resource-src, -aidl"
+    <target name="compile" depends="-resource-src, -aidl, git-id"
                 description="Compiles project's .java files into .class files">
         <!-- If android rules are used for a test project, its classpath should include
              tested project's location -->
@@ -494,6 +494,17 @@
         <echo>              signatures must match.</echo>
         <echo>   uninstall: Uninstalls the application from a running emulator or</echo>
         <echo>              device.</echo>
+    </target>
+
+    <target name="git-id">
+        <exec executable="git" outputproperty="git.id" logError="true">
+           <arg value="describe"/>
+           <arg value="--long"/>
+        </exec>
+        <echo message="id=${git.id}"/>
+        <propertyfile file="res/raw/git">
+            <entry key="git.id" value="${git.id}"/>
+        </propertyfile>
     </target>
 
 </project>
