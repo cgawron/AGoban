@@ -55,11 +55,14 @@ import android.widget.SeekBar;
 public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener, GobanEventListener
 {
     public static Resources resources;
+    private static String gitId = "$Id$";
+
     private GobanView gobanView;
     private SeekBar seekBar;
     private GameTree gameTree;
     private Node currentNode;
     private Uri data;
+
 
     /** Called when the activity is first created. */
     @Override
