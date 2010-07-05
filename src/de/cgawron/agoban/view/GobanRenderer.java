@@ -46,7 +46,7 @@ public class GobanRenderer
     private static float HIGHLIGHT_RADIUS = 0.2f;
     private static float HIGHLIGHT_STROKEWIDTH = 0.06f;
     private static float STONE_STROKEWIDTH = 0.03f;
-    private static float SELECTION_STROKEWIDTH = 0.03f;
+    private static float SELECTION_STROKEWIDTH = 0.05f;
     private static int   SELECTION_COLOR = Color.RED;
 
     private GobanView view;
@@ -174,14 +174,16 @@ public class GobanRenderer
         }
     }
 
-    void drawSelection(int i, int j, Canvas canvas)
+    void drawSelection(int x, int y, Canvas canvas)
     {
+	Log.d("GobanRenderer", String.format("drawSelection(%d, %d)", x, y));
+
 	Paint paint = new Paint();
 	paint.setAntiAlias(true);
 	paint.setStrokeWidth(SELECTION_STROKEWIDTH);
 	paint.setColor(SELECTION_COLOR);
 	paint.setStyle(Paint.Style.STROKE);
-	canvas.drawRect(i, j, i+1.0f, j+1.0f, paint);
+	canvas.drawRect(x+0.5f, y+0.5f, x+1.5f, y+1.5f, paint);
     }
 
 }

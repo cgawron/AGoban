@@ -139,21 +139,7 @@ public class GobanView extends View implements MultiTouchObjectCanvas<Object>
 	canvas.scale(min / size, min / size);
 	canvas.translate(-0.5f, -0.5f);
 	renderer.render(goban, canvas);
-	drawSelection(getSelection(), canvas);
     }
-
-    void drawSelection(Point p, Canvas canvas)
-    {
-	if (p == null) return;
-	
-	Paint paint = new Paint();
-	paint.setARGB(128, 255, 0, 0);
-	int x = p.getX();
-	int y = p.getY();
-	Log.d("GobanRenderer", String.format("drawSelection: (%d, %d)", x, y));
-	canvas.drawRect(x+0.5f, y+0.5f, x+1.5f, y+1.5f, paint);
-    }
-
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -211,22 +197,13 @@ public class GobanView extends View implements MultiTouchObjectCanvas<Object>
 	return true;
     }
 
-    public void setSelection(Point p)
-    {
-	selection = p;
-    }
-
-    public Point getSelection()
-    {
-	return selection;
-    }
-
     public int getBoardSize()
     {
 	return goban.getBoardSize();
     }
 
-    public void addGobanEventListener(GobanEventListener listener) {
+    public void addGobanEventListener(GobanEventListener listener) 
+    {
 	listeners.add(listener);
     }
 
@@ -239,7 +216,21 @@ public class GobanView extends View implements MultiTouchObjectCanvas<Object>
 
     public boolean isSelected(int i, int j)
     {
-	// Just a test
-	return (i==9) && (j==9);
+	if (selection == null)
+	    return false;
+	else
+	    return selection.equals(i, j);
     }
+
+    public Point getSelection()
+    {
+	return selection;
+    }
+
+    public void setSelection(Point point)
+    {
+	Log.d("Goban", "setSelection: " + point);
+	selection = point;
+	invalidate();
+   }
 }

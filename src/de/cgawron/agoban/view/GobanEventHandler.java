@@ -55,13 +55,16 @@ public class GobanEventHandler extends MultiTouchController<Object>
     {
 	if (!super.onTouchEvent(event)) {
 	    Log.d("GobanEventHandler", "onTouchEvent: " + event);
+	    GobanEvent gobanEvent = new GobanEvent(gobanView, event);
+	    Log.d("GobanEventHandler", "gobanEvent: " + gobanEvent);
+
 	    if (event.getAction() == event.ACTION_UP) {
-		GobanEvent gobanEvent = new GobanEvent(gobanView, event);
-		Log.d("GobanEventHandler", "gobanEvent: " + gobanEvent);
 		gobanView.fireGobanEvent(gobanEvent);
-		return false;
 	    }
-	    return false;
+	    else
+		gobanView.setSelection(gobanEvent.getPoint());
+
+	    return true;
 	}
 	else return true;
     }
