@@ -57,6 +57,7 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
     public static Resources resources;
     private static String gitId = "$Id$";
 
+
     private GobanView gobanView;
     private SeekBar seekBar;
     private GameTree gameTree;
