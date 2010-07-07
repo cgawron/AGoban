@@ -50,6 +50,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 /**
  * Provides an sgf editor.
@@ -160,6 +161,14 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	switch (item.getItemId()) {
 	case R.id.save:
 	    save();
+	    return true;
+
+	case R.id.about:
+	    Context context = getApplicationContext();
+	    CharSequence text = String.format("AGoban, ©2010 Christian Gawron\nGit-Id: %s", properties.get("git.id"));
+	    int duration = Toast.LENGTH_LONG;
+	    Toast toast = Toast.makeText(context, text, duration);
+	    toast.show();
 	    return true;
 	}
 	return false;

@@ -9,4 +9,6 @@
           android:title="Game Info" />
     <item android:id="@+id/quit"
           android:title="Quit" />
+    <item android:id="@+id/about"
+          android:title="About" />
 </menu>
