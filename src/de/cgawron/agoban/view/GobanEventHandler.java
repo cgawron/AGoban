@@ -43,7 +43,10 @@ import demo.multitouch.controller.MultiTouchController.PositionAndScale;
 
 public class GobanEventHandler extends MultiTouchController<Object>
 {
+    private static int MIN_STILL_TIME = 100;
+
     private GobanView gobanView;
+    private long time;
 
     public GobanEventHandler(GobanView gobanView, Resources res) {
 	super(gobanView, res, false);
@@ -53,17 +56,24 @@ public class GobanEventHandler extends MultiTouchController<Object>
 
     public boolean onTouchEvent(MotionEvent event) 
     {
+ 
 	if (!super.onTouchEvent(event)) {
-	    Log.d("GobanEventHandler", "onTouchEvent: " + event);
+	    Log.d("GobanEventHandler", String.format("onTouchEvent: %s %d", event, event.getEventTime() - time));
 	    GobanEvent gobanEvent = new GobanEvent(gobanView, event);
 	    Log.d("GobanEventHandler", "gobanEvent: " + gobanEvent);
 
-	    if (event.getAction() == event.ACTION_UP) {
-		gobanView.fireGobanEvent(gobanEvent);
-	    }
-	    else
-		gobanView.setSelection(gobanEvent.getPoint());
+	    switch (event.getAction()) {
+	    case MotionEvent.ACTION_UP: 
+		if (event.getEventTime() - time > MIN_STILL_TIME) {
+		    gobanView.fireGobanEvent(gobanEvent);
+		}
+		break;
 
+	    default:
+		time = event.getEventTime();
+		gobanView.setSelection(gobanEvent.getPoint());
+		break;
+	    }
 	    return true;
 	}
 	else return true;
@@ -72,6 +82,42 @@ public class GobanEventHandler extends MultiTouchController<Object>
     public boolean onTrackballEvent(MotionEvent event) 
     {
 	Log.d("GobanEventHandler", "onTrackballEvent: " + event);
-	return false;
+	Point p = gobanView.getSelection();
+	if (p == null) p = new Point(9, 9);
+	
+	switch (event.getAction()) {
+	case MotionEvent.ACTION_UP: 
+	    if (event.getEventTime() - time > MIN_STILL_TIME) {
+		GobanEvent gobanEvent = new GobanEvent(gobanView, p);
+		Log.d("GobanEventHandler", "gobanEvent: " + gobanEvent);
+		gobanView.fireGobanEvent(gobanEvent);
+	    }
+	    break;
+	    
+	case MotionEvent.ACTION_MOVE:
+	    float  dx = event.getX();
+	    float  dy = event.getY();
+	    int x = (int) (p.getX() + Math.signum(dx));
+	    int y = (int) (p.getY() + Math.signum(dy));
+	    if (x < 0) 
+		x=0;
+	    else if (x >= gobanView.getBoardSize())
+		x = gobanView.getBoardSize() -1;
+	    if (y < 0) 
+		y=0;
+	    else if (y >= gobanView.getBoardSize())
+		y = gobanView.getBoardSize() -1;
+	    p = new Point(x, y);
+	    Log.d("GobanEventHandler", String.format("onTrackballEvent: %s (%f, %f)", p, dx, dy));
+	    /* fall through */
+	default:
+	    time = event.getEventTime();
+	    GobanEvent gobanEvent = new GobanEvent(gobanView, p);
+	    Log.d("GobanEventHandler", "gobanEvent: " + gobanEvent);
+	    gobanView.setSelection(gobanEvent.getPoint());
+	    break;
+	}
+
+	return true;
     }
 }

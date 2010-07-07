@@ -38,19 +38,22 @@ import de.cgawron.agoban.view.GobanView;
 
 public class GobanEvent
 {
-    private MotionEvent motionEvent;
     private GobanView gobanView;
     private Point point;
 
     public GobanEvent(GobanView gobanView, MotionEvent motionEvent) 
     {
-	this.motionEvent = motionEvent;
 	this.gobanView = gobanView;
-	initialize();
+	initialize(motionEvent);
     }
 
+    public GobanEvent(GobanView gobanView, Point point) 
+    {
+	this.gobanView = gobanView;
+	initialize(point);
+    }
 
-    public void initialize() 
+    public void initialize(MotionEvent motionEvent) 
     {
 	int width = gobanView.getWidth();
 	int height = gobanView.getHeight();
@@ -60,6 +63,12 @@ public class GobanEvent
 	int by = (int) (size*motionEvent.getY()/height);
 	point = new Point(bx, by);
 	Log.d("GobanEvent", String.format("initialize: (%d, %d)", bx, by));
+    }
+
+    public void initialize(Point point) 
+    {
+	this.point = point;
+	Log.d("GobanEvent", String.format("initialize: (%s)", point));
     }
 
     @Override
