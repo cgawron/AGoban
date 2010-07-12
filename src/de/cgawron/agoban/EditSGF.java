@@ -36,8 +36,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageItemInfo;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
@@ -64,7 +67,7 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
     private GameTree gameTree;
     private Node currentNode;
     private Uri data;
-    private Properties properties;
+    private String gitId;
 
     /** Called when the activity is first created. */
     @Override
@@ -72,15 +75,15 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
     {
         super.onCreate(savedInstanceState);
 	resources = getResources();
-	properties = new Properties();
 	try {
-	    properties.load(de.cgawron.agoban.EditSGF.resources.openRawResource(de.cgawron.agoban.R.raw.git));
+	    PackageItemInfo info = getPackageManager().getActivityInfo(new ComponentName(this, EditSGF.class), PackageManager.GET_META_DATA);
+	    gitId = info.metaData.getString("git-id");
 	}
 	catch (Exception e)
 	{
-	    throw new RuntimeException("git.properties", e);
+	    throw new RuntimeException("git-id", e);
 	}
-	Log.d("EditSGF", "git-id: " + properties.get("git.id"));
+	Log.d("EditSGF", "git-id: " + gitId);
 
         setContentView(R.layout.main);
 
@@ -165,7 +168,7 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 
 	case R.id.about:
 	    Context context = getApplicationContext();
-	    CharSequence text = String.format("AGoban, ©2010 Christian Gawron\nGit-Id: %s", properties.get("git.id"));
+	    CharSequence text = String.format("AGoban, ©2010 Christian Gawron\nGit-Id: %s", gitId);
 	    int duration = Toast.LENGTH_LONG;
 	    Toast toast = Toast.makeText(context, text, duration);
 	    toast.show();
