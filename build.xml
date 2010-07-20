@@ -318,7 +318,7 @@
         <echo>Packaging resources</echo>
         <aaptexec executable="${aapt}"
                 command="package"
-                manifest="{android.manifest}"
+                manifest="${android.manifest}"
                 resources="${resource.absolute.dir}"
                 assets="${asset.absolute.dir}"
                 androidjar="${android.jar}"
