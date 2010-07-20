@@ -227,6 +227,9 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	currentNode = node;
 	if (currentNode != null) {
 	    Goban goban = (MarkupModel) currentNode.getGoban();
+	    if (currentNode.getSiblingCount() > 0) {
+		Log.d("EditSGF", "siblingCount: " + currentNode.getSiblingCount());
+	    }
 	    gobanView.setGoban(goban);
 	}
     }
