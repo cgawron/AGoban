@@ -5,7 +5,9 @@
   It contains the path to the SDK. It should *NOT* be checked in in Version
   Control Systems. -->
   <property file="local.properties" />
-
+  <property name="gen.dir" value="gen" />
+  <property name="template.dir" value="template" />
+	
   <!-- The build.properties file can be created by you and is never touched
   by the 'android' tool. This is the place to change some of the default property values
   used by the Ant rules.
@@ -44,6 +46,18 @@
     <pathelement path="${sdk.dir}/tools/lib/jarutils.jar" />
   </path>
 
+  <property name="android.manifest" value="AndroidManifest.xml"/>
+    <exec executable="git" outputproperty="git.id" logError="true">
+      <arg value="describe"/>
+      <arg value="--long"/>
+    </exec>
+   
+    <echo message="id=${git.id}"/>
+   
+    <xslt in="template/AndroidManifest.xml" out="AndroidManifest.xml" style="misc/manifest.xsl" force="yes">
+      <param name="git-id" expression="${git.id}"/>
+    </xslt>
+
   <taskdef name="setup"
     classname="com.android.ant.SetupTask"
     classpathref="android.antlibs" />
@@ -62,6 +76,7 @@
          This will ensure that the properties are setup correctly but that your customized
          build steps are used.
     -->
+
   <setup import="false"/>
 
     <!-- Custom tasks -->
@@ -253,7 +268,7 @@
     </target>
 
     <!-- Generates the R.java file for this project's resources. -->
-    <target name="-resource-src" depends="-dirs, android-manifest">
+    <target name="-resource-src" depends="-dirs">
         <echo>Generating R.java / Manifest.java from the resources...</echo>
         <exec executable="${aapt}" failonerror="true">
             <arg value="package" />
@@ -284,7 +299,7 @@
     </target>
 
     <!-- Compiles this project's .java files into .class files. -->
-    <target name="compile" depends="-resource-src, -aidl, android-manifest"
+    <target name="compile" depends="-resource-src, -aidl"
                 description="Compiles project's .java files into .class files">
         <!-- If android rules are used for a test project, its classpath should include
              tested project's location -->
@@ -496,22 +511,5 @@
     </target>
 
   <!-- private tasks -->
-  <property name="gen.dir" value="gen" />
-  <property name="android.manifest" value="${gen.dir}/AndroidManifest.xml"/>
-
-  <target name="android-manifest">
-    <exec executable="git" outputproperty="git.id" logError="true">
-      <arg value="describe"/>
-      <arg value="--long"/>
-    </exec>
-    <echo message="id=${git.id}"/>
-    <propertyfile file="res/raw/git">
-      <entry key="git.id" value="${git.id}"/>
-    </propertyfile>
-    
-    <xslt in="AndroidManifest.xml" out="${android.manifest}" style="misc/manifest.xsl">
-      <param name="git-id" expression="${git.id}"/>
-    </xslt>
-  </target>
 
 </project>
