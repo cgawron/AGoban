@@ -25,6 +25,7 @@ import de.cgawron.go.sgf.MarkupModel;
 import de.cgawron.go.sgf.Node;
 
 import de.cgawron.agoban.view.GobanView;
+import de.cgawron.agoban.intent.GameInfo;
 
 import java.util.List;
 import java.util.Properties;
@@ -166,6 +167,10 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	    save();
 	    return true;
 
+	case R.id.game_info:
+	    showGameInfo();
+	    return true;
+
 	case R.id.about:
 	    Context context = getApplicationContext();
 	    CharSequence text = String.format("AGoban, ©2010 Christian Gawron\nGit-Id: %s", gitId);
@@ -177,21 +182,17 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	return false;
     }
 
-    @Override
     public void onProgressChanged(SeekBar  seekBar, int moveNo, boolean fromUser) {
 	Log.d("EditSGF", "move " + moveNo);
 	setCurrentNode(gameTree.getMove(moveNo));
     }
 
-    @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
     }
 
-    @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
     }
 
-    @Override
     public void onGobanEvent(GobanEvent gobanEvent) {
 	Log.d("EditSGF", "onGobanEvent: " + gobanEvent);
 	if (currentNode != null) {
@@ -252,5 +253,11 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	catch (Exception ex) {
 	    Log.e("EditSGF", "Exception while saving SGF", ex);
        }
+    }
+
+    public void showGameInfo() {
+	Log.d("EditSGF", "Show game info");
+	Intent viewGameInfo = new GameInfo(gameTree);
+	startActivity(viewGameInfo);
     }
 }
