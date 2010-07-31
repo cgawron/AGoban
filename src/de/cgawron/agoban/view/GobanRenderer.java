@@ -16,23 +16,14 @@
 
 package de.cgawron.agoban.view;
 
-// Need the following import to get access to the app resources, since this
-// class is in a sub-package.
-import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
-import android.view.OrientationEventListener;
 
 import de.cgawron.go.Goban;
 import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
-import de.cgawron.agoban.R;
-
 
 /**
  * A {@code GobanRenderer} can render a {@link Goban} on a {@link Canvas}.

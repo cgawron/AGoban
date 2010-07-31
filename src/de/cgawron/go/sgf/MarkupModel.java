@@ -1,6 +1,6 @@
 /*
  *
- * $Id: MarkupModel.java 369 2006-04-14 17:04:02Z cgawron $
+ * $Id$
  *
  * (c) 2001 Christian Gawron. All rights reserved.
  *
@@ -14,19 +14,14 @@
 package de.cgawron.go.sgf;
 
 import de.cgawron.go.Goban;
-import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
-import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
-
-import java.util.logging.Logger;
 
 /**
  * Represents markup on a goban - move numbers, letters, views.
  * @see GobanModel
  * @see Goban
- * @version $Id: MarkupModel.java 369 2006-04-14 17:04:02Z cgawron $
+ * @version $Id$
  */
 public interface MarkupModel extends Goban
 {

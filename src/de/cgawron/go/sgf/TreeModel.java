@@ -65,7 +65,7 @@ public interface TreeModel
      *
      * @return  the root of the tree
      */
-    public Object getRoot();
+    public TreeNode getRoot();
 
 
     /**
@@ -80,7 +80,7 @@ public interface TreeModel
      * @param   parent  a node in the tree, obtained from this data source
      * @return  the child of <code>parent</code> at index <code>index</code>
      */
-    public Object getChild(Object parent, int index);
+    public TreeNode getChild(TreeNode parent, int index);
 
 
     /**

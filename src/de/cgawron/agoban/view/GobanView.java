@@ -18,45 +18,38 @@ package de.cgawron.agoban.view;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
 import android.view.MotionEvent;
-
-import de.cgawron.go.Goban;
-import de.cgawron.go.Goban.BoardType;
-import de.cgawron.go.Point;
-
-import de.cgawron.agoban.R;
+import android.view.View;
 import de.cgawron.agoban.GobanEvent;
 import de.cgawron.agoban.GobanEventListener;
-
-import java.util.List;
-import java.util.ArrayList;
-
-import demo.multitouch.controller.MultiTouchController.MultiTouchObjectCanvas;
-import demo.multitouch.controller.MultiTouchController.PointInfo;
-import demo.multitouch.controller.MultiTouchController.PositionAndScale;
+import de.cgawron.agoban.R;
+import de.cgawron.go.Goban;
+import de.cgawron.go.Point;
+import demo.MultiTouchController.PointInfo;
+import demo.MultiTouchController.PositionAndScale;
 
 /**
  * A {@link View} to be used for {@link de.cgawron.go.Goban} 
  *
  */
-public class GobanView extends View implements MultiTouchObjectCanvas<Object> 
+public class GobanView extends View implements demo.MultiTouchController.MultiTouchObjectCanvas<Object> 
 {
     private Goban goban;
     private GobanRenderer renderer;
-    private List<GobanEventListener> listeners = new ArrayList<GobanEventListener>();
+    private final List<GobanEventListener> listeners = new ArrayList<GobanEventListener>();
     private GobanEventHandler gobanEventHandler ;
     private Point selection;
 
-    private float xOff = 0.0f, yOff = 0.0f, relativeScale = 1.0f;
+    private final float xOff = 0.0f, yOff = 0.0f, relativeScale = 1.0f;
 
     /**
      * Constructor.  This version is only needed if you will be instantiating
@@ -93,6 +86,9 @@ public class GobanView extends View implements MultiTouchObjectCanvas<Object>
     private final void initGobanView() {
 	// Create Event handler
 	gobanEventHandler = new GobanEventHandler(this, getResources());
+	setOnTouchListener(gobanEventHandler);
+	//setOnClickListener(gobanEventHandler);
+	setOnLongClickListener(gobanEventHandler);
 
 	renderer = new GobanRenderer(this);
     }
@@ -130,6 +126,7 @@ public class GobanView extends View implements MultiTouchObjectCanvas<Object>
 	boolean clip = canvas.getClipBounds(bounds);
 	Log.d("Goban", "onDraw, clip=" + clip);
 
+	if (goban == null) return;
 	int size = goban.getBoardSize();
 	int width = getWidth();
 	int height = getHeight();
@@ -141,6 +138,7 @@ public class GobanView extends View implements MultiTouchObjectCanvas<Object>
 	renderer.render(goban, canvas);
     }
 
+    /*
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 	if (!gobanEventHandler.onTouchEvent(event))
@@ -148,6 +146,7 @@ public class GobanView extends View implements MultiTouchObjectCanvas<Object>
 	else
 	    return true;
     }
+    */
 
     @Override
     public boolean onTrackballEvent(MotionEvent event) {
@@ -157,20 +156,16 @@ public class GobanView extends View implements MultiTouchObjectCanvas<Object>
 	    return true;
     }
     
-    
-    @Override
     public Object getDraggableObjectAtPoint(PointInfo pt) {
 	// We do not support dragging on a goban
 	return null;
     }
 
-    @Override
     public void getPositionAndScale(Object obj, PositionAndScale objPosAndScaleOut) {
 	// We start at 0.0f each time the drag position is replaced, because we just want the relative drag distance 
 	objPosAndScaleOut.set(xOff, yOff, relativeScale);
     }
 
-    @Override
     public void selectObject(Object obj, PointInfo pt) {
 	int width = getWidth();
 	int height = getHeight();
@@ -186,11 +181,8 @@ public class GobanView extends View implements MultiTouchObjectCanvas<Object>
 	invalidate();
     }
 	
-    @Override
     public boolean setPositionAndScale(Object obj, PositionAndScale update, PointInfo touchPoint) {
 	// Get new offsets and coords
-	float newXOff = update.getXOff();
-	float newYOff = update.getYOff();
 	float newRelativeScale = update.getScale();
 	Log.d("Goban", "multitouch: " + newRelativeScale);
 

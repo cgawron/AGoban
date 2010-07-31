@@ -65,5 +65,5 @@ public interface TreeNode
     /**
      * Returns the children of the receiver as an <code>Enumeration</code>.
      */
-    Enumeration children();
+    Enumeration<TreeNode> children();
 }

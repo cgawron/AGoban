@@ -1,6 +1,6 @@
 /*
  *
- * $Id: TreeIterator.java 363 2005-12-15 23:28:33Z cgawron $
+ * $Id$
  *
  * © 2001 Christian Gawron. All rights reserved.
  *
@@ -78,7 +78,7 @@ public class TreeIterator<N extends TreeNode> implements Iterator<N>
 	    Enumeration<TreeNode> en = node.children();
 	    while (en.hasMoreElements())
 	    {
-		TreeNode n = en.nextElement();
+		N n = (N) en.nextElement();
 		tmp.add((N) n);
 	    }
             Iterator<N> children = tmp.iterator();
@@ -232,14 +232,14 @@ public class TreeIterator<N extends TreeNode> implements Iterator<N>
             Iterator<N> it = stack.peek();
             N node = it.next();
             logger.debug("DepthFirstIterator " + this + ": node " + node);
-            Iterator<N> children = new EnumIterator(node.children());
+            Iterator<TreeNode> children = new EnumIterator<TreeNode>(node.children());
             if (!it.hasNext())
             {
                 stack.pop();
             }
             if (children.hasNext())
             {
-                stack.push(children);
+                stack.push((Iterator<N>) children);
             }
             return node;
         }
@@ -298,11 +298,11 @@ public class TreeIterator<N extends TreeNode> implements Iterator<N>
     }
 
 
-    static class EnumIterator implements Iterator
+    static class EnumIterator<N extends TreeNode> implements Iterator<N>
     {
-        Enumeration e;
+        Enumeration<N> e;
 
-        EnumIterator(Enumeration e)
+        EnumIterator(Enumeration<N> e)
         {
             this.e = e;
         }
@@ -312,7 +312,7 @@ public class TreeIterator<N extends TreeNode> implements Iterator<N>
             return e.hasMoreElements();
         }
 
-        public Object next()
+        public N next()
         {
             return e.nextElement();
         }

@@ -1,6 +1,6 @@
 /*
  *
- * $Id: GobanModelEvent.java 97 2004-08-21 18:35:50Z  $
+ * $Id$
  *
  * (c) 2001 Christian Gawron. All rights reserved.
  *
@@ -25,7 +25,9 @@ import java.util.Vector;
 
 public class GobanEvent extends EventObject
 {
-    protected Vector<Point> points;
+	private static final long serialVersionUID = -3305394382897241209L;
+	
+	protected Vector<Point> points;
     protected BoardType color;
 
     /** GobanEvent constructor comment. */
@@ -81,7 +83,7 @@ public class GobanEvent extends EventObject
      * Insert the method's description here. Creation date: (03/23/00 23:22:53)
      * @return java.util.Vector
      */
-    public Vector getPoints()
+    public Vector<Point> getPoints()
     {
         return points;
     }

@@ -16,32 +16,18 @@
 
 package de.cgawron.agoban;
 
-import de.cgawron.go.Goban;
-import static de.cgawron.go.Goban.BoardType.WHITE;
-import static de.cgawron.go.Goban.BoardType.BLACK;
-import de.cgawron.go.SimpleGoban;
-import de.cgawron.go.sgf.GameTree;
-import de.cgawron.go.sgf.MarkupModel;
-import de.cgawron.go.sgf.Node;
-
-import de.cgawron.agoban.view.GobanView;
-import de.cgawron.agoban.intent.GameInfo;
-
-import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.UUID;
 
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.pm.PackageItemInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
@@ -55,6 +41,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.Toast;
+import de.cgawron.agoban.intent.GameInfo;
+import de.cgawron.agoban.view.GobanView;
+import de.cgawron.go.Goban;
+import de.cgawron.go.sgf.GameTree;
+import de.cgawron.go.sgf.Node;
 
 /**
  * Provides an sgf editor.
@@ -86,7 +77,7 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	}
 	Log.d("EditSGF", "git-id: " + gitId);
 
-        setContentView(R.layout.main);
+	setContentView(R.layout.main);
 
 	gobanView = (GobanView) findViewById(R.id.goban);
 	gobanView.addGobanEventListener(this);
@@ -148,7 +139,7 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	seekBar.setMax(gameTree.getNoOfMoves());
 	seekBar.setKeyProgressIncrement(1);
 	
-	Goban goban = (MarkupModel) gameTree.getRoot().getGoban();
+	Goban goban = gameTree.getRoot().getGoban();
 	gobanView.setGoban(goban);
 
     }
@@ -227,7 +218,7 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
     public void setCurrentNode(Node node) {
 	currentNode = node;
 	if (currentNode != null) {
-	    Goban goban = (MarkupModel) currentNode.getGoban();
+	    Goban goban = currentNode.getGoban();
 	    if (currentNode.getSiblingCount() > 0) {
 		Log.d("EditSGF", "siblingCount: " + currentNode.getSiblingCount());
 	    }

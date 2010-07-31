@@ -1,6 +1,6 @@
 /*
  *
- * $Id: NeighborhoodEnumeration.java 15 2003-03-15 23:25:52Z cgawron $
+ * $Id$
  *
  * (c) 2010 Christian Gawron. All rights reserved.
  *
@@ -20,7 +20,7 @@ package de.cgawron.go;
 import de.cgawron.go.Point;
 import java.util.Enumeration;
 
-public class NeighborhoodEnumeration implements Enumeration
+public class NeighborhoodEnumeration implements Enumeration<Point>
 {
     protected int direction;
     protected int size;
@@ -73,7 +73,7 @@ public class NeighborhoodEnumeration implements Enumeration
     }
 
     /** nextElement method comment. */
-    public Object nextElement()
+    public Point nextElement()
     {
         Point p = nextPoint;
         calcNext();

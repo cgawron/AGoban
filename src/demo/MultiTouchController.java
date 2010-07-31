@@ -1,4 +1,4 @@
-package demo.multitouch.controller;
+package demo;
 
 /**
  * MultiTouchController.java

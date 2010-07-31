@@ -1,6 +1,6 @@
 /*
  *
- * $Id: Value.java 129 2004-10-21 17:16:09Z cgawron $
+ * $Id$
  *
  * © 2001 Christian Gawron. All rights reserved.
  *
@@ -13,11 +13,8 @@
 
 package de.cgawron.go.sgf;
 
-import de.cgawron.go.MutablePoint;
 import de.cgawron.go.Symmetry;
 import java.io.PrintWriter;
-import java.util.*;
-import java.util.logging.Logger;
 
 /**
  * A value of a {@link Property}

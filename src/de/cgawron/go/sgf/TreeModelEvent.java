@@ -49,7 +49,8 @@ import java.util.EventObject;
  * @author Scott Violet
  */
 public class TreeModelEvent extends EventObject {
-    /** Path to the parent of the nodes that have changed. */
+   	private static final long serialVersionUID = 615897123779784218L;
+	/** Path to the parent of the nodes that have changed. */
     protected TreePath  path;
     /** Indices identifying the position of where the children were. */
     protected int[]     childIndices;

@@ -16,32 +16,17 @@
 
 package de.cgawron.agoban.view;
 
-// Need the following import to get access to the app resources, since this
-// class is in a sub-package.
-import android.content.Context;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import de.cgawron.go.Goban;
-import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
-
-import de.cgawron.agoban.R;
 import de.cgawron.agoban.GobanEvent;
 
-import demo.multitouch.controller.MultiTouchController;
-import demo.multitouch.controller.MultiTouchController.MultiTouchObjectCanvas;
-import demo.multitouch.controller.MultiTouchController.PointInfo;
-import demo.multitouch.controller.MultiTouchController.PositionAndScale;
+import demo.MultiTouchController;
 
-public class GobanEventHandler extends MultiTouchController<Object>
+public class GobanEventHandler extends MultiTouchController<Object> implements View.OnLongClickListener, View.OnTouchListener
 {
     private static int MIN_STILL_TIME = 100;
 
@@ -54,7 +39,7 @@ public class GobanEventHandler extends MultiTouchController<Object>
     }
 
 
-    public boolean onTouchEvent(MotionEvent event) 
+    public boolean onTouch(View view, MotionEvent event) 
     {
  
 	if (!super.onTouchEvent(event)) {
@@ -118,6 +103,12 @@ public class GobanEventHandler extends MultiTouchController<Object>
 	    break;
 	}
 
+	return true;
+    }
+
+    public boolean onLongClick(View view) 
+    {
+	Log.d("GobanEventHandler", "onLongClick");
 	return true;
     }
 }

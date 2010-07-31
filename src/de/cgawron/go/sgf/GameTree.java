@@ -40,7 +40,7 @@ import org.apache.log4j.Logger;
  */
 public class GameTree implements TreeModel, PropertyChangeListener, MementoOriginator
 {
-    private static String cvsId = "$Id: GameTree.java 369 2006-04-14 17:04:02Z cgawron $";
+    private static String cvsId = "$Id$";
     private static Logger logger = Logger.getLogger(GameTree.class.getName());
 
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
@@ -437,7 +437,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
      * @param   parent  a node in the tree, obtained from this data source
      * @return  the child of <I>parent</I> at index <I>index</I>
      */
-    public Object getChild(Object parent, int index)
+    public TreeNode getChild(TreeNode parent, int index)
     {
         if (parent instanceof TreeNode) {
 	    TreeNode node = (TreeNode)parent;

@@ -1,6 +1,6 @@
 /*
  *
- * $Id: TreeVisitor.java 98 2004-08-26 21:46:15Z  $
+ * $Id$
  *
  * © 2001 Christian Gawron. All rights reserved.
  *

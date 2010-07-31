@@ -1,6 +1,6 @@
 /*
  *
- * $Id: Point.java 289 2005-08-15 09:44:31Z cgawron $
+ * $Id$
  *
  * (c) 2001 Christian Gawron. All rights reserved.
  *
@@ -181,7 +181,7 @@ public class Point implements Comparable<Point>
     /** 
      * An Iterator traversing all points on a goban.
      */
-    public static class BoardIterator implements java.util.Iterator
+    public static class BoardIterator implements java.util.Iterator<Point>
     {
 	private Point p = new Point();
 	private int boardSize;
@@ -202,7 +202,7 @@ public class Point implements Comparable<Point>
 	    return (p.y < boardSize - 1) || (p.y == boardSize - 1 && p.x < boardSize - 1);
 	}
 	
-	public Object next()
+	public Point next()
 	{
 	    p.x++;
 	    if (p.x == boardSize) {
