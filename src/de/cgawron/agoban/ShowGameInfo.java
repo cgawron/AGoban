@@ -16,50 +16,18 @@
 
 package de.cgawron.agoban;
 
-import de.cgawron.go.Goban;
-import static de.cgawron.go.Goban.BoardType.WHITE;
-import static de.cgawron.go.Goban.BoardType.BLACK;
-import de.cgawron.go.SimpleGoban;
-import de.cgawron.go.sgf.GameTree;
-import de.cgawron.go.sgf.MarkupModel;
-import de.cgawron.go.sgf.Node;
-
-import de.cgawron.agoban.view.GobanView;
-import de.cgawron.agoban.intent.GameInfo;
-
-import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-
-import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
+import android.app.TabActivity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageItemInfo;
 import android.content.res.Resources;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.SeekBar;
-import android.widget.Toast;
+import android.widget.TabHost;
+import de.cgawron.go.sgf.GameTree;
 
 /**
  * Shows the game info
  */
-public class ShowGameInfo extends Activity
+public class ShowGameInfo extends TabActivity
 {
     public static Resources resources;
 
@@ -71,13 +39,24 @@ public class ShowGameInfo extends Activity
     {
         super.onCreate(savedInstanceState);
 	resources = getResources();
-	try {
-	    PackageItemInfo info = getPackageManager().getActivityInfo(new ComponentName(this, EditSGF.class), PackageManager.GET_META_DATA);
-	}
-	catch (Exception e)
-	{
-	    throw new RuntimeException("git-id", e);
-	}
+	super.onCreate(savedInstanceState);
+	setContentView(R.layout.game_info);
+
+	Resources res = getResources(); // Resource object to get Drawables
+	TabHost tabHost = getTabHost();  // The activity TabHost
+	TabHost.TabSpec spec;  // Resusable TabSpec for each tab
+	Intent intent;  // Reusable Intent for each tab
+	
+	// Create an Intent to launch an Activity for the tab (to be reused)
+	// intent = new Intent().setClass(this, ArtistsActivity.class);
+	intent = new Intent(Intent.ACTION_VIEW); //.setClass(this, Show.class);
+	
+	// Initialize a TabSpec for each tab and add it to the TabHost
+	spec = tabHost.newTabSpec("artists").setIndicator("Artists").setContent(intent);
+	tabHost.addTab(spec);
+	
+	tabHost.setCurrentTab(1);
+	
 	Log.d("ShowGameInfo", "starting!");
 
         setContentView(R.layout.game_info);
