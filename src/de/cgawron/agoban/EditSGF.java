@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.UUID;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -58,14 +57,15 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
     private SeekBar seekBar;
     private GameTree gameTree;
     private Node currentNode;
-    private Uri data;
     private String gitId;
+    private SGFApplication application;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+	application = (SGFApplication) getApplication();
 	resources = getResources();
 	try {
 	    PackageItemInfo info = getPackageManager().getActivityInfo(new ComponentName(this, EditSGF.class), PackageManager.GET_META_DATA);
@@ -88,17 +88,9 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	seekBar.requestFocus();
 
 	Intent intent = getIntent();
-	data = intent.getData();
+	application.setData(intent.getData());
 
 	gameTree = null;
-	if (data == null) {
-	    File file = getNewFile();
-	    Uri.Builder ub = new Uri.Builder();
-	    ub.path(file.getAbsolutePath());
-	    ub.scheme("file");
-	    data = ub.build();
-	}
-	Log.d("EditSGF", "OnCreate: data=" + data);
     }
 
     @Override
@@ -111,29 +103,14 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 
 	return new File(directory, name);
     }
-    
-    public File getNewFile() {
-	return getFileStreamPath(UUID.randomUUID().toString() + ".sgf");
-    }
-    
+        
     @Override
     public void onStart() {
 	super.onStart();
-	Log.d("EditSGF", "OnStart: data=" + data);
+	Log.d("EditSGF", "OnStart");
 
-	if (data != null)
-	{
-	    try {
-		InputStream is = getContentResolver().openInputStream(data);
-		gameTree = new GameTree(new InputStreamReader(is));
-	    }
-	    catch (Exception ex) {
-		Log.e("EditSGF", "Exception while parsing SGF", ex);
-		gameTree = new GameTree();
-	    }
-	    
-	}
-	else gameTree = new GameTree();
+	application.init();
+	gameTree = application.get(application.KEY_DEFAULT); 
 	currentNode = gameTree.getRoot();
 
 	seekBar.setMax(gameTree.getNoOfMoves());
@@ -227,28 +204,13 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
     }
 
     public void save() {
-	if (data == null) {
-	    File file = getFileStreamPath("test.sgf");
-	    Uri.Builder ub = new Uri.Builder();
-	    ub.path(file.getAbsolutePath());
-	    ub.scheme("file");
-	    data = ub.build();
-	}
-	
-	Log.d("EditSGF", "saving " + data);
-	try {
-	    OutputStream os = getContentResolver().openOutputStream(data);
-	    gameTree.save(os);
-	    os.close();
-	}
-	catch (Exception ex) {
-	    Log.e("EditSGF", "Exception while saving SGF", ex);
-       }
+	application.save();
     }
 
     public void showGameInfo() {
 	Log.d("EditSGF", "Show game info");
 	Intent viewGameInfo = new GameInfo(gameTree);
+	Log.d("EditSGF", "thread: " + Thread.currentThread().getId() + " " + viewGameInfo.getClass().toString());
 	startActivity(viewGameInfo);
     }
 }

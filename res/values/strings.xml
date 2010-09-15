@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">EditSGF</string>
+    <string name="AP">Application</string>
+    <string name="PW">White</string>
+    <string name="PB">Black</string>
 </resources>

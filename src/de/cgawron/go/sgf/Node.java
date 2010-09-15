@@ -1,6 +1,6 @@
 /*
  *
- * $Id: Node.java 369 2006-04-14 17:04:02Z cgawron $
+ * $Id$
  *
  * © 2001 Christian Gawron. All rights reserved.
  *
@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
 /**
  * An instance of this class represents a node in a sgf game tree.
  * @author Christian Gawron
- * @version $Id: Node.java 369 2006-04-14 17:04:02Z cgawron $
+ * @version $Id$
  */
 public class Node 
     extends PropertyList 
@@ -1147,6 +1147,7 @@ public class Node
     {
 	setFileFormat(4);
 	setGame(1);
+	setProperty(Property.APPLICATION, "AGoban");
 	//setProperty(Property.APPLICATION, "GoDiagram:" + GoDiagram.getVersion());
 	/*
 	Charset defaultCharset = Charset.forName(new OutputStreamWriter(System.out).getEncoding());

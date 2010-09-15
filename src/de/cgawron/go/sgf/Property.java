@@ -1,3 +1,4 @@
+
 /*
  *
  * © 2001 Christian Gawron. All rights reserved.
@@ -24,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import android.util.Log;
 
 /**
  * This class represents an SGF property.
@@ -51,7 +53,7 @@ public class Property implements Cloneable
 	 * Only uppercase characters are relevant according to the SGF spec.
 	 * @param name the name of the Key
 	 */
-        Key(String name)
+        public Key(String name)
         {
             StringBuffer shortName = new StringBuffer(2);
             for (int i = 0; i < name.length(); i++)
@@ -332,8 +334,8 @@ public class Property implements Cloneable
             try
             {
                 argv[0] = key;
-		// logger.debug("Creating property for key " + argv[0] + " " + argt[0]);
                 propertyClass = getDescriptor(key).getPropertyClass();
+		Log.d("Property$Factory", "Creating property for key " + argv[0] + " " + argt[0]+ " " + propertyClass);
                 Constructor c = propertyClass.getConstructor(argt);
                 return (Property)c.newInstance(argv);
             }
@@ -378,6 +380,7 @@ public class Property implements Cloneable
                 argv2[1] = s.substring(1, s.length()-1);
 		// logger.debug("Creating property for key " + argv2[0] + " " + argv2[1]);
                 propertyClass = getDescriptor(key).getPropertyClass();
+		Log.d("Property$Factory", "Creating property for key " + argv[0] + " " + argt[0]+ " " + propertyClass);
                 Constructor c = propertyClass.getConstructor(argt2);
                 return (Property)c.newInstance(argv2);
             }

@@ -1,29 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"         
-  xmlns:app="http://schemas.android.com/apk/res/de.cgawron.agoban"
-
+    xmlns:android="http://schemas.android.com/apk/res/android"         
+    xmlns:app="http://schemas.android.com/apk/res/de.cgawron.agoban"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
-
-    <de.cgawron.agoban.view.GobanView 
+    android:layout_height="fill_parent">
+  <de.cgawron.agoban.view.GobanView 
       android:id="@+id/goban"  
       android:layout_width="fill_parent" 
       android:layout_height="fill_parent" 
       android:focusableInTouchMode="true"
       android:clickable="true"
       app:textColor="@drawable/red"
-      app:text="Hello World, EditSGF"
-    />
- 
-    <SeekBar 
+      app:text="Hello World, EditSGF"/>
+  <SeekBar 
       android:text="move" 
       android:id="@+id/seekBar"  
       android:focusable="true"
       android:layout_width="fill_parent" 
-      android:layout_height="wrap_content" 
-    />
+      android:layout_height="wrap_content"/>
 </LinearLayout>
 

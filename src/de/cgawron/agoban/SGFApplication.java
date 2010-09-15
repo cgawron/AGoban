@@ -17,10 +17,17 @@
 package de.cgawron.agoban;
 
 import android.app.Application;
+import android.util.Log;
+import android.net.Uri;
 
 import de.cgawron.go.sgf.GameTree;
 
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Application class for EditSGF.
@@ -28,12 +35,36 @@ import java.util.Map;
  */
 public class SGFApplication extends Application
 {
+    public static String KEY_DEFAULT = "default";
+
     private Map<String, GameTree> gameTreeMap;
+    private Uri data;
 
     public SGFApplication()
     {
 	super();
 	gameTreeMap = new java.util.HashMap<String, GameTree>();
+    }
+
+    public void init()
+    {
+	GameTree gameTree = null;
+	if (data != null)
+	{
+	    try {
+		InputStream is = getContentResolver().openInputStream(data);
+		gameTree = new GameTree(new InputStreamReader(is));
+		put(KEY_DEFAULT, gameTree); 
+	    }
+	    catch (Exception ex) {
+		Log.e("EditSGF", "Exception while parsing SGF", ex);
+		gameTree = new GameTree();
+		put(KEY_DEFAULT, gameTree); 
+	    }
+	    
+	}
+	else gameTree = new GameTree();
+	put(KEY_DEFAULT, gameTree); 
     }
 
     public void put(String key, GameTree gameTree)
@@ -44,5 +75,45 @@ public class SGFApplication extends Application
     public GameTree get(String key)
     {
 	return gameTreeMap.get(key);
+    }
+
+    public GameTree getGameTree()
+    {
+	return get(KEY_DEFAULT);
+    }
+
+    public void setData(Uri data)
+    {
+	if (data == null) {
+	    File file = getNewFile();
+	    Uri.Builder ub = new Uri.Builder();
+	    ub.path(file.getAbsolutePath());
+	    ub.scheme("file");
+	    data = ub.build();
+	}
+    }
+
+    public File getNewFile() {
+	return getFileStreamPath(UUID.randomUUID().toString() + ".sgf");
+    }
+
+    public void save() {
+	if (data == null) {
+	    File file = getFileStreamPath("test.sgf");
+	    Uri.Builder ub = new Uri.Builder();
+	    ub.path(file.getAbsolutePath());
+	    ub.scheme("file");
+	    data = ub.build();
+	}
+	
+	Log.d("SGFApplication", "saving " + data);
+	try {
+	    OutputStream os = getContentResolver().openOutputStream(data);
+	    gameTreeMap.get(KEY_DEFAULT).save(os);
+	    os.close();
+	}
+	catch (Exception ex) {
+	    Log.e("SGFApplication", "Exception while saving SGF", ex);
+       }
     }
 }

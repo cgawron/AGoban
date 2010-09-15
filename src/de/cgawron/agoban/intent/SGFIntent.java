@@ -63,4 +63,9 @@ public class SGFIntent extends Intent
 	super(action);
 	this.gameTree = gameTree;
     }
+
+    public GameTree getGameTree()
+    {
+	return gameTree;
+    }
 }

@@ -2,16 +2,51 @@
 
 <TabHost 
   xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:cgawron="http://cgawron"
   android:id="@android:id/tabhost"
   android:layout_width="fill_parent"
   android:layout_height="fill_parent">
-    <TabWidget
-      android:id="@android:id/tabs"
-      android:layout_width="fill_parent"
-      android:layout_height="wrap_content" />
-    <FrameLayout
-      android:id="@android:id/tabcontent"
+  <LinearLayout
+      android:orientation="vertical"
       android:layout_width="fill_parent"
       android:layout_height="fill_parent"
-      android:padding="5dp" />
+      android:padding="5dp">
+    <TabWidget
+	android:id="@android:id/tabs"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content" />
+    <FrameLayout
+	android:id="@android:id/tabcontent"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:padding="5dp">
+      <LinearLayout
+	  android:id="@+id/players"
+	  android:orientation="vertical"
+	  android:layout_width="fill_parent" 
+	  android:layout_height="fill_parent">
+	<de.cgawron.agoban.view.PropertyView
+	    cgawron:property="PW"
+	    cgawron:label="@string/PW"
+	    android:id="@+id/PW"
+	    android:focusable="true"
+	    android:layout_width="wrap_content" 
+	    android:layout_height="wrap_content"/>
+	<de.cgawron.agoban.view.PropertyView
+	    cgawron:property="PB"
+	    cgawron:label="@string/PB"
+	    android:id="@+id/PB"
+	    android:focusable="true"
+	    android:layout_width="wrap_content" 
+	    android:layout_height="wrap_content"/>
+      </LinearLayout>
+
+      <TextView
+	  android:text="rules" 
+	  android:id="@+id/rules"  
+	  android:focusable="true"
+	  android:layout_width="wrap_content" 
+	  android:layout_height="wrap_content"/>
+    </FrameLayout>
+  </LinearLayout>
 </TabHost>
