@@ -23,11 +23,13 @@ import java.io.OutputStream;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageItemInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -42,6 +44,7 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 import de.cgawron.agoban.intent.GameInfo;
 import de.cgawron.agoban.view.GobanView;
+import de.cgawron.agoban.provider.SGFProvider;
 import de.cgawron.go.Goban;
 import de.cgawron.go.sgf.GameTree;
 import de.cgawron.go.sgf.Node;
@@ -88,6 +91,7 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	seekBar.requestFocus();
 
 	Intent intent = getIntent();
+	Log.d("EditSGF", "Uri: " + intent.getData());
 	application.setData(intent.getData());
 
 	gameTree = null;
@@ -133,6 +137,10 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	switch (item.getItemId()) {
 	case R.id.save:
 	    save();
+	    return true;
+
+	case R.id.open:
+	    open();
 	    return true;
 
 	case R.id.game_info:
@@ -205,6 +213,12 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 
     public void save() {
 	application.save();
+    }
+
+    public void open() {
+	ContentResolver resolver = getContentResolver();
+	Cursor cursor = resolver.query(SGFProvider.CONTENT_URI, null, null, null, null);
+	//application.open();
     }
 
     public void showGameInfo() {

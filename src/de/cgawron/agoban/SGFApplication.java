@@ -91,6 +91,7 @@ public class SGFApplication extends Application
 	    ub.scheme("file");
 	    data = ub.build();
 	}
+	this.data = data;
     }
 
     public File getNewFile() {
