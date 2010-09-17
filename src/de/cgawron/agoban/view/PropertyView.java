@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2010 Christian Gawron
  *
@@ -30,9 +31,10 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
 
 import de.cgawron.agoban.SGFApplication;
 import de.cgawron.agoban.R;
@@ -46,7 +48,7 @@ import de.cgawron.go.sgf.Value;
  * A {@link View} to be used for {@link de.cgawron.go.Goban} 
  *
  */
-public class PropertyView extends LinearLayout implements TextWatcher
+public class PropertyView extends TableRow implements TextWatcher
 {
     SGFApplication application;
     private PropertyList properties;
@@ -97,10 +99,12 @@ public class PropertyView extends LinearLayout implements TextWatcher
 
     protected void init(Context context)
     {
+	TableRow.LayoutParams params = new TableRow.LayoutParams(1);
 	label = new TextView(context);
 	text = new EditText(context);
+	label.setPadding(0, 0, 5, 0);
 	addView(label);
-	addView(text);
+	addView(text, params);
 	text.addTextChangedListener(this);
 	initText();
     }

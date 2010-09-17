@@ -20,9 +20,11 @@
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
 	android:padding="5dp">
-      <LinearLayout
+      <TableLayout
 	  android:id="@+id/players"
+	  android:focusable="true"
 	  android:orientation="vertical"
+	  android:stretchColumns="1"
 	  android:layout_width="fill_parent" 
 	  android:layout_height="fill_parent">
 	<de.cgawron.agoban.view.PropertyView
@@ -30,21 +32,20 @@
 	    cgawron:label="@string/PW"
 	    android:id="@+id/PW"
 	    android:focusable="true"
-	    android:layout_width="wrap_content" 
+	    android:layout_width="fill_parent" 
 	    android:layout_height="wrap_content"/>
 	<de.cgawron.agoban.view.PropertyView
 	    cgawron:property="PB"
 	    cgawron:label="@string/PB"
 	    android:id="@+id/PB"
 	    android:focusable="true"
-	    android:layout_width="wrap_content" 
+	    android:layout_width="fill_parent" 
 	    android:layout_height="wrap_content"/>
-      </LinearLayout>
+      </TableLayout>
 
       <TextView
 	  android:text="rules" 
 	  android:id="@+id/rules"  
-	  android:focusable="true"
 	  android:layout_width="wrap_content" 
 	  android:layout_height="wrap_content"/>
     </FrameLayout>

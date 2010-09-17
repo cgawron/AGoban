@@ -55,12 +55,12 @@ public class ShowGameInfo extends TabActivity
 	TabHost.TabSpec spec;  // Resusable TabSpec for each tab
 	
 	// Initialize a TabSpec for each tab and add it to the TabHost
-	spec = tabHost.newTabSpec("players").setIndicator("Players").setContent(R.id.players);
+	spec = tabHost.newTabSpec("player").setIndicator(res.getString(R.string.player)).setContent(R.id.players);
 	tabHost.addTab(spec);
 	spec = tabHost.newTabSpec("rules").setIndicator("Rules").setContent(R.id.rules);
 	tabHost.addTab(spec);
 	
-	tabHost.setCurrentTab(1);
+	tabHost.setCurrentTab(0);
 	
 	Log.d("ShowGameInfo", "starting!");
     }
