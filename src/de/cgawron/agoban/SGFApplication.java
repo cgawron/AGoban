@@ -21,6 +21,7 @@ import android.util.Log;
 import android.net.Uri;
 
 import de.cgawron.go.sgf.GameTree;
+import de.cgawron.agoban.provider.SGFProvider;
 
 import java.io.File;
 import java.io.InputStream;
@@ -85,13 +86,14 @@ public class SGFApplication extends Application
     public void setData(Uri data)
     {
 	if (data == null) {
-	    File file = getNewFile();
-	    Uri.Builder ub = new Uri.Builder();
-	    ub.path(file.getAbsolutePath());
-	    ub.scheme("file");
-	    data = ub.build();
+	    data = getContentResolver().insert(SGFProvider.CONTENT_URI, null);
 	}
 	this.data = data;
+    }
+
+    public Uri getData()
+    {
+	return data;
     }
 
     public File getNewFile() {
@@ -100,11 +102,7 @@ public class SGFApplication extends Application
 
     public void save() {
 	if (data == null) {
-	    File file = getFileStreamPath("test.sgf");
-	    Uri.Builder ub = new Uri.Builder();
-	    ub.path(file.getAbsolutePath());
-	    ub.scheme("file");
-	    data = ub.build();
+	    setData(null);
 	}
 	
 	Log.d("SGFApplication", "saving " + data);

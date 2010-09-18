@@ -216,14 +216,18 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
     }
 
     public void open() {
-	ContentResolver resolver = getContentResolver();
-	Cursor cursor = resolver.query(SGFProvider.CONTENT_URI, null, null, null, null);
-	//application.open();
+	Log.d("EditSGF", "open()");
+	Intent openSGF = new Intent(Intent.ACTION_SEARCH, SGFProvider.CONTENT_URI, this, ChooseSGF.class);
+	//Log.d("EditSGF", "thread: " + Thread.currentThread().getId() + " " + openSGF.getClass().toString());
+	startActivity(openSGF);
+	finish();
     }
 
     public void showGameInfo() {
 	Log.d("EditSGF", "Show game info");
-	Intent viewGameInfo = new GameInfo(gameTree);
+	Intent viewGameInfo = new Intent(Intent.ACTION_VIEW, application.getData());
+	viewGameInfo.setClassName("de.cgawron.agoban", "de.cgawron.agoban.ShowGameInfo");
+
 	Log.d("EditSGF", "thread: " + Thread.currentThread().getId() + " " + viewGameInfo.getClass().toString());
 	startActivity(viewGameInfo);
     }

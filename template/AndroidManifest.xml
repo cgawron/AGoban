@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest 
   xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:git="http://cgawron.dyndns.org/android/git"
   package="de.cgawron.agoban"
   android:versionCode="1"
   android:versionName="1.0">
@@ -9,7 +8,7 @@
 
     <provider android:authorities="de.cgawron.agoban" android:name="de.cgawron.agoban.provider.SGFProvider"/>
 
-    <activity android:name=".EditSGF"
+    <activity android:name="de.cgawron.agoban.EditSGF"
       android:label="@string/app_name">
       <intent-filter>
 	<action android:name="android.intent.action.MAIN" />
@@ -22,10 +21,15 @@
         <data android:mimeType="application/x-go-sgf" />
       </intent-filter>
     </activity>
-    <activity android:name=".ShowGameInfo"
+    <activity android:name="de.cgawron.agoban.ShowGameInfo"
       android:label="@string/app_name">
       <intent-filter>
         <action android:name="GameInfo" />
+      </intent-filter>
+    </activity>
+    <activity android:name="de.cgawron.agoban.ChooseSGF">
+      <intent-filter>
+        <action android:name="android.intent.action.SEARCH" />
       </intent-filter>
     </activity>
   </application>
