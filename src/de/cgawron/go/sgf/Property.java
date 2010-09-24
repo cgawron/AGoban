@@ -1,4 +1,5 @@
 
+
 /*
  *
  * © 2001 Christian Gawron. All rights reserved.
@@ -17,8 +18,14 @@ import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
 import de.cgawron.go.sgf.MarkupModel;
 
+import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Target;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -33,6 +40,14 @@ import android.util.Log;
  */
 public class Property implements Cloneable
 {
+    @Retention(value=RUNTIME)
+    @Target(value=ElementType.FIELD)
+    public @interface SGFProperty
+    {
+	Class propertyClass() default GameInfo.class;
+	String name() default "";
+	int priority() default 0;
+    }
     
     public interface Joinable
     {
@@ -62,10 +77,14 @@ public class Property implements Cloneable
                 if (Character.isUpperCase(c)) shortName.append(c);
             }
             k = shortName.toString();
+	    /*
             PropertyDescriptor d = getDescriptor(this);
             priority = new Integer(d != null ? d.getPriority() : 0);
 	    if (d != null)
 		userFriendlyName = d.getUserFriendlyName(); 
+	    */
+	    if (priority == null)
+		priority = 0;
 	    if (userFriendlyName == null)
 		userFriendlyName = shortName.toString();
         }
@@ -121,96 +140,127 @@ public class Property implements Cloneable
     }
 
     /** The SGF Property AddBlack. */
+    @SGFProperty(propertyClass=AddStones.class, priority=62)
     public static final Key ADD_BLACK = new Key("AB");
 
     /** The SGF Property AddEmpty. */
+    @SGFProperty(propertyClass=AddStones.class, priority=61)
     public final static Key ADD_EMPTY = new Key("AE");
 
     /** The SGF Property AddWhite. */
+    @SGFProperty(propertyClass=AddStones.class, priority=62)
     public final static Key ADD_WHITE = new Key("AW");
 
     /** The SGF Property APplication. */
+    @SGFProperty(propertyClass=Root.class, priority=91)
     public final static Key APPLICATION = new Key("AP");
 
     /** The SGF Property Black. */
+    @SGFProperty(propertyClass=Move.class, priority=60)
     public final static Key BLACK = new Key("B");
 
     /** The SGF Property BlackRank. */
+    @SGFProperty(propertyClass=GameInfo.class, priority=85)
     public final static Key BLACK_RANK = new Key("BR");
 
     /** The SGF Property ChAracterset. */
+    @SGFProperty(propertyClass=Charset.class)
     public final static Key CHARACTER_SET = new Key("CA");
 
     /** The SGF Property CiRcle. */
+    @SGFProperty(propertyClass=Markup.class)
     public final static Key CIRCLE = new Key("CR");
 
     /** The SGF Property Comment. */
+    @SGFProperty(propertyClass=Text.class)
     public final static Key COMMENT = new Key("C");
 
     /** The SGF Property DAte. */
+    @SGFProperty(propertyClass=GameInfo.class, priority=77)
     public final static Key DATE = new Key("DT");
 
     /** The SGF Property EVent. */
+    @SGFProperty(propertyClass=GameInfo.class, priority=88)
     public final static Key EVENT = new Key("EV");
 
     /** The SGF Property FiGure. */
+    @SGFProperty(propertyClass=Property.class)
     public final static Key FIGURE = new Key("FG");
 
     /** The SGF Property FileFormat. */
+    @SGFProperty(propertyClass=Root.class)
     public final static Key FILE_FORMAT = new Key("FF");
 
     /** The SGF Property GaMe. */
+    @SGFProperty(propertyClass=Root.class)
     public final static Key GAME = new Key("GM");
 
     /** The SGF Property GameName. */
+    @SGFProperty(propertyClass=GameInfo.class)
     public final static Key GAME_NAME = new Key("GN");
 
     /** The SGF Property LaBel. */
+    @SGFProperty(propertyClass=Label.class)
     public final static Key LABEL = new Key("LB");
 
     /** The SGF Property MArk. */
+    @SGFProperty(propertyClass=Markup.class)
     public final static Key MARK = new Key("MA");
 
     /** The SGF Property MoveNumber. */
+    @SGFProperty(propertyClass=SimpleNumber.class)
     public final static Key MOVE_NO = new Key("MN");
 
     /** The SGF Property Name. */
+    @SGFProperty(propertyClass=Text.class)
     public final static Key NAME = new Key("N");
 
     /** The SGF Property PlayerBlack. */
+    @SGFProperty(propertyClass=GameInfo.class)
     public final static Key PLAYER_BLACK = new Key("PB");
 
     /** The SGF Property PlayerWhite. */
+    @SGFProperty(propertyClass=GameInfo.class)
     public final static Key PLAYER_WHITE = new Key("PW");
 
     /** The SGF Property REsult. */
+    @SGFProperty(propertyClass=GameInfo.class)
     public final static Key RESULT = new Key("RE");
 
     /** The SGF Property SiZe. */
+    @SGFProperty(propertyClass=GameInfo.class)
     public final static Key SIZE = new Key("SZ");
 
     /** The SGF Property SQuare. */
+    @SGFProperty(propertyClass=Markup.class)
     public final static Key SQUARE = new Key("SQ");
 
     /** The SGF Property TerritoryWhite. */
+    @SGFProperty(propertyClass=Markup.class)
     public final static Key TERRITORY_WHITE = new Key("TW");
 
     /** The SGF Property TerritoryBlack. */
+    @SGFProperty(propertyClass=Markup.class)
     public final static Key TERRITORY_BLACK = new Key("TB");
 
     /** The SGF Property TRiangle. */
+    @SGFProperty(propertyClass=Markup.class)
     public final static Key TRIANGLE = new Key("TR");
 
     /** The SGF Property USer. */
+    @SGFProperty(propertyClass=GameInfo.class)
     public final static Key USER = new Key("US");
 
     /** The SGF Property VieW. */
+    @SGFProperty(propertyClass=View.class)
     public final static Key VIEW = new Key("VW");
 
     /** The SGF Property White. */
+    @SGFProperty(propertyClass=Move.class, priority=60)
     public final static Key WHITE = new Key("W");
 
     /** The SGF Property WhiteRank. */
+    @SGFProperty(propertyClass=GameInfo.class)
     public final static Key WHITE_RANK = new Key("WR");
 
 
@@ -231,6 +281,13 @@ public class Property implements Cloneable
         Class myClass;
         int priority = 0;
 	String userFriendlyName;
+
+        PropertyDescriptor(SGFProperty annotation)
+	{
+	    myClass = annotation.propertyClass();
+	    priority = annotation.priority();
+	    userFriendlyName = annotation.name();
+	}
 
         PropertyDescriptor(String s)
         {
@@ -277,7 +334,10 @@ public class Property implements Cloneable
 
         Factory()
         {
+	    Log.d("Property$Factory", "Factory()");
+	    Log.d("Property$Factory", "B=" + Property.BLACK);
             Properties properties = new Properties();
+	    /*
             try
             {
                 //properties.load(getClass().getResourceAsStream("sgf.properties"));
@@ -297,6 +357,23 @@ public class Property implements Cloneable
                 else
                     logger.warn("key " + key + " without value");
             }
+	    */
+
+	    Field[] fields = Property.class.getFields();
+	    for (Field field : fields) {
+		try {
+		    Log.d("Property$Factory", "field: " + field.getName() + " " + field.get(null));
+		    SGFProperty annotation = field.getAnnotation(SGFProperty.class);
+		    if (annotation != null) {
+			Key key = (Key) field.get(null);
+			Log.d("Property$Factory", "key: " + key);
+			propertyMap.put(key.toString(), new PropertyDescriptor(annotation));
+		    }
+		}
+		catch (IllegalAccessException ex) {
+		    throw new RuntimeException(ex);
+		}
+	    }
         }
 
         static Object[] argv = new Object[1];

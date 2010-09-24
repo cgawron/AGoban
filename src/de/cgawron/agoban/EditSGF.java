@@ -42,7 +42,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.Toast;
-import de.cgawron.agoban.intent.GameInfo;
+
 import de.cgawron.agoban.view.GobanView;
 import de.cgawron.agoban.provider.SGFProvider;
 import de.cgawron.go.Goban;
@@ -92,6 +92,9 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 
 	Intent intent = getIntent();
 	Log.d("EditSGF", "Uri: " + intent.getData());
+	if (intent.getData() == null)
+	    open();
+
 	application.setData(intent.getData());
 
 	gameTree = null;
@@ -218,6 +221,7 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
     public void open() {
 	Log.d("EditSGF", "open()");
 	Intent openSGF = new Intent(Intent.ACTION_SEARCH, SGFProvider.CONTENT_URI, this, ChooseSGF.class);
+	//Intent openSGF = new Intent(Intent.ACTION_SEARCH, SGFProvider.CONTENT_URI, this, ListGoogleSGF.class);
 	//Log.d("EditSGF", "thread: " + Thread.currentThread().getId() + " " + openSGF.getClass().toString());
 	startActivity(openSGF);
 	finish();

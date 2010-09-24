@@ -24,7 +24,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TabHost;
 
-import de.cgawron.agoban.intent.SGFIntent;
 import de.cgawron.agoban.view.PropertyView;
 import de.cgawron.go.sgf.GameTree;
 
