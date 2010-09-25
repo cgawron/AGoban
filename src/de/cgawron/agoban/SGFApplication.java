@@ -17,6 +17,11 @@
 package de.cgawron.agoban;
 
 import android.app.Application;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.net.Uri;
 
@@ -47,25 +52,50 @@ public class SGFApplication extends Application
 	gameTreeMap = new java.util.HashMap<String, GameTree>();
     }
 
-    public void init()
+    /**
+     * Initialize the application and load an SGF file if a data URI has been set.
+     * Due to the small default stack size, this has to be done in a worker thread.
+     */
+    public void loadSGF(Context context, final Runnable loadedCB)
     {
-	GameTree gameTree = null;
 	if (data != null)
 	{
-	    try {
-		InputStream is = getContentResolver().openInputStream(data);
-		gameTree = new GameTree(new InputStreamReader(is));
-		put(KEY_DEFAULT, gameTree); 
-	    }
-	    catch (Exception ex) {
-		Log.e("EditSGF", "Exception while parsing SGF", ex);
-		gameTree = new GameTree();
-		put(KEY_DEFAULT, gameTree); 
-	    }
+	    final ProgressDialog progressDialog = ProgressDialog.show(context, "", "Loading " + data, false, false);
+
+	    final Handler handler = new Handler() {
+		    public void handleMessage(Message msg) {
+			progressDialog.dismiss();
+			if (loadedCB != null)
+			    loadedCB.run();
+		    }
+		};
 	    
+	    Runnable runnable = new Runnable() {
+		    public void run() {
+			GameTree gameTree = null;
+			try {
+			    InputStream is = getContentResolver().openInputStream(data);
+			    gameTree = new GameTree(is);
+			    put(KEY_DEFAULT, gameTree); 
+			}
+			catch (Exception ex) {
+			    Log.e("EditSGF", "Exception while parsing SGF", ex);
+			    gameTree = new GameTree();
+			    put(KEY_DEFAULT, gameTree); 
+			}
+			put(KEY_DEFAULT, gameTree); 
+			Message msg = handler.obtainMessage();
+			Bundle b = new Bundle();
+			b.putInt("total", 100);
+			msg.setData(b);
+			handler.sendMessage(msg);
+		    }
+		};
+	    
+	    Thread thread = new Thread(Thread.currentThread().getThreadGroup(), runnable, "loadSGF", 64*1024);
+	    thread.start();
 	}
-	else gameTree = new GameTree();
-	put(KEY_DEFAULT, gameTree); 
+	else put(KEY_DEFAULT, new GameTree()); 
     }
 
     public void put(String key, GameTree gameTree)
@@ -101,18 +131,40 @@ public class SGFApplication extends Application
     }
 
     public void save() {
+	save(false);
+    }
+
+    /**
+     * Save the GameTree.
+     * Due to the small default stack size, this has to be done in a worker thread.
+     */
+    public void save(boolean async) {
 	if (data == null) {
 	    setData(null);
 	}
+
+	Runnable runnable = new Runnable() {
+		public void run() {
+		    Log.d("SGFApplication", "saving " + data);
+		    try {
+			OutputStream os = getContentResolver().openOutputStream(data);
+			gameTreeMap.get(KEY_DEFAULT).save(os);
+			os.close();
+		    }
+		    catch (Exception ex) {
+			Log.e("SGFApplication", "Exception while saving SGF", ex);
+		    }
+		}
+	    };
 	
-	Log.d("SGFApplication", "saving " + data);
-	try {
-	    OutputStream os = getContentResolver().openOutputStream(data);
-	    gameTreeMap.get(KEY_DEFAULT).save(os);
-	    os.close();
+	Thread thread = new Thread(Thread.currentThread().getThreadGroup(), runnable, "saveSGF", 64*1024);
+	thread.start();
+	while (!async && thread.isAlive()) {
+	    try {
+		thread.join();
+	    }
+	    catch (InterruptedException ex) {
+	    }
 	}
-	catch (Exception ex) {
-	    Log.e("SGFApplication", "Exception while saving SGF", ex);
-       }
     }
 }

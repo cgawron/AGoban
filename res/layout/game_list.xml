@@ -4,13 +4,45 @@
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:padding="5dp">
+        android:padding="1dp">
+
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="horizontal"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
+		android:padding="1dp">
+    <TextView
+            android:id="@+id/player_white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" 
+	    android:padding="5dp"/>
+    <TextView
+            android:id="@+id/player_black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" 
+	    android:padding="5dp"/>
+    <TextView
+            android:id="@+id/result"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" 
+	    android:padding="5dp"/>
+  </LinearLayout>
+
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="horizontal"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
+		android:padding="1dp">
     <TextView
             android:id="@+id/modified"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content" 
+	    android:padding="5dp"/>
     <TextView
             android:id="@+id/filename"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content" 
+	    android:padding="5dp"/>
+  </LinearLayout>
 </LinearLayout>
+  

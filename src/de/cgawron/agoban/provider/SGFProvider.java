@@ -93,7 +93,18 @@ public class SGFProvider extends ContentProvider
 	return cursor;
     }
 
-    private void updateDatabase()
+    private void updateDatabase() {
+	Runnable runnable = new Runnable() {
+		public void run() {
+		    doUpdateDatabase();
+		}
+	    };
+
+	Thread thread = new Thread(Thread.currentThread().getThreadGroup(), runnable, "updateDatabase", 64*1024);
+	thread.start();
+    }
+
+    private void doUpdateDatabase()
     {
 	Log.d("SGFProvider", "initFileMap");
 	
@@ -124,8 +135,6 @@ public class SGFProvider extends ContentProvider
 		    
 		    if (cursor.getCount() > 0 && cursor.getLong(cursor.getColumnIndex(KEY_MODIFIED_DATE)) == lastModified) {
 			Log.d("SGFProvider", "found entry");
-			//GameInfo gameInfo = new GameInfo(file, cursor);
-			//fileMap.put(file.hashCode(), gameInfo);
 		    }
 		    else {
 			Log.d("SGFProvider", "parsing " + file);
@@ -133,7 +142,6 @@ public class SGFProvider extends ContentProvider
 			long _id = db.insertWithOnConflict(SGFDBOpenHelper.SGF_TABLE_NAME, "", 
 							   gameInfo.getContentValues(), SQLiteDatabase.CONFLICT_REPLACE);
 			Log.d("SGFProvider", "insert: " + id + " " + _id);
-			//fileMap.put(file.hashCode(), gameInfo);
 		    }
 		    cursor.close();
 		}

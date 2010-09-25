@@ -55,6 +55,8 @@ public class ChooseSGF extends Activity
     private TextView textView;
     private ListView listView;
 
+    private Cursor cursor = null;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -78,7 +80,7 @@ public class ChooseSGF extends Activity
  
         textView = (TextView) findViewById(R.id.text);
         listView = (ListView) findViewById(R.id.list);
-   }
+    }
 
     @Override
     public void onStart() {
@@ -86,7 +88,7 @@ public class ChooseSGF extends Activity
 	Log.d("ChooseSGF", "OnStart");
 
 	ContentResolver resolver = getContentResolver();
-	final Cursor cursor = resolver.query(intent.getData(), null, null, null, null);
+	cursor = resolver.query(intent.getData(), null, null, null, null);
 
 	String[] from = new String[] { GameInfo.KEY_FILENAME, GameInfo.KEY_MODIFIED_DATE};
 	
@@ -103,7 +105,6 @@ public class ChooseSGF extends Activity
                     Intent sgfIntent = new Intent(getApplicationContext(), EditSGF.class);
                     Uri data = SGFProvider.CONTENT_URI.buildUpon().appendQueryParameter(GameInfo.KEY_ID, String.valueOf(id)).build();
                     sgfIntent.setData(data);
-		    cursor.close();
                     startActivity(sgfIntent);
 		    finish();
                 }
@@ -114,6 +115,8 @@ public class ChooseSGF extends Activity
     protected void onStop() {
 	Log.d("ChooseSGF", "onStop");
 	super.onStop();
+	if (cursor != null)
+	    cursor.close();
     }
 
     @Override

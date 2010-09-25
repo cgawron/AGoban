@@ -510,62 +510,6 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
         logger.info("Setting root: " + newRoot);
         root = newRoot;
 
-	/*
-        TreeVisitor<GameTree, Node> visitor = 
-	    new TreeVisitor<GameTree, Node>(this) 
-	    {
-		protected void visitNode(Object o)
-		{
-		    Node n = (Node) o;
-		    MarkupModel markup = null;
-		    logger.debug("setRoot(" + newRoot + "): visiting " + n);
-		    if (true || n.getGoban() == null) {
-			Node p = (Node)n.getParent();
-			if (p == null) {
-			    markup = new SimpleMarkupModel(n.getBoardSize());
-			    n.setMoveNo(n.isMove() ? 1 : 0);
-			}
-			else {
-			    logger.debug(n.toString() + ": inheriting Board from " + p.toString());
-			    markup = new SimpleMarkupModel(p.getGoban());
-			    if (n.isBeginOfVariation() || p.isDiagram())
-				markup.resetMarkup();
-			    
-			    if (n.contains(Property.MOVE_NO)) {
-				Value.Number no = null;
-				try {
-				  Value value = (Value) ((Property) n.get(Property.MOVE_NO)).getValue();
-				  logger.info("value is " + value + " " + value.getClass());
-				  if (value instanceof Value.ValueList)
-				    no = (Value.Number) ((Value.ValueList) value).get(0);
-				  else
-				    no = (Value.Number) value;
-				    
-				  logger.debug("Setting moveNo on node " + n + " to " + no.intValue());
-				  n.setMoveNo(no.intValue());
-				}
-				catch (Throwable e) {
-				    logger.info("value is " + ((Property) n.get(Property.MOVE_NO)).getValue());
-				    //throw new RuntimeException(e);
-				}
-			    }
-			    else if (p.getIndex(n) != 0) {
-				logger.debug("Setting moveNo on node " + n + " to 1");
-				n.setMoveNo(1);
-			    }
-			    else
-			    {
-				logger.debug("Setting moveNo on node " + n + " to " + p.getMoveNo() + " + " + (n.isMove() ? 1 : 0));
-				n.setMoveNo(p.getMoveNo() + (n.isMove() ? 1 : 0));
-			    }
-			}
-			n.setGoban(markup);
-		    }
-		}
-	    };
-        visitor.visit();
-	*/
-
         TreeVisitor<GameTree, Node> visitor = 
 	    new TreeVisitor<GameTree, Node>(this) 
 	    {

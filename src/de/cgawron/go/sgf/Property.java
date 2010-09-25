@@ -188,7 +188,7 @@ public class Property implements Cloneable
     public final static Key FIGURE = new Key("FG");
 
     /** The SGF Property FileFormat. */
-    @SGFProperty(propertyClass=Root.class)
+    @SGFProperty(propertyClass=RootNumber.class)
     public final static Key FILE_FORMAT = new Key("FF");
 
     /** The SGF Property GaMe. */
@@ -228,7 +228,7 @@ public class Property implements Cloneable
     public final static Key RESULT = new Key("RE");
 
     /** The SGF Property SiZe. */
-    @SGFProperty(propertyClass=GameInfo.class)
+    @SGFProperty(propertyClass=RootNumber.class)
     public final static Key SIZE = new Key("SZ");
 
     /** The SGF Property SQuare. */
@@ -412,7 +412,6 @@ public class Property implements Cloneable
             {
                 argv[0] = key;
                 propertyClass = getDescriptor(key).getPropertyClass();
-		Log.d("Property$Factory", "Creating property for key " + argv[0] + " " + argt[0]+ " " + propertyClass);
                 Constructor c = propertyClass.getConstructor(argt);
                 return (Property)c.newInstance(argv);
             }

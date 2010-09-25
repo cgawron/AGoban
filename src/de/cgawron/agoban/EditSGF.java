@@ -92,8 +92,12 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 
 	Intent intent = getIntent();
 	Log.d("EditSGF", "Uri: " + intent.getData());
-	if (intent.getData() == null)
-	    open();
+	if (intent.getData() == null) {
+	    Intent searchSGF = new Intent(Intent.ACTION_SEARCH, SGFProvider.CONTENT_URI, this, ChooseSGF.class);
+	    //Intent searchSGF = new Intent(Intent.ACTION_SEARCH, SGFProvider.CONTENT_URI, this, ListGoogleSGF.class);
+	    startActivity(searchSGF);
+	    finish();
+	}
 
 	application.setData(intent.getData());
 
@@ -116,16 +120,22 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	super.onStart();
 	Log.d("EditSGF", "OnStart");
 
-	application.init();
-	gameTree = application.get(application.KEY_DEFAULT); 
-	currentNode = gameTree.getRoot();
+	final Runnable afterLoaded = new Runnable() {
+		public void run() {
+		    gameTree = application.get(application.KEY_DEFAULT); 
+		    if (gameTree != null) {
+			currentNode = gameTree.getRoot();
+			
+			seekBar.setMax(gameTree.getNoOfMoves());
+			seekBar.setKeyProgressIncrement(1);
+			
+			Goban goban = gameTree.getRoot().getGoban();
+			gobanView.setGoban(goban);
+		    }
+		}
+	    };
 
-	seekBar.setMax(gameTree.getNoOfMoves());
-	seekBar.setKeyProgressIncrement(1);
-	
-	Goban goban = gameTree.getRoot().getGoban();
-	gobanView.setGoban(goban);
-
+	application.loadSGF(this, afterLoaded);
     }
 
     @Override
@@ -220,11 +230,6 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 
     public void open() {
 	Log.d("EditSGF", "open()");
-	Intent openSGF = new Intent(Intent.ACTION_SEARCH, SGFProvider.CONTENT_URI, this, ChooseSGF.class);
-	//Intent openSGF = new Intent(Intent.ACTION_SEARCH, SGFProvider.CONTENT_URI, this, ListGoogleSGF.class);
-	//Log.d("EditSGF", "thread: " + Thread.currentThread().getId() + " " + openSGF.getClass().toString());
-	startActivity(openSGF);
-	finish();
     }
 
     public void showGameInfo() {
