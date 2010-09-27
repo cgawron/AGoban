@@ -1,0 +1,4 @@
+- Optimze loading of sgf files (memory), especially when only root node is needed.
+- Improve navigation through the game tree (forward, backward, variations).
+- Improve load dialog.
+- Add support for google documents.
