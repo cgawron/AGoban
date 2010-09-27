@@ -59,6 +59,7 @@ public class GameInfo
     final public static @Column String KEY_URI = "URI";
     final public static @Column String KEY_FILENAME = "FILENAME";
     final public static @Column @SGFProperty String KEY_GAMENAME = "GN";
+    final public static @Column @SGFProperty String KEY_DATE = "DT";
     final public static @Column @SGFProperty String KEY_RESULT = "RE";
     final public static @Column @SGFProperty String KEY_PLAYER_WHITE = "PW";
     final public static @Column @SGFProperty String KEY_PLAYER_BLACK = "PB";

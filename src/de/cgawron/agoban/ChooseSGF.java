@@ -33,7 +33,11 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.SimpleCursorAdapter.ViewBinder;
 import android.widget.TextView;
+
+import java.text.DateFormat;
+import java.util.Date;
 
 import de.cgawron.agoban.provider.SGFProvider;
 import de.cgawron.agoban.provider.GameInfo;
@@ -43,9 +47,10 @@ import de.cgawron.go.sgf.GameTree;
 /**
  * Shows the game info
  */
-public class ChooseSGF extends Activity
+public class ChooseSGF extends Activity implements ViewBinder
 {
     private static Resources resources;
+    private static DateFormat dateFormat = DateFormat.getDateInstance();
 
     private SGFApplication application;
     private String gitId;
@@ -90,12 +95,15 @@ public class ChooseSGF extends Activity
 	ContentResolver resolver = getContentResolver();
 	cursor = resolver.query(intent.getData(), null, null, null, null);
 
-	String[] from = new String[] { GameInfo.KEY_FILENAME, GameInfo.KEY_MODIFIED_DATE};
+	String[] from = new String[] {GameInfo.KEY_FILENAME, GameInfo.KEY_MODIFIED_DATE, 
+				      GameInfo.KEY_PLAYER_WHITE, GameInfo.KEY_PLAYER_BLACK, GameInfo.KEY_RESULT};
 	
-	int[] to = new int[] { R.id.filename, R.id.modified };
+	int[] to = new int[] {R.id.filename, R.id.modified, R.id.player_white, R.id.player_black, R.id.result};
 	
-	ListAdapter adapter = new SimpleCursorAdapter(this,
-						      R.layout.game_list, cursor, from, to);
+	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
+							      R.layout.game_list, cursor, from, to);
+	adapter.setViewBinder(this);
+
 	if (listView != null)
 	    listView.setAdapter(adapter);
 
@@ -125,4 +133,22 @@ public class ChooseSGF extends Activity
 	super.onPause();
     }
 
+    @Override
+    public boolean setViewValue(View view, Cursor cursor, int columnIndex)
+    {
+	String columnName = cursor.getColumnName(columnIndex);
+	int colDate = cursor.getColumnIndex(GameInfo.KEY_DATE);
+	Log.d("ChooseSGF", "setViewValue: " + cursor + ", column=" + columnName);
+	
+	if (view.getId() == R.id.modified) {
+	    TextView text = (TextView) view;
+	    String sgfDate = cursor.getString(colDate);
+	    if (sgfDate != null && sgfDate.length() > 0) 
+		text.setText(sgfDate);
+	    else
+		text.setText(dateFormat.format(new Date(cursor.getLong(columnIndex))));
+	    return true;
+	}
+	return false;
+    }
 }
