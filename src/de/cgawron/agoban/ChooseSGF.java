@@ -16,13 +16,15 @@
 
 package de.cgawron.agoban;
 
+import java.text.DateFormat;
+import java.util.Date;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageItemInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,32 +32,23 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.SimpleCursorAdapter.ViewBinder;
 import android.widget.TextView;
-
-import java.text.DateFormat;
-import java.util.Date;
-
-import de.cgawron.agoban.provider.SGFProvider;
 import de.cgawron.agoban.provider.GameInfo;
-
-import de.cgawron.go.sgf.GameTree;
+import de.cgawron.agoban.provider.SGFProvider;
 
 /**
  * Shows the game info
  */
 public class ChooseSGF extends Activity implements ViewBinder
 {
-    private static Resources resources;
     private static DateFormat dateFormat = DateFormat.getDateInstance();
 
     private SGFApplication application;
     private String gitId;
     private Intent intent;
-    private GameTree gameTree;
 
     private TextView textView;
     private ListView listView;
@@ -66,25 +59,24 @@ public class ChooseSGF extends Activity implements ViewBinder
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
-	application = (SGFApplication) getApplication();
-	resources = getResources();
-	try {
-	    PackageItemInfo info = getPackageManager().getActivityInfo(new ComponentName(this, ChooseSGF.class), PackageManager.GET_META_DATA);
-	    gitId = info.metaData.getString("git-id");
-	}
-	catch (Exception e)
-	{
-	    throw new RuntimeException("git-id", e);
-	}
-	Log.d("ChooseSGF", "git-id: " + gitId);
+    	super.onCreate(savedInstanceState);
+    	application = (SGFApplication) getApplication();
+    	try {
+    		PackageItemInfo info = getPackageManager().getActivityInfo(new ComponentName(this, ChooseSGF.class), PackageManager.GET_META_DATA);
+    		gitId = info.metaData.getString("git-id");
+    	}
+    	catch (Exception e)
+    	{
+    		throw new RuntimeException("git-id", e);
+    	}
+    	Log.d("ChooseSGF", "git-id: " + gitId);
 
-	intent = getIntent();
-	Log.d("ChooseSGF", String.format("onCreate: intent=%s", intent));
-	setContentView(R.layout.choose_sgf_dialog);
- 
-        textView = (TextView) findViewById(R.id.text);
-        listView = (ListView) findViewById(R.id.list);
+    	intent = getIntent();
+    	Log.d("ChooseSGF", String.format("onCreate: intent=%s", intent));
+    	setContentView(R.layout.choose_sgf_dialog);
+
+    	textView = (TextView) findViewById(R.id.text);
+    	listView = (ListView) findViewById(R.id.list);
     }
 
     @Override
@@ -133,7 +125,6 @@ public class ChooseSGF extends Activity implements ViewBinder
 	super.onPause();
     }
 
-    @Override
     public boolean setViewValue(View view, Cursor cursor, int columnIndex)
     {
 	String columnName = cursor.getColumnName(columnIndex);

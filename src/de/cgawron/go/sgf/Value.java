@@ -1,6 +1,6 @@
 /*
  *
- * $Id$
+ * $Id: Value.java 129 2004-10-21 17:16:09Z cgawron $
  *
  * © 2001 Christian Gawron. All rights reserved.
  *

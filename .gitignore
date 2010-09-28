@@ -1,0 +1,7 @@
+AndroidManifest.xml
+bin/**
+gen/**
+res/raw/git
+CATALOG
+.*
+*~

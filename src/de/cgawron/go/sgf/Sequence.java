@@ -30,12 +30,12 @@ public class Sequence extends Node
         len = 1;
     }
 
-    public boolean addAll(Collection c)
+    public boolean addAll(Collection<Node> c)
     {
-        Iterator i = c.iterator();
+        Iterator<Node> i = c.iterator();
         while (i.hasNext())
         {
-            last.add((Node)i.next());
+            last.add(i.next());
         }
         return true;
     }

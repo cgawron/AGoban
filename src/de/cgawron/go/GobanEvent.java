@@ -1,6 +1,6 @@
 /*
  *
- * $Id$
+ * $Id: GobanModelEvent.java 97 2004-08-21 18:35:50Z  $
  *
  * (c) 2001 Christian Gawron. All rights reserved.
  *

@@ -12,52 +12,68 @@
 
 package de.cgawron.go.sgf;
 
-import de.cgawron.go.Goban;
-import de.cgawron.go.Goban.BoardType;
-import de.cgawron.go.Symmetry;
-import de.cgawron.go.SimpleGoban;
-import de.cgawron.go.sgf.MarkupModel;
-import de.cgawron.go.sgf.SimpleMarkupModel;
-
-import de.cgawron.util.MiscEncodingReader;
-import de.cgawron.util.Memento;
-import de.cgawron.util.MementoOriginator;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.RandomAccessFile;
+import java.io.Reader;
+import java.io.StringReader;
 import java.nio.charset.Charset;
-import java.util.*;
-
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EventListener;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
+import org.junit.Before;
+import org.junit.Test;
+
+import de.cgawron.go.Goban;
+import de.cgawron.go.Goban.BoardType;
+import de.cgawron.go.Symmetry;
+import de.cgawron.util.Memento;
+import de.cgawron.util.MementoOriginator;
+import de.cgawron.util.MiscEncodingReader;
 
 /**
  * This class represents an SGF game tree.
  */
 public class GameTree implements TreeModel, PropertyChangeListener, MementoOriginator
 {
-    private static String cvsId = "$Id$";
+    private static String cvsId = "$Id: GameTree.java 369 2006-04-14 17:04:02Z cgawron $";
     private static Logger logger = Logger.getLogger(GameTree.class.getName());
 
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     private File file = null;
     private String name;
     private RootNode root;
     //TODO: EventListenerList
-    private Collection<EventListener> listeners;
+    private final Collection<EventListener> listeners;
 
     private boolean modified = false;
     private int noOfDiagrams = -1;
     private int noOfFigures = -1;
 
     private boolean collection = false;
-
+    private final boolean rootOnly = true;
+    
     interface GobanFactory<M extends Goban>
     {
 	M getGoban(short boardsize);
@@ -84,7 +100,8 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 
         public abstract boolean predicate(Node n);
 
-        public void visitNode(Object o)
+        @Override
+		public void visitNode(Object o)
         {
             if (predicate((Node)o))
                 count++;
@@ -175,7 +192,8 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
      */
     public GameTree(final RandomAccessFile file) throws Exception
     {
-        this(new InputStream() { public int read() throws IOException {return file.read();}});
+        this(new InputStream() { @Override
+		public int read() throws IOException {return file.read();}});
     }
 
     /**
@@ -204,7 +222,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 	    Iterator it = roots.iterator();
 	    while (it.hasNext()) {
 		GameTree tree = (GameTree)it.next();
-		Node n = (Node) tree.getRoot();
+		Node n = tree.getRoot();
 		logger.info("GameTree(stream): " + root + ", " + n);
 		if (n != null) {
 		    root.add(n);
@@ -215,7 +233,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 	}
         else {
 	    GameTree tree = (GameTree) roots.get(0);
-	    Node node = (Node) tree.getRoot();
+	    Node node = tree.getRoot();
 	    //node.setRoot((Node)getRoot());
 	    //node.setRoot(node);
 	    init(node);
@@ -340,10 +358,10 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 
     public void save(OutputStream stream) throws IOException
     {
-        Node root = (Node) getRoot();
+        Node root = getRoot();
 	String charset = null;
 	if (root.get(Property.CHARACTER_SET) != null)
-	    ((Property) root.get(Property.CHARACTER_SET)).getValue().getString();
+	    (root.get(Property.CHARACTER_SET)).getValue().getString();
 	if (charset == null) charset = "utf8";
         PrintWriter out = new PrintWriter(new OutputStreamWriter(new BufferedOutputStream(stream), charset));
         root.write(out);
@@ -358,7 +376,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
      */
     public void setCharset(Charset charset)
     {
-        Node root = (Node) getRoot();
+        Node root = getRoot();
 	Property ca = Property.createProperty(Property.CHARACTER_SET, charset.name());
 	root.add(ca);
     }
@@ -404,7 +422,8 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 	}
     }
 
-    public String toString()
+    @Override
+	public String toString()
     {
         return "GameTree " + name;
     }
@@ -441,7 +460,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
     public TreeNode getChild(TreeNode parent, int index)
     {
         if (parent instanceof TreeNode) {
-	    TreeNode node = (TreeNode)parent;
+	    TreeNode node = parent;
 	    return node.getChildAt(index);
 	}
         else {
@@ -479,7 +498,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 
     public String getSignature()
     {
-      return ((RootNode) getRoot()).getSignature();
+      return (getRoot()).getSignature();
     }
 
     /**
@@ -510,60 +529,60 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
         logger.info("Setting root: " + newRoot);
         root = newRoot;
 
-        TreeVisitor<GameTree, Node> visitor = 
-	    new TreeVisitor<GameTree, Node>(this) 
-	    {
-		protected void visitNode(Object o)
+	if (!rootOnly) {
+	    TreeVisitor<GameTree, Node> visitor = 
+		new TreeVisitor<GameTree, Node>(this) 
 		{
-		    Node n = (Node) o;
-		    Goban goban = null;
-
-		    logger.debug("setRoot(" + newRoot + "): visiting " + n);
-		    Node p = (Node) n.getParent();
-
-		    if (p == null) 
+		    @Override
+			protected void visitNode(Object o)
 		    {
-			goban = getGoban(n.getBoardSize());
-			n.setMoveNo(n.isMove() ? 1 : 0);
-		    }
-		    else 
-		    {
-			logger.debug(n.toString() + ": inheriting Board from " + p.toString());
-			goban = getGoban(p.getGoban());
-
+			Node n = (Node) o;
+			Goban goban = null;
 			
-			if (n.contains(Property.MOVE_NO)) {
-			    Value.Number no = null;
-			    try {
-				Value value = (Value) ((Property) n.get(Property.MOVE_NO)).getValue();
-				logger.info("value is " + value + " " + value.getClass());
-				if (value instanceof Value.ValueList)
-				    no = (Value.Number) ((Value.ValueList) value).get(0);
-				else
-				    no = (Value.Number) value;
-				
-				logger.debug("Setting moveNo on node " + n + " to " + no.intValue());
-				n.setMoveNo(no.intValue());
+			logger.debug("setRoot(" + newRoot + "): visiting " + n);
+			Node p = n.getParent();
+			
+			if (p == null) {
+			    goban = getGoban(n.getBoardSize());
+			    n.setMoveNo(n.isMove() ? 1 : 0);
+			}
+			else {
+			    logger.debug(n.toString() + ": inheriting Board from " + p.toString());
+			    goban = getGoban(p.getGoban());
+			    
+			    
+			    if (n.contains(Property.MOVE_NO)) {
+				Value.Number no = null;
+				try {
+				    Value value = (n.get(Property.MOVE_NO)).getValue();
+				    logger.info("value is " + value + " " + value.getClass());
+				    if (value instanceof Value.ValueList)
+					no = (Value.Number) ((Value.ValueList) value).get(0);
+				    else
+					no = (Value.Number) value;
+				    
+				    logger.debug("Setting moveNo on node " + n + " to " + no.intValue());
+				    n.setMoveNo(no.intValue());
+				}
+				catch (Throwable e) {
+				    logger.info("value is " + (n.get(Property.MOVE_NO)).getValue());
+				    //throw new RuntimeException(e);
+				}
 			    }
-			    catch (Throwable e) {
-				logger.info("value is " + ((Property) n.get(Property.MOVE_NO)).getValue());
-				//throw new RuntimeException(e);
+			    else if (p.getIndex(n) != 0) {
+				logger.debug("Setting moveNo on node " + n + " to 1");
+				n.setMoveNo(1);
+			    }
+			    else {
+				logger.debug("Setting moveNo on node " + n + " to " + p.getMoveNo() + " + " + (n.isMove() ? 1 : 0));
+				n.setMoveNo(p.getMoveNo() + (n.isMove() ? 1 : 0));
 			    }
 			}
-			else if (p.getIndex(n) != 0) {
-			    logger.debug("Setting moveNo on node " + n + " to 1");
-			    n.setMoveNo(1);
-			}
-			else
-			{
-			    logger.debug("Setting moveNo on node " + n + " to " + p.getMoveNo() + " + " + (n.isMove() ? 1 : 0));
-			    n.setMoveNo(p.getMoveNo() + (n.isMove() ? 1 : 0));
-			}
+			n.setGoban(goban);
 		    }
-		    n.setGoban(goban);
-		}
-	    };
-        visitor.visit();
+		};
+	    visitor.visit();
+	}
 
         TreeModelEvent ev = new TreeModelEvent(this, new TreePath(root));
         fireTreeStructureChanged(ev);
@@ -584,7 +603,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
     public Node getNode(String nodeSpec) throws Exception
     {
 	if ("root".equals(nodeSpec))
-	    return (Node) getRoot();
+	    return getRoot();
 	else
 	    throw new Exception("node specification " + nodeSpec + " not recognized");
     }
@@ -622,7 +641,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
     public int getNoOfMoves()
     {
 	int moves = 0;
-	Node node = (Node) getRoot();
+	Node node = getRoot();
 	while (node != null) {
 	    if (node.isMove()) moves++;
 	    if (node.getChildCount() > 0)
@@ -639,7 +658,8 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 	    NodeCount counter = 
 		new NodeCount()
 		{
-		    public boolean predicate(Node node)
+		    @Override
+			public boolean predicate(Node node)
 		    {
 			return !node.isMainVariation() && node.isDiagram();
 		    }
@@ -655,7 +675,8 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 	    NodeCount counter = 
 		new NodeCount()
 		{
-		    public boolean predicate(Node node)
+		    @Override
+			public boolean predicate(Node node)
 		    {
 			return node.isMainVariation() && node.isDiagram();
 		    }
@@ -688,6 +709,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 	TreeVisitor<GameTree, Node> visitor = 
 	    new TreeVisitor<GameTree, Node>(this)
 	    {
+		@Override
 		protected void visitNode(Object o)
 		{
 		    logger.debug("getLeafs: visiting " + o);
@@ -753,7 +775,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 
 	NodePropertyChangedEvent(PropertyChangeEvent e)
 	{
-	    super(GameTree.this, new TreePath((Node) e.getSource()));
+	    super(GameTree.this, new TreePath(e.getSource()));
 	    this.event = e;
 	}
 
@@ -917,7 +939,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
     
     public void join(GameTree tree, Node theirSetup)
     {
-	Node mySetup = (Node) getRoot();
+	Node mySetup = getRoot();
 	while (mySetup != null && !mySetup.isBoardSetup())
 	    mySetup = (Node) mySetup.getChildAt(0);
 	while (theirSetup != null && !theirSetup.isBoardSetup())
@@ -940,7 +962,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 	logger.info("Symmetry is " + symmetry);
 	tree.transform(symmetry);    
 	
-	((Node) getRoot()).join((Node) tree.getRoot());
+	((Node) getRoot()).join(tree.getRoot());
     }
 
     public void transform(final Symmetry s)
@@ -948,6 +970,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
         TreeVisitor<GameTree, Node> visitor = 
 	    new TreeVisitor<GameTree, Node>(this) 
 	    {
+		@Override
 		protected void visitNode(Object o)
 		{
 		    Node n = (Node) o;

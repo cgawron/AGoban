@@ -1,6 +1,6 @@
 /*
  *
- * $Id$
+ * $Id: TreeIterator.java 363 2005-12-15 23:28:33Z cgawron $
  *
  * © 2001 Christian Gawron. All rights reserved.
  *

@@ -1,6 +1,6 @@
 /*
  *
- * $Id$
+ * $Id: Node.java 369 2006-04-14 17:04:02Z cgawron $
  *
  * © 2001 Christian Gawron. All rights reserved.
  *
@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
 /**
  * An instance of this class represents a node in a sgf game tree.
  * @author Christian Gawron
- * @version $Id$
+ * @version $Id: Node.java 369 2006-04-14 17:04:02Z cgawron $
  */
 public class Node 
     extends PropertyList 
@@ -854,9 +854,8 @@ public class Node
 	}
     }
 
-    public boolean add(Node o)
+    public boolean add(Node n)
     {
-        Node n = (Node)o;
         n.setParent(this);
         return children.add(n);
     }

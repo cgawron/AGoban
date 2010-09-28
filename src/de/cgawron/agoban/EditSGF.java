@@ -88,6 +88,7 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 
 	seekBar = (SeekBar) findViewById(R.id.seekBar);
 	seekBar.setOnSeekBarChangeListener(this);
+	seekBar.setKeyProgressIncrement(1);
 	seekBar.requestFocus();
 
 	Intent intent = getIntent();
@@ -127,7 +128,6 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 			currentNode = gameTree.getRoot();
 			
 			seekBar.setMax(gameTree.getNoOfMoves());
-			seekBar.setKeyProgressIncrement(1);
 			
 			Goban goban = gameTree.getRoot().getGoban();
 			gobanView.setGoban(goban);

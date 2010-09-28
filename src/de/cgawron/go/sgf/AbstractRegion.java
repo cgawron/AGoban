@@ -13,8 +13,6 @@
 
 package de.cgawron.go.sgf;
 
-import de.cgawron.go.*;
-import de.cgawron.go.sgf.Region;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -27,7 +25,7 @@ import java.beans.PropertyChangeSupport;
  */
 public abstract class AbstractRegion implements Region
 {
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     /**
      * Adds a PropertyChangeListener to the listener list. The listener is registered for all properties.
@@ -130,7 +128,8 @@ public abstract class AbstractRegion implements Region
     {
     }
 
-    public Object clone() throws CloneNotSupportedException
+    @Override
+	public Object clone() throws CloneNotSupportedException
     {
 	return super.clone();
     }

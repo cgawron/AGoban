@@ -24,6 +24,7 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.net.Uri;
 import android.net.UrlQuerySanitizer;
+import android.os.Debug;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
@@ -106,7 +107,8 @@ public class SGFProvider extends ContentProvider
 
     private void doUpdateDatabase()
     {
-	Log.d("SGFProvider", "initFileMap");
+	Log.d("SGFProvider", "updateDatabase");
+	//Debug.startMethodTracing("updateDatabase");
 	
 	//fileMap = new HashMap<Integer, GameInfo>();
 	String state = Environment.getExternalStorageState();
@@ -152,6 +154,7 @@ public class SGFProvider extends ContentProvider
 	    }
 	}
 	lastChecked = System.currentTimeMillis();
+	Debug.stopMethodTracing();
     }
 
 

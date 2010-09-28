@@ -2,7 +2,7 @@
 
 /**
  *
- * $Id: Yylex.java 363 2005-12-15 23:28:33Z cgawron $
+ * $Id: 4464fa6ae7475721f6ef39df55ded546168e4181 $
  *
  * © 2001 Christian Gawron. All rights reserved.
  *
