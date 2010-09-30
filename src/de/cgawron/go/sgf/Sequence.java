@@ -1,6 +1,6 @@
 /*
  *
- * $Id: Sequence.java 92 2004-08-07 12:32:15Z  $
+ * $Id$
  *
  * © 2001 Christian Gawron. All rights reserved.
  *

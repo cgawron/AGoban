@@ -167,21 +167,6 @@ public class SGFProvider extends ContentProvider
 	Log.d("SGFProvider", String.format("path=%s", path));
 
 	Cursor cursor = queryDB(projection, selection, selectionArgs);
-	/*
-	if (path.length() > 0) {
-	    cursor.newRow().add(path).add(path);
-	}
-	else {
-	    for (Map.Entry<Integer, GameInfo> entry : fileMap.entrySet()) {
-		Log.d("SGFProvider", "adding " + entry.getValue().getContentValues());
-		ContentValues values = entry.getValue().getContentValues();
-		MatrixCursor.RowBuilder row = cursor.newRow();
-		for (Map.Entry<String, Object> _entry : values.valueSet()) {
-		    row.add(_entry.getValue());
-		}
-	    }
-	}
-	*/
 	return cursor;
     }
 	

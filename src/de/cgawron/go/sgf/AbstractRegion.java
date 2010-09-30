@@ -1,6 +1,6 @@
 /*
  *
- * $Id: AbstractRegion.java 154 2004-12-17 23:51:02Z cgawron $
+ * $Id$
  *
  * © 2001 Christian Gawron. All rights reserved.
  *

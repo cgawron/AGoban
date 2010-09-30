@@ -56,7 +56,6 @@ import de.cgawron.util.MiscEncodingReader;
  */
 public class GameTree implements TreeModel, PropertyChangeListener, MementoOriginator
 {
-    private static String cvsId = "$Id: GameTree.java 369 2006-04-14 17:04:02Z cgawron $";
     private static Logger logger = Logger.getLogger(GameTree.class.getName());
 
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
@@ -72,12 +71,12 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
     private int noOfFigures = -1;
 
     private boolean collection = false;
-    private final boolean rootOnly = true;
+    private final boolean rootOnly = false;
     
     interface GobanFactory<M extends Goban>
     {
-	M getGoban(short boardsize);
-	M getGoban(Goban m);
+    	M getGoban(short boardsize);
+    	M getGoban(Goban m);
     }
 
     GobanFactory factory;

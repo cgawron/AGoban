@@ -20,7 +20,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
-
 import de.cgawron.go.Goban;
 import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
@@ -40,20 +39,22 @@ public class GobanRenderer
     private static float SELECTION_STROKEWIDTH = 0.05f;
     private static int   SELECTION_COLOR = Color.RED;
 
-    private GobanView view;
+    private final GobanView view;
 
     public GobanRenderer(GobanView view)
     {
 	this.view = view;
     }
 
+    //Paint paint = new Paint();
+	
     public void render(Goban goban, Canvas canvas)
     {
 	int size = goban.getBoardSize();
 	Point lastMove = goban.getLastMove();
-	Paint paint = new Paint();
+
 	paint.setARGB(255, 255, 255, 0);
-        canvas.drawRect(0.5f, 0.5f, size+0.5f, size+0.5f, paint);
+	canvas.drawRect(0.5f, 0.5f, size+0.5f, size+0.5f, paint);
 	paint.setARGB(255, 0, 0, 0);
 	paint.setStyle(Paint.Style.STROKE);
 	for (int i=1; i<=size; i++) {
@@ -64,31 +65,34 @@ public class GobanRenderer
 	drawHoshi(size, canvas, paint);
 
 	if (goban != null)
-	{
-	    for (short i=0; i<size; i++) {
-		for (short j=0; j<size; j++) {
-		    BoardType stone = goban.getStone(i, j);
-		    switch (stone) {
-		    case BLACK:
-		    case WHITE:
-			if (lastMove != null && lastMove.equals(i, j))
-			    drawStoneHighlighted(i, j, stone, canvas);
-			else
-			    drawStone(i, j, stone, canvas);
-			break;
-		    case EMPTY:
-			break;
+	    {
+		for (short i=0; i<size; i++) {
+		    for (short j=0; j<size; j++) {
+			BoardType stone = goban.getStone(i, j);
+			switch (stone) {
+			case BLACK:
+			case WHITE:
+			    if (lastMove != null && lastMove.equals(i, j))
+				drawStoneHighlighted(i, j, stone, canvas);
+			    else
+				drawStone(i, j, stone, canvas);
+			    break;
+			case EMPTY:
+			    break;
+			}
+			if (view.isSelected(i, j))
+			    drawSelection(i, j, canvas);
 		    }
-		    if (view.isSelected(i, j))
-			drawSelection(i, j, canvas);
 		}
 	    }
-	}
     }
+
+    Paint paint = new Paint();
 
     void drawStone(int i, int j, BoardType stone, Canvas canvas)
     {
-	Paint paint = new Paint();
+
+
 	paint.setAntiAlias(true);
 	paint.setStrokeWidth(STONE_STROKEWIDTH);
 
@@ -144,25 +148,25 @@ public class GobanRenderer
 	paint.setStyle(Paint.Style.FILL_AND_STROKE);
 
 	if (boardSize % 2 != 0)
-	{
-	    canvas.drawCircle(m+1, m+1, HOSHI_RADIUS, paint);
-	    
-	    if (boardSize > 9)
 	    {
-		canvas.drawCircle(h+1, m+1, HOSHI_RADIUS, paint);
-		canvas.drawCircle(boardSize-h, m+1, HOSHI_RADIUS, paint);
-		canvas.drawCircle(m+1, h+1, HOSHI_RADIUS, paint);
-		canvas.drawCircle(m+1, boardSize-h, HOSHI_RADIUS, paint);
-	    }
-	}
+		canvas.drawCircle(m+1, m+1, HOSHI_RADIUS, paint);
 
-        if (boardSize > 7)
-        {
-	    canvas.drawCircle(h+1, h+1, HOSHI_RADIUS, paint);
-	    canvas.drawCircle(h+1, boardSize-h, HOSHI_RADIUS, paint);
-	    canvas.drawCircle(boardSize-h, h+1, HOSHI_RADIUS, paint);
-	    canvas.drawCircle(boardSize-h, boardSize-h, HOSHI_RADIUS, paint);
-        }
+		if (boardSize > 9)
+		    {
+			canvas.drawCircle(h+1, m+1, HOSHI_RADIUS, paint);
+			canvas.drawCircle(boardSize-h, m+1, HOSHI_RADIUS, paint);
+			canvas.drawCircle(m+1, h+1, HOSHI_RADIUS, paint);
+			canvas.drawCircle(m+1, boardSize-h, HOSHI_RADIUS, paint);
+		    }
+	    }
+
+	if (boardSize > 7)
+	    {
+		canvas.drawCircle(h+1, h+1, HOSHI_RADIUS, paint);
+		canvas.drawCircle(h+1, boardSize-h, HOSHI_RADIUS, paint);
+		canvas.drawCircle(boardSize-h, h+1, HOSHI_RADIUS, paint);
+		canvas.drawCircle(boardSize-h, boardSize-h, HOSHI_RADIUS, paint);
+	    }
     }
 
     void drawSelection(int x, int y, Canvas canvas)
