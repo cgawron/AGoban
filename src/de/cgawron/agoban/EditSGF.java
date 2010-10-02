@@ -157,6 +157,10 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	    open();
 	    return true;
 
+	case R.id.new_game:
+	    newGame();
+	    return true;
+
 	case R.id.game_info:
 	    showGameInfo();
 	    return true;
@@ -225,15 +229,26 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	}
     }
 
-    public void save() {
+    public void save() 
+    {
 	application.save();
     }
 
-    public void open() {
+    public void open() 
+    {
 	Log.d("EditSGF", "open()");
     }
 
-    public void showGameInfo() {
+    public void newGame()
+    {
+	Intent sgfIntent = new Intent(Intent.ACTION_VIEW, application.getNewGameUri());
+	application.setReadOnly(false);
+	startActivity(sgfIntent);
+	finish();
+    }
+
+    public void showGameInfo() 
+    {
 	Log.d("EditSGF", "Show game info");
 	Intent viewGameInfo = new Intent(Intent.ACTION_VIEW, application.getData());
 	viewGameInfo.setClassName("de.cgawron.agoban", "de.cgawron.agoban.ShowGameInfo");

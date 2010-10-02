@@ -101,10 +101,8 @@ public class ChooseSGF extends Activity implements ViewBinder
 
 	listView.setOnItemClickListener(new OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		    // Build the Intent used to open WordActivity with a specific word Uri
-                    Intent sgfIntent = new Intent(getApplicationContext(), EditSGF.class);
                     Uri data = SGFProvider.CONTENT_URI.buildUpon().appendQueryParameter(GameInfo.KEY_ID, String.valueOf(id)).build();
-                    sgfIntent.setData(data);
+                    Intent sgfIntent = new Intent(Intent.ACTION_VIEW, data);
                     startActivity(sgfIntent);
 		    finish();
                 }

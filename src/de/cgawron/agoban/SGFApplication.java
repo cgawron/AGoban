@@ -103,10 +103,15 @@ public class SGFApplication extends Application
 	return gameTree;
     }
 
+    public Uri getNewGameUri()
+    {
+	return getContentResolver().insert(SGFProvider.CONTENT_URI, null);
+    }
+
     public void setData(Uri data)
     {
 	if (data == null) {
-	    data = getContentResolver().insert(SGFProvider.CONTENT_URI, null);
+	    data = getNewGameUri();
 	}
 	this.data = data;
     }
@@ -156,6 +161,11 @@ public class SGFApplication extends Application
 	    catch (InterruptedException ex) {
 	    }
 	}
+    }
+
+    public void setReadOnly(boolean readOnly)
+    {
+	this.readOnly = readOnly;
     }
 
     public boolean checkNotReadOnly(Context context)
