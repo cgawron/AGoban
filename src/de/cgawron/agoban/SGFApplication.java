@@ -17,8 +17,12 @@
 package de.cgawron.agoban;
 
 import android.app.Application;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -43,13 +47,13 @@ public class SGFApplication extends Application
 {
     public static String KEY_DEFAULT = "default";
 
-    private Map<String, GameTree> gameTreeMap;
+    private GameTree gameTree;
     private Uri data;
+    private boolean readOnly = true;
 
     public SGFApplication()
     {
 	super();
-	gameTreeMap = new java.util.HashMap<String, GameTree>();
     }
 
     /**
@@ -72,18 +76,14 @@ public class SGFApplication extends Application
 	    
 	    Runnable runnable = new Runnable() {
 		    public void run() {
-			GameTree gameTree = null;
 			try {
 			    InputStream is = getContentResolver().openInputStream(data);
 			    gameTree = new GameTree(is);
-			    put(KEY_DEFAULT, gameTree); 
 			}
 			catch (Exception ex) {
 			    Log.e("EditSGF", "Exception while parsing SGF", ex);
 			    gameTree = new GameTree();
-			    put(KEY_DEFAULT, gameTree); 
 			}
-			put(KEY_DEFAULT, gameTree); 
 			Message msg = handler.obtainMessage();
 			Bundle b = new Bundle();
 			b.putInt("total", 100);
@@ -95,22 +95,12 @@ public class SGFApplication extends Application
 	    Thread thread = new Thread(Thread.currentThread().getThreadGroup(), runnable, "loadSGF", 64*1024);
 	    thread.start();
 	}
-	else put(KEY_DEFAULT, new GameTree()); 
-    }
-
-    public void put(String key, GameTree gameTree)
-    {
-	gameTreeMap.put(key, gameTree);
-    }
-
-    public GameTree get(String key)
-    {
-	return gameTreeMap.get(key);
+	else gameTree = new GameTree(); 
     }
 
     public GameTree getGameTree()
     {
-	return get(KEY_DEFAULT);
+	return gameTree;
     }
 
     public void setData(Uri data)
@@ -148,7 +138,7 @@ public class SGFApplication extends Application
 		    Log.d("SGFApplication", "saving " + data);
 		    try {
 			OutputStream os = getContentResolver().openOutputStream(data);
-			gameTreeMap.get(KEY_DEFAULT).save(os);
+			gameTree.save(os);
 			os.close();
 		    }
 		    catch (Exception ex) {
@@ -165,6 +155,30 @@ public class SGFApplication extends Application
 	    }
 	    catch (InterruptedException ex) {
 	    }
+	}
+    }
+
+    public boolean checkNotReadOnly(Context context)
+    {
+	if (!readOnly)
+	    return true;
+	else {
+	    Dialog dialog;
+	    OnClickListener listener = new OnClickListener() {
+		    public void onClick(DialogInterface dialog, int which) {
+			if (which == DialogInterface.BUTTON_POSITIVE)
+			    readOnly = false;
+			dialog.dismiss();
+		    }
+		};
+	    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+	    builder.setTitle("Modify File?");
+	    builder.setMessage("Do you want to edit this file?");
+	    builder.setPositiveButton("Yes", listener);
+	    builder.setNegativeButton("No", listener);
+	    dialog = builder.show();
+	    
+	    return !readOnly;
 	}
     }
 }

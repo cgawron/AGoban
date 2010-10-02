@@ -71,7 +71,8 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	application = (SGFApplication) getApplication();
 	resources = getResources();
 	try {
-	    PackageItemInfo info = getPackageManager().getActivityInfo(new ComponentName(this, EditSGF.class), PackageManager.GET_META_DATA);
+	    PackageItemInfo info = getPackageManager().getActivityInfo(new ComponentName(this, EditSGF.class), 
+								       PackageManager.GET_META_DATA);
 	    gitId = info.metaData.getString("git-id");
 	}
 	catch (Exception e)
@@ -123,7 +124,7 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 
 	final Runnable afterLoaded = new Runnable() {
 		public void run() {
-		    gameTree = application.get(application.KEY_DEFAULT); 
+		    gameTree = application.getGameTree(); 
 		    if (gameTree != null) {
 			currentNode = gameTree.getRoot();
 			
@@ -184,7 +185,7 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 
     public void onGobanEvent(GobanEvent gobanEvent) {
 	Log.d("EditSGF", "onGobanEvent: " + gobanEvent);
-	if (currentNode != null) {
+	if (currentNode != null && application.checkNotReadOnly(this)) {
 	    Node node = new Node(gameTree);
 	    try {
 		node.setGoban(currentNode.getGoban().clone());
