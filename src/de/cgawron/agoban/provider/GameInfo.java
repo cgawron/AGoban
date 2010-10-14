@@ -28,6 +28,7 @@ import java.lang.reflect.Field;
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Map;
 
 import de.cgawron.go.sgf.GameTree;
 import de.cgawron.go.sgf.RootNode;
@@ -98,7 +99,6 @@ public class GameInfo
 	if (sgfKeys == null)
 	    initSGFKeys();
 
-	values = new ContentValues();
 	values.put(KEY_FILENAME, file.getName());
 	for (Key key : sgfKeys) {
 	    String _key = key.toString();
@@ -111,14 +111,13 @@ public class GameInfo
 	if (sgfKeys == null)
 	    initSGFKeys();
 
-	RootNode root = gameTree.getRoot();
 	values = new ContentValues();
 	values.put(KEY_ID, file.hashCode());
 	values.put(KEY_FILENAME, file.getName());
 	values.put(KEY_MODIFIED_DATE, file.lastModified());
 
 	for (Key key : sgfKeys) {
-	    Property property = root.get(key);
+	    Property property = gameTree.getRoot().get(key);
 	    if (property != null)
 		values.put(key.toString(), property.getValue().toString());
 	}
@@ -139,7 +138,6 @@ public class GameInfo
 	    }
 	}
 	sgfKeys = keys.toArray(new Key[0]);
-
     }
 
     public ContentValues getContentValues()

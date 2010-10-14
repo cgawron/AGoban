@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2010 Christian Gawron
  *
@@ -17,8 +16,6 @@
 
 package de.cgawron.agoban.view;
 
-// Need the following import to get access to the app resources, since this
-// class is in a sub-package.
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +24,7 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -34,24 +32,27 @@ import android.widget.TextView;
 
 import de.cgawron.agoban.R;
 import de.cgawron.go.sgf.GameTree;
+import de.cgawron.go.sgf.Node;
 
 /**
  * {@code GameTreeControls} allow to navigate through a game tree.
  *
  */
-public class GameTreeControls extends LinearLayout
+public class GameTreeControls extends LinearLayout implements View.OnClickListener
 {
     public interface GameTreeNavigationListener 
     {
+	public void setCurrentNode(Node node);
     }
 
-    private GameTree gameTree;
-    private GameTreeNavigationListener listener;
-    
     private final Button buttonNext;
     private final Button buttonPrev;
     private final TextView moveNoView;
 
+    private GameTree gameTree;
+    private GameTreeNavigationListener listener;
+    private Node currentNode;
+    
     public GameTreeControls(Context context, AttributeSet attrs) 
     {
         super(context, attrs);
@@ -72,10 +73,57 @@ public class GameTreeControls extends LinearLayout
     {
 	LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
 	params.gravity  = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
-	addView(buttonNext, params);
+	addView(buttonPrev, params);
+	buttonPrev.setOnClickListener(this);
 	params.gravity = Gravity.CENTER;
 	addView(moveNoView, params);
 	params.gravity = Gravity.CENTER_VERTICAL | Gravity.LEFT;
-	addView(buttonPrev, params);
+	addView(buttonNext, params);
+	buttonNext.setOnClickListener(this);
+    }
+
+    public void onClick(View v)
+    {
+	if (buttonPrev.equals(v)) {
+	    Log.d("GameTreeControls", "button pressed: prev");
+	    prevNode();
+	}
+	else if (buttonNext.equals(v)) {
+	    Log.d("GameTreeControls", "button pressed: next");
+	    nextNode();
+	}
+    }
+
+    public void setGameTreeNavigationListener(GameTreeNavigationListener listener) 
+    {
+	this.listener = listener;
+    }
+
+    public void setGameTree(GameTree gameTree) {
+	Log.d("GameTreeControls", "setGameTree: " + gameTree);
+	this.gameTree = gameTree;
+	setCurrentNode(gameTree.getRoot());
+    }
+
+    public void setCurrentNode(Node node) {
+	Log.d("GameTreeControls", "setCurrentNode: " + node);
+	this.currentNode = node;
+	moveNoView.setText(Integer.toString(node.getMoveNo()));
+	if (listener != null)
+	    listener.setCurrentNode(node);
+    }
+
+    public void nextNode() 
+    {
+	if (currentNode != null && currentNode.getChildCount() > 0) {
+	    setCurrentNode(currentNode.getChildAt(0));
+	}
+    }
+
+    public void prevNode() 
+    {
+	if (currentNode != null && currentNode.getParent() != null) {
+	    setCurrentNode(currentNode.getParent());
+	}
     }
 }

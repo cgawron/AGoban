@@ -43,6 +43,8 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import de.cgawron.agoban.view.GameTreeControls;
+import de.cgawron.agoban.view.GameTreeControls.GameTreeNavigationListener;
 import de.cgawron.agoban.view.GobanView;
 import de.cgawron.agoban.provider.SGFProvider;
 import de.cgawron.go.Goban;
@@ -52,13 +54,14 @@ import de.cgawron.go.sgf.Node;
 /**
  * Provides an sgf editor.
  */
-public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener, GobanEventListener
+public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener, GobanEventListener, GameTreeNavigationListener
 {
     public static Resources resources;
 
     private GobanView gobanView;
     private SeekBar seekBar;
     private GameTree gameTree;
+    private GameTreeControls gameTreeControls;
     private Node currentNode;
     private String gitId;
     private SGFApplication application;
@@ -92,7 +95,13 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	seekBar.setKeyProgressIncrement(1);
 	seekBar.requestFocus();
 
+	gameTreeControls = (GameTreeControls) findViewById(R.id.controls);
+	gameTreeControls.setGameTreeNavigationListener(this);
+	
 	Intent intent = getIntent();
+	if (Intent.ACTION_EDIT.equals(intent.getAction()))
+	    application.setReadOnly(false);
+
 	Log.d("EditSGF", "Uri: " + intent.getData());
 	if (intent.getData() == null) {
 	    Intent searchSGF = new Intent(Intent.ACTION_SEARCH, SGFProvider.CONTENT_URI, this, ChooseSGF.class);
@@ -126,12 +135,12 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 		public void run() {
 		    gameTree = application.getGameTree(); 
 		    if (gameTree != null) {
-			currentNode = gameTree.getRoot();
-			
+			gameTreeControls.setGameTree(gameTree);
+						
 			seekBar.setMax(gameTree.getNoOfMoves());
 			
-			Goban goban = gameTree.getRoot().getGoban();
-			gobanView.setGoban(goban);
+			//Goban goban = gameTree.getRoot().getGoban();
+			//gobanView.setGoban(goban);
 		    }
 		}
 	    };
@@ -219,13 +228,16 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
     }
 
     public void setCurrentNode(Node node) {
-	currentNode = node;
-	if (currentNode != null) {
-	    Goban goban = currentNode.getGoban();
-	    if (currentNode.getSiblingCount() > 0) {
-		Log.d("EditSGF", "siblingCount: " + currentNode.getSiblingCount());
+	if (!node.equals(currentNode)) {
+	    currentNode = node;
+	    if (currentNode != null) {
+		Goban goban = currentNode.getGoban();
+		if (currentNode.getSiblingCount() > 0) {
+		    Log.d("EditSGF", "siblingCount: " + currentNode.getSiblingCount());
+		}
+		gobanView.setGoban(goban);
 	    }
-	    gobanView.setGoban(goban);
+	    gameTreeControls.setCurrentNode(node);
 	}
     }
 
@@ -241,8 +253,7 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 
     public void newGame()
     {
-	Intent sgfIntent = new Intent(Intent.ACTION_VIEW, application.getNewGameUri());
-	application.setReadOnly(false);
+	Intent sgfIntent = new Intent(Intent.ACTION_EDIT, application.getNewGameUri());
 	startActivity(sgfIntent);
 	finish();
     }

@@ -32,6 +32,7 @@ public class GobanEventHandler extends MultiTouchController<Object> implements V
 
     private GobanView gobanView;
     private long time;
+    private boolean armed;
 
     public GobanEventHandler(GobanView gobanView, Resources res) {
 	super(gobanView, res, false);
@@ -49,10 +50,16 @@ public class GobanEventHandler extends MultiTouchController<Object> implements V
 
 	    switch (event.getAction()) {
 	    case MotionEvent.ACTION_UP: 
-		if (event.getEventTime() - time > MIN_STILL_TIME) {
+		if (armed && event.getEventTime() - time > MIN_STILL_TIME) {
 		    gobanView.fireGobanEvent(gobanEvent);
 		}
 		break;
+
+	    case MotionEvent.ACTION_DOWN: 
+		time = event.getEventTime();
+		armed = true;
+		gobanView.setSelection(gobanEvent.getPoint());
+		return false;
 
 	    default:
 		time = event.getEventTime();
@@ -109,6 +116,9 @@ public class GobanEventHandler extends MultiTouchController<Object> implements V
     public boolean onLongClick(View view) 
     {
 	Log.d("GobanEventHandler", "onLongClick");
+	armed = false;
+	boolean shown = gobanView.showContextMenu();
+	Log.d("GobanEventHandler", "onLongClick: " + shown);
 	return true;
     }
 }

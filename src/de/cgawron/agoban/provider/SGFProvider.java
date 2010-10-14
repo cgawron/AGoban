@@ -44,7 +44,6 @@ import de.cgawron.go.sgf.Property.Key;
 
 public class SGFProvider extends ContentProvider
 {
-
     final public static Uri CONTENT_URI = new Uri.Builder().scheme("content").authority("de.cgawron.agoban").build();
     final public static String SGF_TYPE = "application/x-go-sgf";
 
@@ -63,6 +62,7 @@ public class SGFProvider extends ContentProvider
     private SGFDBOpenHelper dbHelper = null;
     private SQLiteDatabase db = null;
     private long lastChecked = 0;
+    private static Map<Long, GameInfo> sgfMap = new HashMap<Long, GameInfo>();
 
     private void initColumns()
     {
@@ -143,6 +143,7 @@ public class SGFProvider extends ContentProvider
 			GameInfo gameInfo = new GameInfo(file);
 			long _id = db.insertWithOnConflict(SGFDBOpenHelper.SGF_TABLE_NAME, "", 
 							   gameInfo.getContentValues(), SQLiteDatabase.CONFLICT_REPLACE);
+			sgfMap.put(Long.valueOf(id), gameInfo);
 			Log.d("SGFProvider", "insert: " + id + " " + _id);
 		    }
 		    cursor.close();
@@ -241,5 +242,11 @@ public class SGFProvider extends ContentProvider
 	}
 	Log.d("SGFProvider", String.format("openFile: file=%s", file));
 	return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_WRITE | ParcelFileDescriptor.MODE_CREATE);
+    }
+
+    public static GameInfo getGameInfo(long id)
+    {
+	Log.d("SGFProvider", String.format("getGameInfo(%d)=%s", id, sgfMap.get(id)));
+	return sgfMap.get(id);
     }
 }

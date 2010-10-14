@@ -36,6 +36,7 @@ public class GobanRenderer
     private static float HIGHLIGHT_RADIUS = 0.2f;
     private static float HIGHLIGHT_STROKEWIDTH = 0.06f;
     private static float STONE_STROKEWIDTH = 0.03f;
+    private static float BOARD_STROKEWIDTH = 0.0f;
     private static float SELECTION_STROKEWIDTH = 0.05f;
     private static int   SELECTION_COLOR = Color.RED;
 
@@ -46,16 +47,16 @@ public class GobanRenderer
 	this.view = view;
     }
 
-    //Paint paint = new Paint();
-	
     public void render(Goban goban, Canvas canvas)
     {
+	Paint paint = new Paint();
 	int size = goban.getBoardSize();
 	Point lastMove = goban.getLastMove();
 
-	paint.setARGB(255, 255, 255, 0);
+	paint.setARGB(255, 255, 255, 10);
 	canvas.drawRect(0.5f, 0.5f, size+0.5f, size+0.5f, paint);
 	paint.setARGB(255, 0, 0, 0);
+	paint.setStrokeWidth(BOARD_STROKEWIDTH);
 	paint.setStyle(Paint.Style.STROKE);
 	for (int i=1; i<=size; i++) {
 	    canvas.drawLine(1, i, size, i, paint);
@@ -64,35 +65,32 @@ public class GobanRenderer
 
 	drawHoshi(size, canvas, paint);
 
-	if (goban != null)
-	    {
-		for (short i=0; i<size; i++) {
-		    for (short j=0; j<size; j++) {
-			BoardType stone = goban.getStone(i, j);
-			switch (stone) {
-			case BLACK:
-			case WHITE:
-			    if (lastMove != null && lastMove.equals(i, j))
-				drawStoneHighlighted(i, j, stone, canvas);
-			    else
-				drawStone(i, j, stone, canvas);
-			    break;
-			case EMPTY:
-			    break;
-			}
-			if (view.isSelected(i, j))
-			    drawSelection(i, j, canvas);
+	if (goban != null) {
+	    for (short i=0; i<size; i++) {
+		for (short j=0; j<size; j++) {
+		    BoardType stone = goban.getStone(i, j);
+		    switch (stone) {
+		    case BLACK:
+		    case WHITE:
+			if (lastMove != null && lastMove.equals(i, j))
+			    drawStoneHighlighted(i, j, stone, canvas);
+			else
+			    drawStone(i, j, stone, canvas);
+			break;
+		    case EMPTY:
+			break;
 		    }
+		    if (view.isSelected(i, j))
+			drawSelection(i, j, canvas);
 		}
 	    }
+	}
     }
 
     Paint paint = new Paint();
 
     void drawStone(int i, int j, BoardType stone, Canvas canvas)
     {
-
-
 	paint.setAntiAlias(true);
 	paint.setStrokeWidth(STONE_STROKEWIDTH);
 

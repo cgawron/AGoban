@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.content.ContentValues;
 import android.content.res.TypedArray;
+import android.database.Cursor;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.text.TextWatcher;
@@ -39,6 +41,7 @@ import android.widget.TextView;
 import de.cgawron.agoban.SGFApplication;
 import de.cgawron.agoban.R;
 
+import de.cgawron.go.sgf.GameTree;
 import de.cgawron.go.sgf.Property.GameInfo;
 import de.cgawron.go.sgf.Property;
 import de.cgawron.go.sgf.PropertyList;
@@ -50,13 +53,12 @@ import de.cgawron.go.sgf.Value;
  */
 public class PropertyView extends TableRow implements TextWatcher
 {
-    SGFApplication application;
-    private PropertyList properties;
     private GameInfo property;
 
     private TextView label;
     private TextView text;
     private String key;
+    private String valueText = "";
 
     /**
      * Construct object, initializing with any attributes we understand from a
@@ -68,28 +70,16 @@ public class PropertyView extends TableRow implements TextWatcher
     public PropertyView(Context context, AttributeSet attrs) 
     {
         super(context, attrs);
-	application = (SGFApplication) context.getApplicationContext();
-	properties = application.getGameTree().getRoot();
-
-	for (int i=0; i < attrs.getAttributeCount(); i++)
-	    Log.d("PropertyView", "attr: " + attrs.getAttributeName(i) + " = " + attrs.getAttributeValue(i));
-	
 	key = attrs.getAttributeValue("http://cgawron", "property");
-	if (this.key != null) {
-	    Property.Key key = new Property.Key(this.key);
-	    property = (GameInfo) properties.get(key); 
-	    Log.d("PropertyView", "property: " + property); 
 
-	    if (property == null) {
-		Property prop = Property.createProperty(key);
-		Log.d("PropertyView", "new property class for key " + this.key + ": " + prop.getClass()); 
-		property = (GameInfo) prop;
-		properties.add(property);
-	    }
+	SGFApplication application = (SGFApplication) context.getApplicationContext();
+	init(context);
 
+	//TODO: Rethink initialization
+	if (application.getGameTree() != null) {
+	    setPropertyList(application.getGameTree().getRoot());
 	}
 
-	init(context);
 	String labelText = "";
 	int labelId = attrs.getAttributeResourceValue("http://cgawron", "label", 0);
 	if (labelId > 0)
@@ -106,15 +96,16 @@ public class PropertyView extends TableRow implements TextWatcher
 	addView(label);
 	addView(text, params);
 	text.addTextChangedListener(this);
-	initText();
     }
 
     protected void initText() 
     {
-	String valueText = "";
-	Value value = property.getValue();
-	if (value != null)
-	    valueText = value.toString();
+	if (property != null) {
+	    Value value = property.getValue();
+	    if (value != null)
+		valueText = value.toString();
+	}
+	    
 	text.setText(valueText);
     }
 
@@ -123,10 +114,48 @@ public class PropertyView extends TableRow implements TextWatcher
      * @param text The text to display. This will be drawn as one line.
      */
     public void setPropertyList(PropertyList properties) {
-        this.properties = properties;
+	if (this.key != null) {
+	    Property.Key key = new Property.Key(this.key);
+	    property = (GameInfo) properties.get(key); 
+	    Log.d("PropertyView", "property: " + property); 
+	    
+	    if (property == null) {
+		Property prop = Property.createProperty(key);
+		Log.d("PropertyView", "new property class for key " + this.key + ": " + prop.getClass()); 
+		property = (GameInfo) prop;
+		properties.add(property);
+	    }
+	}
 	
 	Log.d("PropertyView", "setPropertyList: " + properties); 
 	initText();
+    }
+
+    public void setValue(String value)
+    {
+	valueText = value;
+	text.setText(valueText);
+    }
+
+    public void setValue(ContentValues values)
+    {
+	valueText = values.get(key).toString();
+	if (valueText == null)
+	    valueText= "";
+	text.setText(valueText);
+    }
+
+    public void setValue(Cursor cursor, int position)
+    {
+	Log.d("PropertyView", String.format("setValue(%s, %d)", cursor, position));
+	int oldPosition = cursor.getPosition();
+	cursor.moveToPosition(position);
+	valueText = cursor.getString(cursor.getColumnIndex(key));
+	cursor.moveToPosition(oldPosition);
+	
+	if (valueText == null)
+	    valueText= "";
+	text.setText(valueText);
     }
 
     public void afterTextChanged(android.text.Editable s)

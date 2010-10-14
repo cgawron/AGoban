@@ -19,5 +19,11 @@
       android:focusable="true"
       android:layout_width="fill_parent" 
       android:layout_height="wrap_content"/>
+  <de.cgawron.agoban.view.GameTreeControls 
+      android:id="@+id/controls"  
+      android:focusable="true"
+      android:layout_width="wrap_content" 
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal"/>
 </LinearLayout>
 

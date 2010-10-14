@@ -30,12 +30,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.SimpleCursorAdapter.ViewBinder;
 import android.widget.TextView;
+
+import de.cgawron.agoban.view.PropertyView;
 import de.cgawron.agoban.provider.GameInfo;
 import de.cgawron.agoban.provider.SGFProvider;
 
@@ -52,6 +57,7 @@ public class ChooseSGF extends Activity implements ViewBinder
 
     private TextView textView;
     private ListView listView;
+    private ViewGroup footerView;
 
     private Cursor cursor = null;
 
@@ -77,6 +83,7 @@ public class ChooseSGF extends Activity implements ViewBinder
 
     	textView = (TextView) findViewById(R.id.text);
     	listView = (ListView) findViewById(R.id.list);
+    	footerView = (ViewGroup) findViewById(R.id.footer);
     }
 
     @Override
@@ -99,13 +106,30 @@ public class ChooseSGF extends Activity implements ViewBinder
 	if (listView != null)
 	    listView.setAdapter(adapter);
 
-	listView.setOnItemClickListener(new OnItemClickListener() {
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+	listView.setOnItemLongClickListener(new OnItemLongClickListener() {
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                     Uri data = SGFProvider.CONTENT_URI.buildUpon().appendQueryParameter(GameInfo.KEY_ID, String.valueOf(id)).build();
                     Intent sgfIntent = new Intent(Intent.ACTION_VIEW, data);
                     startActivity(sgfIntent);
 		    finish();
+		    return true;
                 }
+            });
+
+	listView.setOnItemClickListener(new OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		    updateFooter(cursor, position);
+                }
+            });
+
+	listView.setOnItemSelectedListener(new OnItemSelectedListener() {
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+		    updateFooter(cursor, position);
+                }
+
+		public void onNothingSelected(AdapterView<?> parent) {
+		    //updateFooter(null);
+		}
             });
     }
 
@@ -127,7 +151,7 @@ public class ChooseSGF extends Activity implements ViewBinder
     {
 	String columnName = cursor.getColumnName(columnIndex);
 	int colDate = cursor.getColumnIndex(GameInfo.KEY_DATE);
-	Log.d("ChooseSGF", "setViewValue: " + cursor + ", column=" + columnName);
+	Log.d("ChooseSGF", "setViewValue: " + cursor + ", position=" + cursor.getPosition() + ", column=" + columnName);
 	
 	if (view.getId() == R.id.modified) {
 	    TextView text = (TextView) view;
@@ -139,5 +163,14 @@ public class ChooseSGF extends Activity implements ViewBinder
 	    return true;
 	}
 	return false;
+    }
+
+    private void updateFooter(Cursor cursor, int position) {
+	Log.d("ChooseSGF", String.format("updateFooter(%s, %d)", cursor, position));
+
+	for (int i=0; i<footerView.getChildCount(); i++) {
+	    PropertyView view = (PropertyView) footerView.getChildAt(i);
+	    //view.setValue(cursor, position);
+	}
     }
 }

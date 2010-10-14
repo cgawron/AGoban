@@ -439,16 +439,14 @@ implements MarkupModelListener, TreeNode, Comparable<Node>, MementoOriginator//,
 		return true;
 	}
 
-	public TreeNode getChildAt(int i)
+	public Node getChildAt(int i)
 	{
-		try
-		{
-			return children.get(i);
-		}
-		catch (IndexOutOfBoundsException ex)
-		{
-			return null;
-		}
+	    try {
+		return children.get(i);
+	    }
+	    catch (IndexOutOfBoundsException ex) {
+		return null;
+	    }
 	}
 
 	public int getChildCount()

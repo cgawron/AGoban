@@ -27,6 +27,8 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MotionEvent;
 import android.view.View;
 import de.cgawron.agoban.GobanEvent;
@@ -51,6 +53,16 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
 
     private final float xOff = 0.0f, yOff = 0.0f, relativeScale = 1.0f;
 
+    public class GobanContextMenuInfo implementes ContextMenuInfo
+    {
+	public Point point;
+ 
+	GobanContextMenuInfo(Point point)
+	{
+	    this.point = point;
+	}
+    }
+    
     /**
      * Constructor.  This version is only needed if you will be instantiating
      * the object manually (not from a layout XML file).
@@ -74,7 +86,7 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
         initGobanView();
 
         TypedArray a = context.obtainStyledAttributes(attrs,
-                R.styleable.GobanView);
+						      R.styleable.GobanView);
 
         // Note, if you only care about supporting a single color, that you
         // can instead call a.getColor() and pass that to setTextColor().
@@ -103,16 +115,16 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
-    {
-	int width = MeasureSpec.getSize(widthMeasureSpec);
-	int height = MeasureSpec.getSize(heightMeasureSpec);
-	int min = width < height ? width : height;
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
+	{
+	    int width = MeasureSpec.getSize(widthMeasureSpec);
+	    int height = MeasureSpec.getSize(heightMeasureSpec);
+	    int min = width < height ? width : height;
 	
-	Log.d("Goban", "onMeasure: " + width + ", " + height);
-	setMeasuredDimension(min, min);
-	invalidate();
-    }
+	    Log.d("Goban", "onMeasure: " + width + ", " + height);
+	    setMeasuredDimension(min, min);
+	    invalidate();
+	}
 
     /**
      * Render the Goban
@@ -120,7 +132,7 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
      * @see android.view.View#onDraw(android.graphics.Canvas)
      */
     @Override
-    protected void onDraw(Canvas canvas) {
+	protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 	Rect bounds = new Rect();
 	boolean clip = canvas.getClipBounds(bounds);
@@ -139,17 +151,17 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
     }
 
     /*
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-	if (!gobanEventHandler.onTouchEvent(event))
-	    return super.onTouchEvent(event);
-	else
-	    return true;
-    }
+      @Override
+      public boolean onTouchEvent(MotionEvent event) {
+      if (!gobanEventHandler.onTouchEvent(event))
+      return super.onTouchEvent(event);
+      else
+      return true;
+      }
     */
 
     @Override
-    public boolean onTrackballEvent(MotionEvent event) {
+	public boolean onTrackballEvent(MotionEvent event) {
 	if (!gobanEventHandler.onTrackballEvent(event))
 	    return super.onTrackballEvent(event);
 	else
@@ -224,5 +236,11 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
 	Log.d("Goban", "setSelection: " + point);
 	selection = point;
 	invalidate();
-   }
+    }
+    
+    public ContextMenuInfo getContextMenuInfo()
+    {
+	return new GobanContextMenuInfo(selection);
+    }
+
 }
