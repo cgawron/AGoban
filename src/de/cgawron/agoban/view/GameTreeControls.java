@@ -27,6 +27,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -47,6 +48,8 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 
     private final Button buttonNext;
     private final Button buttonPrev;
+    private final Button buttonNextMarkup;
+    private final Button buttonPrevMarkup;
     private final TextView moveNoView;
 
     private GameTree gameTree;
@@ -58,9 +61,13 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
         super(context, attrs);
 	buttonNext = new Button(context);
 	buttonPrev = new Button(context);
+	buttonNextMarkup = new Button(context);
+	buttonPrevMarkup = new Button(context);
 	moveNoView = new TextView(context);
 	buttonNext.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.arrow_up_float, 0, 0, 0);
 	buttonPrev.setCompoundDrawablesWithIntrinsicBounds(0, 0, android.R.drawable.arrow_down_float, 0);
+	buttonNextMarkup.setText("nm");
+	buttonPrevMarkup.setText("pm");
 	moveNoView.setText("-");
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.GobanView);
@@ -75,9 +82,13 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 	params.gravity  = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
 	addView(buttonPrev, params);
 	buttonPrev.setOnClickListener(this);
+	addView(buttonPrevMarkup, params);
+	buttonPrevMarkup.setOnClickListener(this);
 	params.gravity = Gravity.CENTER;
 	addView(moveNoView, params);
 	params.gravity = Gravity.CENTER_VERTICAL | Gravity.LEFT;
+	addView(buttonNextMarkup, params);
+	buttonNextMarkup.setOnClickListener(this);
 	addView(buttonNext, params);
 	buttonNext.setOnClickListener(this);
     }
@@ -88,9 +99,17 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 	    Log.d("GameTreeControls", "button pressed: prev");
 	    prevNode();
 	}
+	else if (buttonPrevMarkup.equals(v)) {
+	    Log.d("GameTreeControls", "button pressed: prevMarkup");
+	    prevMarkupNode();
+	}
 	else if (buttonNext.equals(v)) {
 	    Log.d("GameTreeControls", "button pressed: next");
 	    nextNode();
+	}
+	else if (buttonNextMarkup.equals(v)) {
+	    Log.d("GameTreeControls", "button pressed: nextMarkup");
+	    nextMarkupNode();
 	}
     }
 
@@ -125,5 +144,18 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 	if (currentNode != null && currentNode.getParent() != null) {
 	    setCurrentNode(currentNode.getParent());
 	}
+    }
+
+    public void nextMarkupNode() 
+    {
+	while (currentNode != null && currentNode.getChildCount() > 0 /* && !currentNode.isMarkup()*/) {
+	    currentNode = currentNode.getChildAt(0);
+	}
+	throw new RuntimeException("Not yet implemented");
+    }
+
+    public void prevMarkupNode() 
+    {
+	throw new RuntimeException("Not yet implemented");
     }
 }

@@ -53,13 +53,19 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
 
     private final float xOff = 0.0f, yOff = 0.0f, relativeScale = 1.0f;
 
-    public class GobanContextMenuInfo implementes ContextMenuInfo
+    public class GobanContextMenuInfo implements ContextMenuInfo
     {
 	public Point point;
  
 	GobanContextMenuInfo(Point point)
 	{
 	    this.point = point;
+	}
+	
+	@Override
+	public String toString() 
+	{
+	    return String.format("GobanContextMenuInfo(%s)", point);
 	}
     }
     
