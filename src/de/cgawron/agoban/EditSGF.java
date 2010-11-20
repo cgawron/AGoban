@@ -46,6 +46,7 @@ import android.widget.Toast;
 import de.cgawron.agoban.view.GameTreeControls;
 import de.cgawron.agoban.view.GameTreeControls.GameTreeNavigationListener;
 import de.cgawron.agoban.view.GobanView;
+import de.cgawron.agoban.view.GobanView.GobanContextMenuInfo;
 import de.cgawron.agoban.provider.SGFProvider;
 import de.cgawron.go.Goban;
 import de.cgawron.go.sgf.GameTree;
@@ -105,7 +106,6 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	Log.d("EditSGF", "Uri: " + intent.getData());
 	if (intent.getData() == null) {
 	    Intent searchSGF = new Intent(Intent.ACTION_SEARCH, SGFProvider.CONTENT_URI, this, ChooseSGF.class);
-	    //Intent searchSGF = new Intent(Intent.ACTION_SEARCH, SGFProvider.CONTENT_URI, this, ListGoogleSGF.class);
 	    startActivity(searchSGF);
 	    finish();
 	}
@@ -218,6 +218,14 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	Log.d("EditSGF", "onCreateContextMenu");
 	MenuInflater inflater = getMenuInflater();
 	inflater.inflate(R.menu.stone_context_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item)
+    {
+	GobanContextMenuInfo info = (GobanContextMenuInfo) item.getMenuInfo();
+	Log.d("onContextMenuItemSelected", item.toString() + " " + info);
+	return true;
     }
 
     @Override
