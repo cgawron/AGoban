@@ -22,6 +22,7 @@ import java.util.Date;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageItemInfo;
 import android.content.pm.PackageManager;
@@ -31,6 +32,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -39,10 +43,12 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.SimpleCursorAdapter.ViewBinder;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import de.cgawron.agoban.view.PropertyView;
 import de.cgawron.agoban.provider.GameInfo;
 import de.cgawron.agoban.provider.SGFProvider;
+import de.cgawron.agoban.sync.GoogleSync;
 
 /**
  * Shows the game info
@@ -68,7 +74,8 @@ public class ChooseSGF extends Activity implements ViewBinder
     	super.onCreate(savedInstanceState);
     	application = (SGFApplication) getApplication();
     	try {
-    		PackageItemInfo info = getPackageManager().getActivityInfo(new ComponentName(this, ChooseSGF.class), PackageManager.GET_META_DATA);
+    		PackageItemInfo info = getPackageManager().getActivityInfo(new ComponentName(this, ChooseSGF.class), 
+									   PackageManager.GET_META_DATA);
     		gitId = info.metaData.getString("git-id");
     	}
     	catch (Exception e)
@@ -145,6 +152,50 @@ public class ChooseSGF extends Activity implements ViewBinder
     protected void onPause() {
 	Log.d("ChooseSGF", "onPause");
 	super.onPause();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+	MenuInflater inflater = getMenuInflater();
+	inflater.inflate(R.menu.options_menu, menu);
+	return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+	switch (item.getItemId()) {
+
+	case R.id.google_sync:
+	    googleSync();
+	    return true;
+
+	case R.id.new_game:
+	    newGame();
+	    return true;
+
+	case R.id.about:
+	    Context context = getApplicationContext();
+	    CharSequence text = String.format("AGoban, (c)2010 Christian Gawron\nGit-Id: %s", gitId);
+	    int duration = Toast.LENGTH_LONG;
+	    Toast toast = Toast.makeText(context, text, duration);
+	    toast.show();
+	    return true;
+	}
+	return false;
+    }
+
+    public void newGame()
+    {
+	Intent sgfIntent = new Intent(Intent.ACTION_EDIT, application.getNewGameUri());
+	startActivity(sgfIntent);
+	finish();
+    }
+
+    public void googleSync()
+    {
+	Intent searchSGF = new Intent(Intent.ACTION_SEARCH, SGFProvider.CONTENT_URI, this, GoogleSync.class);
+	startActivity(searchSGF);
+	finish();
     }
 
     public boolean setViewValue(View view, Cursor cursor, int columnIndex)

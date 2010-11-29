@@ -2,12 +2,19 @@
  *
  * $Id: sgf.lex,v 1.7.2.6 2003/02/16 14:23:38 cgawron Exp $
  *
- * © 2001 Christian Gawron. All rights reserved.
+ * (C) 2010 Christian Gawron. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  * 
  */
 package de.cgawron.go.sgf;
@@ -16,6 +23,7 @@ import java.lang.System;
 import java.io.IOException;
 import de.cgawron.util.MiscEncodingReader;
 import org.apache.log4j.Logger;
+import android.util.Log;
 
 %%
 
@@ -61,12 +69,12 @@ import org.apache.log4j.Logger;
 
     public String getCurrentLine()
     {
-	int beg = yy_currentPos; 
-	int end = yy_currentPos; 
-	while (beg > 0 && yy_buffer[beg-1] != '\n') beg--;
-	while (end < yy_endRead && yy_buffer[end] != '\n') end++;
+	int beg = zzCurrentPos; 
+	int end = zzCurrentPos; 
+	while (beg > 0 && zzBuffer[beg-1] != '\n') beg--;
+	while (end < zzEndRead && zzBuffer[end] != '\n') end++;
 	
-	return new String(yy_buffer, beg, end-beg);
+	return new String(zzBuffer, beg, end-beg);
     }
 
 
@@ -80,19 +88,19 @@ import org.apache.log4j.Logger;
 
     public void _setCharset(String charSetName)
     {
-	MiscEncodingReader mer = (MiscEncodingReader) yy_reader;
+	MiscEncodingReader mer = (MiscEncodingReader) zzReader;
 	try {
-	  //mer.setCharset(charSetName, yy_currentPos);
-	  mer.setCharset(charSetName, yy_markedPos);
-	  yy_reader = null;
+	  //mer.setCharset(charSetName, zzcurrentPos);
+	  mer.setCharset(charSetName, zzMarkedPos);
+	  zzReader = null;
 	  yyclose();
-	  yy_reader = mer;
-	  yy_atEOF  = false;
-	  yy_endRead = yy_startRead = 0;
-	  yy_currentPos = yy_markedPos = yy_pushbackPos = 0;
+	  zzReader = mer;
+	  zzAtEOF  = false;
+	  zzEndRead = zzStartRead = 0;
+	  zzCurrentPos = zzMarkedPos = 0;
 	}
 	catch (IOException err) {
-	  throw new Error(err);
+	  throw new RuntimeException(err);
 	}
     }
 %}
@@ -275,6 +283,9 @@ import org.apache.log4j.Logger;
 \r { }
 
 .  { 
-       throw new ParseError("Illegal character <"+ yytext() + ">", this); 
+      Log.e("sgf.lex", String.format("Illegal character: text=%s, line=%d, column %d, char=%d", 
+				     yytext(), yyline, getColumn(), yychar));
+      return new Token(Symbols.error, yytext(), yyline, yychar, null);
+  //throw new ParseError("Illegal character <"+ yytext() + ">", this); 
    }
 

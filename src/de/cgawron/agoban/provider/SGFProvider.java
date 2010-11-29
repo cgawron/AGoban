@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2010 Christian Gawron
  *
@@ -18,6 +19,7 @@ package de.cgawron.agoban.provider;
 
 import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.content.ContentProvider;
@@ -105,7 +107,7 @@ public class SGFProvider extends ContentProvider
 	thread.start();
     }
 
-    private void doUpdateDatabase()
+    public void doUpdateDatabase()
     {
 	Log.d("SGFProvider", "updateDatabase");
 	//Debug.startMethodTracing("updateDatabase");
@@ -122,6 +124,7 @@ public class SGFProvider extends ContentProvider
 		});
 
 	    for (File file : files) {
+		Cursor cursor = null;
 		try {
 		    int id = file.hashCode();
 		    long lastModified = file.lastModified();
@@ -131,7 +134,7 @@ public class SGFProvider extends ContentProvider
 		    String[] args = new String[1];
 		    args[0] = Integer.toString(id);
 		    Log.d("SGFProvider", "checking if information for " + file + " is available");
-		    Cursor cursor = queryDB(getColumns(), QUERY_STRING, args);
+		    cursor = queryDB(getColumns(), QUERY_STRING, args);
 		    cursor.moveToFirst();
 		    Log.d("SGFProvider", "getCount(): " + cursor.getCount());
 		    
@@ -140,17 +143,26 @@ public class SGFProvider extends ContentProvider
 		    }
 		    else {
 			Log.d("SGFProvider", "parsing " + file);
-			GameInfo gameInfo = new GameInfo(file);
+			GameInfo gameInfo;
+			try {
+			    gameInfo = new GameInfo(file);
+			}
+			catch (Exception ex) {
+			    Log.e("SGFProvider", "parse error: " + ex);
+			    ex.printStackTrace();
+			    continue;
+			}
 			long _id = db.insertWithOnConflict(SGFDBOpenHelper.SGF_TABLE_NAME, "", 
 							   gameInfo.getContentValues(), SQLiteDatabase.CONFLICT_REPLACE);
-			sgfMap.put(Long.valueOf(id), gameInfo);
-			Log.d("SGFProvider", "insert: " + id + " " + _id);
 		    }
-		    cursor.close();
 		}
 		catch (Exception ex) {
 		    Log.d("SGFProvider", "caught " + ex);
 		    throw new RuntimeException(ex);
+		}
+		finally {
+		    if (cursor != null)
+			cursor.close();
 		}
 	    }
 	}
@@ -168,6 +180,7 @@ public class SGFProvider extends ContentProvider
 	Log.d("SGFProvider", String.format("path=%s", path));
 
 	Cursor cursor = queryDB(projection, selection, selectionArgs);
+	Log.d("SGFProvider", String.format("query: returning cursor with %d rows", cursor.getCount()));
 	return cursor;
     }
 	
@@ -248,5 +261,10 @@ public class SGFProvider extends ContentProvider
     {
 	Log.d("SGFProvider", String.format("getGameInfo(%d)=%s", id, sgfMap.get(id)));
 	return sgfMap.get(id);
+    }
+
+    public static File getSGFDirectory()
+    {
+	return SGF_DIRECTORY;
     }
 }

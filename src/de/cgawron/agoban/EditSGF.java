@@ -48,6 +48,7 @@ import de.cgawron.agoban.view.GameTreeControls.GameTreeNavigationListener;
 import de.cgawron.agoban.view.GobanView;
 import de.cgawron.agoban.view.GobanView.GobanContextMenuInfo;
 import de.cgawron.agoban.provider.SGFProvider;
+import de.cgawron.agoban.sync.GoogleSync;
 import de.cgawron.go.Goban;
 import de.cgawron.go.sgf.GameTree;
 import de.cgawron.go.sgf.Node;
@@ -174,9 +175,13 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 	    showGameInfo();
 	    return true;
 
+	case R.id.google_sync:
+	    googleSync();
+	    return true;
+
 	case R.id.about:
 	    Context context = getApplicationContext();
-	    CharSequence text = String.format("AGoban, ©2010 Christian Gawron\nGit-Id: %s", gitId);
+	    CharSequence text = String.format("AGoban, (c)2010 Christian Gawron\nGit-Id: %s", gitId);
 	    int duration = Toast.LENGTH_LONG;
 	    Toast toast = Toast.makeText(context, text, duration);
 	    toast.show();
@@ -263,6 +268,15 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
     {
 	Intent sgfIntent = new Intent(Intent.ACTION_EDIT, application.getNewGameUri());
 	startActivity(sgfIntent);
+	finish();
+    }
+
+    public void googleSync()
+    {
+	Intent send = new Intent(Intent.ACTION_SEND, application.getData(), this, GoogleSync.class);
+	send.setType("application/x-go-sgf");
+	send.putExtra(Intent.EXTRA_STREAM, application.getData());
+	startActivity(send);
 	finish();
     }
 
