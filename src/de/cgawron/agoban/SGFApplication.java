@@ -134,7 +134,8 @@ public class SGFApplication extends Application
      * Save the GameTree.
      * Due to the small default stack size, this has to be done in a worker thread.
      */
-    public void save(boolean async) {
+    public void save(boolean async) 
+    {
 	if (data == null) {
 	    setData(null);
 	}
@@ -143,7 +144,7 @@ public class SGFApplication extends Application
 		public void run() {
 		    Log.d("SGFApplication", "saving " + data);
 		    try {
-			OutputStream os = getContentResolver().openOutputStream(data);
+			OutputStream os = getContentResolver().openOutputStream(data, "rwt");
 			gameTree.save(os);
 			os.close();
 		    }

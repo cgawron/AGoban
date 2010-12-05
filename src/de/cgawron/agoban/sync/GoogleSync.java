@@ -424,32 +424,36 @@ public final class GoogleSync extends Activity
 	List<GDocEntry> entries = getDocumentList();
 	for (GDocEntry entry : entries) {
 	    Log.d(TAG, "doc: " + entry.title);
-	    if (entry.title.endsWith(".sgf")) {
-		for (Category category : entry.categories) {
-		    Log.d(TAG, "category: " + category);
-		}
-		Log.d(TAG, String.format("file %s updated on %s", entry.title, entry.getUpdated().toString()));
-		Cursor cursor = resolver.query(SGFProvider.CONTENT_URI, projection, 
-					       String.format("%s = '%s'", KEY_FILENAME, entry.title), null, null);
-
-		if (cursor.getCount() > 0) {
-		    cursor.moveToFirst();
-		    Date localModification = new Date(cursor.getLong(1));
-		    Date remoteModification = entry.getUpdated();
-		    Log.d(TAG, "local  modification: " + localModification);
-		    Log.d(TAG, "remote modification: " + remoteModification);
+	    boolean isSgf = false;
+	    for (Category category : entry.categories) {
+		if (category.scheme.equals("http://schemas.google.com/g/2005#kind") &&
+		    category.term.equals("http://schemas.google.com/docs/2007#file") &&
+		    category.label.equals("application/x-go-sgf"))
+		    isSgf = true;
+	    }
+	    if (!isSgf) continue;
 	    
-		    if (localModification.before(remoteModification)) {
-			retrieve(entry);
-		    }
-		    else {
-			Log.d(TAG, "not retrieving " + entry.title);
-		    }
-		    cursor.close();
-		}
-		else {
+	    Log.d(TAG, String.format("file %s updated on %s", entry.title, entry.getUpdated().toString()));
+	    Cursor cursor = resolver.query(SGFProvider.CONTENT_URI, projection, 
+					   String.format("%s = '%s'", KEY_FILENAME, entry.title), null, null);
+	    
+	    if (cursor.getCount() > 0) {
+		cursor.moveToFirst();
+		Date localModification = new Date(cursor.getLong(1));
+		Date remoteModification = entry.getUpdated();
+		Log.d(TAG, "local  modification: " + localModification);
+		Log.d(TAG, "remote modification: " + remoteModification);
+		
+		if (localModification.before(remoteModification)) {
 		    retrieve(entry);
 		}
+		else {
+		    Log.d(TAG, "not retrieving " + entry.title);
+		}
+		cursor.close();
+	    }
+	    else {
+		retrieve(entry);
 	    }
 	}
     }
@@ -488,7 +492,7 @@ public final class GoogleSync extends Activity
 	atom.entry = entry;
 	category.scheme = "http://schemas.google.com/g/2005#kind";
 	category.term = "http://schemas.google.com/docs/2007#file";
-	category.label = "x-go-sgf";
+	category.label = "application/x-go-sgf";
 	entry.categories = new ArrayList();
 	entry.categories.add(category);
 	try {

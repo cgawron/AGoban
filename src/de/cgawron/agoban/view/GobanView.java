@@ -87,7 +87,8 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
      * 
      * @see android.view.View#View(android.content.Context, android.util.AttributeSet)
      */
-    public GobanView(Context context, AttributeSet attrs) {
+    public GobanView(Context context, AttributeSet attrs) 
+    {
         super(context, attrs);
         initGobanView();
 
@@ -101,7 +102,8 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
         a.recycle();
     }
 
-    private final void initGobanView() {
+    private final void initGobanView() 
+    {
 	// Create Event handler
 	gobanEventHandler = new GobanEventHandler(this, getResources());
 	setOnTouchListener(gobanEventHandler);
@@ -115,22 +117,23 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
      * Sets the text to display in this label
      * @param text The text to display. This will be drawn as one line.
      */
-    public void setGoban(Goban goban) {
+    public void setGoban(Goban goban) 
+    {
         this.goban = goban;
         invalidate();
     }
 
     @Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
-	{
-	    int width = MeasureSpec.getSize(widthMeasureSpec);
-	    int height = MeasureSpec.getSize(heightMeasureSpec);
-	    int min = width < height ? width : height;
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
+    {
+	int width = MeasureSpec.getSize(widthMeasureSpec);
+	int height = MeasureSpec.getSize(heightMeasureSpec);
+	int min = width < height ? width : height;
 	
-	    Log.d("Goban", "onMeasure: " + width + ", " + height);
-	    setMeasuredDimension(min, min);
-	    invalidate();
-	}
+	Log.d("Goban", "onMeasure: " + width + ", " + height);
+	setMeasuredDimension(min, min);
+	invalidate();
+    }
 
     /**
      * Render the Goban
@@ -138,7 +141,8 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
      * @see android.view.View#onDraw(android.graphics.Canvas)
      */
     @Override
-	protected void onDraw(Canvas canvas) {
+    protected void onDraw(Canvas canvas) 
+    {
         super.onDraw(canvas);
 	Rect bounds = new Rect();
 	boolean clip = canvas.getClipBounds(bounds);
@@ -156,35 +160,41 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
 	renderer.render(goban, canvas);
     }
 
+
     /*
-      @Override
-      public boolean onTouchEvent(MotionEvent event) {
-      if (!gobanEventHandler.onTouchEvent(event))
-      return super.onTouchEvent(event);
-      else
-      return true;
-      }
+    @Override
+    public boolean onTouchEvent(MotionEvent event) 
+    {
+	if (!gobanEventHandler.onTouchEvent(event))
+	    return super.onTouchEvent(event);
+	else
+	    return true;
+    }
     */
 
     @Override
-	public boolean onTrackballEvent(MotionEvent event) {
+    public boolean onTrackballEvent(MotionEvent event) 
+    {
 	if (!gobanEventHandler.onTrackballEvent(event))
 	    return super.onTrackballEvent(event);
 	else
 	    return true;
     }
     
-    public Object getDraggableObjectAtPoint(PointInfo pt) {
+    public Object getDraggableObjectAtPoint(PointInfo pt) 
+    {
 	// We do not support dragging on a goban
 	return null;
     }
 
-    public void getPositionAndScale(Object obj, PositionAndScale objPosAndScaleOut) {
+    public void getPositionAndScale(Object obj, PositionAndScale objPosAndScaleOut) 
+    {
 	// We start at 0.0f each time the drag position is replaced, because we just want the relative drag distance 
 	objPosAndScaleOut.set(xOff, yOff, relativeScale);
     }
 
-    public void selectObject(Object obj, PointInfo pt) {
+    public void selectObject(Object obj, PointInfo pt) 
+    {
 	int width = getWidth();
 	int height = getHeight();
 	int size = goban.getBoardSize();

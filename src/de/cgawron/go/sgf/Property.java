@@ -46,7 +46,7 @@ public class Property implements Cloneable
     {
 	Class propertyClass() default GameInfo.class;
 	String name() default "";
-	int priority() default 0;
+	int priority() default 1000;
     }
     
     public interface Joinable
@@ -60,7 +60,6 @@ public class Property implements Cloneable
     public static class Key implements Comparable
     {
         String k;
-        Integer priority;
 	String userFriendlyName;
 
 	/**
@@ -77,14 +76,6 @@ public class Property implements Cloneable
                 if (Character.isUpperCase(c)) shortName.append(c);
             }
             k = shortName.toString();
-	    /*
-            PropertyDescriptor d = getDescriptor(this);
-            priority = new Integer(d != null ? d.getPriority() : 0);
-	    if (d != null)
-		userFriendlyName = d.getUserFriendlyName(); 
-	    */
-	    if (priority == null)
-		priority = 0;
 	    if (userFriendlyName == null)
 		userFriendlyName = shortName.toString();
         }
@@ -113,7 +104,10 @@ public class Property implements Cloneable
         public int compareTo(Object o) throws ClassCastException
         {
             Key key = (Key) o;
-	    int c = priority.compareTo(key.priority);
+	    Integer myPrio = getDescriptor(this) != null ? getDescriptor(this).getPriority() : 0;
+	    Integer theirPrio = getDescriptor(key) != null ? getDescriptor(key).getPriority() : 0;
+
+	    int c = myPrio.compareTo(theirPrio);
 	    if (c == 0)
                 return k.compareTo(key.k);
             else
@@ -138,143 +132,6 @@ public class Property implements Cloneable
 
         }
     }
-
-    /** The SGF Property AddBlack. */
-    @SGFProperty(propertyClass=AddStones.class, priority=62)
-    public static final Key ADD_BLACK = new Key("AB");
-
-    /** The SGF Property AddEmpty. */
-    @SGFProperty(propertyClass=AddStones.class, priority=61)
-    public final static Key ADD_EMPTY = new Key("AE");
-
-    /** The SGF Property AddWhite. */
-    @SGFProperty(propertyClass=AddStones.class, priority=62)
-    public final static Key ADD_WHITE = new Key("AW");
-
-    /** The SGF Property APplication. */
-    @SGFProperty(propertyClass=Root.class, priority=91)
-    public final static Key APPLICATION = new Key("AP");
-
-    /** The SGF Property Black. */
-    @SGFProperty(propertyClass=Move.class, priority=60)
-    public final static Key BLACK = new Key("B");
-
-    /** The SGF Property BlackRank. */
-    @SGFProperty(propertyClass=GameInfo.class, priority=85)
-    public final static Key BLACK_RANK = new Key("BR");
-
-    /** The SGF Property ChAracterset. */
-    @SGFProperty(propertyClass=Charset.class)
-    public final static Key CHARACTER_SET = new Key("CA");
-
-    /** The SGF Property CiRcle. */
-    @SGFProperty(propertyClass=Markup.class)
-    public final static Key CIRCLE = new Key("CR");
-
-    /** The SGF Property Comment. */
-    @SGFProperty(propertyClass=Text.class)
-    public final static Key COMMENT = new Key("C");
-
-    /** The SGF Property DAte. */
-    @SGFProperty(propertyClass=GameInfo.class, priority=77)
-    public final static Key DATE = new Key("DT");
-
-    /** The SGF Property EVent. */
-    @SGFProperty(propertyClass=GameInfo.class, priority=88)
-    public final static Key EVENT = new Key("EV");
-
-    /** The SGF Property FiGure. */
-    @SGFProperty(propertyClass=Property.class)
-    public final static Key FIGURE = new Key("FG");
-
-    /** The SGF Property FileFormat. */
-    @SGFProperty(propertyClass=RootNumber.class)
-    public final static Key FILE_FORMAT = new Key("FF");
-
-    /** The SGF Property GaMe. */
-    @SGFProperty(propertyClass=Root.class)
-    public final static Key GAME = new Key("GM");
-
-    /** The SGF Property GameName. */
-    @SGFProperty(propertyClass=GameInfo.class)
-    public final static Key GAME_NAME = new Key("GN");
-
-    /** The SGF Property LaBel. */
-    @SGFProperty(propertyClass=Label.class)
-    public final static Key LABEL = new Key("LB");
-
-    /** The SGF Property MArk. */
-    @SGFProperty(propertyClass=Markup.class)
-    public final static Key MARK = new Key("MA");
-
-    /** The SGF Property MoveNumber. */
-    @SGFProperty(propertyClass=SimpleNumber.class)
-    public final static Key MOVE_NO = new Key("MN");
-
-    /** The SGF Property Name. */
-    @SGFProperty(propertyClass=Text.class)
-    public final static Key NAME = new Key("N");
-
-    /** The SGF Property PlayerBlack. */
-    @SGFProperty(propertyClass=GameInfo.class)
-    public final static Key PLAYER_BLACK = new Key("PB");
-
-    /** The SGF Property PlayerWhite. */
-    @SGFProperty(propertyClass=GameInfo.class)
-    public final static Key PLAYER_WHITE = new Key("PW");
-
-    /** The SGF Property REsult. */
-    @SGFProperty(propertyClass=GameInfo.class)
-    public final static Key RESULT = new Key("RE");
-
-    /** The SGF Property SiZe. */
-    @SGFProperty(propertyClass=RootNumber.class)
-    public final static Key SIZE = new Key("SZ");
-
-    /** The SGF Property SQuare. */
-    @SGFProperty(propertyClass=Markup.class)
-    public final static Key SQUARE = new Key("SQ");
-
-    /** The SGF Property TerritoryWhite. */
-    @SGFProperty(propertyClass=Markup.class)
-    public final static Key TERRITORY_WHITE = new Key("TW");
-
-    /** The SGF Property TerritoryBlack. */
-    @SGFProperty(propertyClass=Markup.class)
-    public final static Key TERRITORY_BLACK = new Key("TB");
-
-    /** The SGF Property TRiangle. */
-    @SGFProperty(propertyClass=Markup.class)
-    public final static Key TRIANGLE = new Key("TR");
-
-    /** The SGF Property USer. */
-    @SGFProperty(propertyClass=GameInfo.class)
-    public final static Key USER = new Key("US");
-
-    /** The SGF Property VieW. */
-    @SGFProperty(propertyClass=View.class)
-    public final static Key VIEW = new Key("VW");
-
-    /** The SGF Property White. */
-    @SGFProperty(propertyClass=Move.class, priority=60)
-    public final static Key WHITE = new Key("W");
-
-    /** The SGF Property WhiteRank. */
-    @SGFProperty(propertyClass=GameInfo.class)
-    public final static Key WHITE_RANK = new Key("WR");
-
-
-    private final static Key[] addStoneKeys = {ADD_BLACK, ADD_WHITE, ADD_EMPTY};
-
-    /**
-     * The properties AddWhite, AddBlack and AddEmpty.
-     */
-    public static final List addStoneProperties = 
-	Arrays.asList(addStoneKeys);
-
-    static Logger logger = Logger.getLogger(Property.class.getName());
-
-    static Set InheritableProperties = new TreeSet();
 
     static class PropertyDescriptor
     {
@@ -311,7 +168,7 @@ public class Property implements Cloneable
 		userFriendlyName = null;
         }
 
-        int getPriority()
+        Integer getPriority()
         {
             return priority;
         }
@@ -330,34 +187,15 @@ public class Property implements Cloneable
 
     private static class Factory
     {
-        private HashMap<String, PropertyDescriptor> propertyMap = new HashMap<String, PropertyDescriptor>();
+	private static HashMap<String, PropertyDescriptor> propertyMap = null;
 
         Factory()
         {
+	    if (propertyMap == null)
+		propertyMap = new HashMap<String, PropertyDescriptor>();
+
 	    Log.d("Property$Factory", "Factory()");
-	    Log.d("Property$Factory", "B=" + Property.BLACK);
             Properties properties = new Properties();
-	    /*
-            try
-            {
-                //properties.load(getClass().getResourceAsStream("sgf.properties"));
-                properties.load(de.cgawron.agoban.EditSGF.resources.openRawResource(de.cgawron.agoban.R.raw.sgf));
-            }
-            catch (Exception e)
-            {
-                throw new MissingResourceException(e.getMessage(), getClass().getName(), "sgf.properties");
-            }
-            Iterator it = properties.keySet().iterator();
-            while (it.hasNext())
-            {
-                String key = (String)it.next();
-                String value = (String)properties.get(key);
-                if (value != null)
-                    propertyMap.put(key, new PropertyDescriptor(value));
-                else
-                    logger.warn("key " + key + " without value");
-            }
-	    */
 
 	    Field[] fields = Property.class.getFields();
 	    for (Field field : fields) {
@@ -394,7 +232,7 @@ public class Property implements Cloneable
 
         PropertyDescriptor getDescriptor(Key key)
         {
-            return (PropertyDescriptor)propertyMap.get(key.toString());
+            return propertyMap.get(key.toString());
         }
 
 	/*
@@ -880,6 +718,143 @@ public class Property implements Cloneable
 	}
     }
 
+    /** The SGF Property AddBlack. */
+    @SGFProperty(propertyClass=AddStones.class, priority=62)
+    public static final Key ADD_BLACK = new Key("AB");
+
+    /** The SGF Property AddEmpty. */
+    @SGFProperty(propertyClass=AddStones.class, priority=61)
+    public final static Key ADD_EMPTY = new Key("AE");
+
+    /** The SGF Property AddWhite. */
+    @SGFProperty(propertyClass=AddStones.class, priority=62)
+    public final static Key ADD_WHITE = new Key("AW");
+
+    /** The SGF Property APplication. */
+    @SGFProperty(propertyClass=Root.class, priority=91)
+    public final static Key APPLICATION = new Key("AP");
+
+    /** The SGF Property Black. */
+    @SGFProperty(propertyClass=Move.class, priority=60)
+    public final static Key BLACK = new Key("B");
+
+    /** The SGF Property BlackRank. */
+    @SGFProperty(propertyClass=GameInfo.class, priority=85)
+    public final static Key BLACK_RANK = new Key("BR");
+
+    /** The SGF Property ChAracterset. */
+    @SGFProperty(propertyClass=Charset.class, priority=0)
+    public final static Key CHARACTER_SET = new Key("CA");
+
+    /** The SGF Property CiRcle. */
+    @SGFProperty(propertyClass=Markup.class)
+    public final static Key CIRCLE = new Key("CR");
+
+    /** The SGF Property Comment. */
+    @SGFProperty(propertyClass=Text.class)
+    public final static Key COMMENT = new Key("C");
+
+    /** The SGF Property DAte. */
+    @SGFProperty(propertyClass=GameInfo.class, priority=77)
+    public final static Key DATE = new Key("DT");
+
+    /** The SGF Property EVent. */
+    @SGFProperty(propertyClass=GameInfo.class, priority=88)
+    public final static Key EVENT = new Key("EV");
+
+    /** The SGF Property FiGure. */
+    @SGFProperty(propertyClass=Property.class)
+    public final static Key FIGURE = new Key("FG");
+
+    /** The SGF Property FileFormat. */
+    @SGFProperty(propertyClass=RootNumber.class, priority=1)
+    public final static Key FILE_FORMAT = new Key("FF");
+
+    /** The SGF Property GaMe. */
+    @SGFProperty(propertyClass=Root.class, priority=2)
+    public final static Key GAME = new Key("GM");
+
+    /** The SGF Property GameName. */
+    @SGFProperty(propertyClass=GameInfo.class)
+    public final static Key GAME_NAME = new Key("GN");
+
+    /** The SGF Property LaBel. */
+    @SGFProperty(propertyClass=Label.class)
+    public final static Key LABEL = new Key("LB");
+
+    /** The SGF Property MArk. */
+    @SGFProperty(propertyClass=Markup.class)
+    public final static Key MARK = new Key("MA");
+
+    /** The SGF Property MoveNumber. */
+    @SGFProperty(propertyClass=SimpleNumber.class)
+    public final static Key MOVE_NO = new Key("MN");
+
+    /** The SGF Property Name. */
+    @SGFProperty(propertyClass=Text.class)
+    public final static Key NAME = new Key("N");
+
+    /** The SGF Property PlayerBlack. */
+    @SGFProperty(propertyClass=GameInfo.class)
+    public final static Key PLAYER_BLACK = new Key("PB");
+
+    /** The SGF Property PlayerWhite. */
+    @SGFProperty(propertyClass=GameInfo.class)
+    public final static Key PLAYER_WHITE = new Key("PW");
+
+    /** The SGF Property REsult. */
+    @SGFProperty(propertyClass=GameInfo.class)
+    public final static Key RESULT = new Key("RE");
+
+    /** The SGF Property SiZe. */
+    @SGFProperty(propertyClass=RootNumber.class)
+    public final static Key SIZE = new Key("SZ");
+
+    /** The SGF Property SQuare. */
+    @SGFProperty(propertyClass=Markup.class)
+    public final static Key SQUARE = new Key("SQ");
+
+    /** The SGF Property TerritoryWhite. */
+    @SGFProperty(propertyClass=Markup.class)
+    public final static Key TERRITORY_WHITE = new Key("TW");
+
+    /** The SGF Property TerritoryBlack. */
+    @SGFProperty(propertyClass=Markup.class)
+    public final static Key TERRITORY_BLACK = new Key("TB");
+
+    /** The SGF Property TRiangle. */
+    @SGFProperty(propertyClass=Markup.class)
+    public final static Key TRIANGLE = new Key("TR");
+
+    /** The SGF Property USer. */
+    @SGFProperty(propertyClass=GameInfo.class)
+    public final static Key USER = new Key("US");
+
+    /** The SGF Property VieW. */
+    @SGFProperty(propertyClass=View.class)
+    public final static Key VIEW = new Key("VW");
+
+    /** The SGF Property White. */
+    @SGFProperty(propertyClass=Move.class, priority=60)
+    public final static Key WHITE = new Key("W");
+
+    /** The SGF Property WhiteRank. */
+    @SGFProperty(propertyClass=GameInfo.class)
+    public final static Key WHITE_RANK = new Key("WR");
+
+
+    private final static Key[] addStoneKeys = {ADD_BLACK, ADD_WHITE, ADD_EMPTY};
+
+    /**
+     * The properties AddWhite, AddBlack and AddEmpty.
+     */
+    public static final List addStoneProperties = 
+	Arrays.asList(addStoneKeys);
+
+    static Logger logger = Logger.getLogger(Property.class.getName());
+
+    static Set InheritableProperties = new TreeSet();
+
 
     private Value value = null;
     private Key key = null;
@@ -996,12 +971,12 @@ public class Property implements Cloneable
 		    String special = m.group(2);
 		    String margin = m.group(3);
 		    if (winner.equals("w") || winner.equals("W")) {
-			winner = "Weiß";
+			winner = "Wei\u00df";
 			looser = "Schwarz"; 
 		    }
 		    else if (winner.equals("b") || winner.equals("B")) {
 			winner = "Schwarz"; 
-			looser = "Weiß";
+			looser = "Wei\u00df";
 		    }
 		    else
 			assert false;
@@ -1010,7 +985,7 @@ public class Property implements Cloneable
 			if (special.equals("resign") || special.equals("R"))
 			    return winner + " gewinnt durch Aufgabe";
 			else if (special.equals("time"))
-			    return looser + " verliert durch Zeitüberschreitung";
+			    return looser + " verliert durch Zeit\u00fcberschreitung";
 			else 
 			    return winner + " gewinnt";
 		    }

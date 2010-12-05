@@ -256,6 +256,7 @@ public class SGFProvider extends ContentProvider
 	Log.d("SGFProvider", String.format("openFile: file=%s", file));
 	int _mode = ParcelFileDescriptor.MODE_CREATE;
 	if (mode.contains("w")) _mode |= ParcelFileDescriptor.MODE_READ_WRITE;
+	else _mode |= ParcelFileDescriptor.MODE_READ_WRITE;
 	if (mode.contains("t")) _mode |= ParcelFileDescriptor.MODE_TRUNCATE;
 	if (mode.contains("a")) _mode |= ParcelFileDescriptor.MODE_APPEND;
 	return ParcelFileDescriptor.open(file, _mode);

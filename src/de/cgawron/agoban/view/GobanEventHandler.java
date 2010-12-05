@@ -42,8 +42,7 @@ public class GobanEventHandler extends MultiTouchController<Object> implements V
 
     public boolean onTouch(View view, MotionEvent event) 
     {
- 
-	if (!super.onTouchEvent(event)) {
+ 	if (!super.onTouchEvent(event)) {
 	    Log.d("GobanEventHandler", String.format("onTouchEvent: %s %d", event, event.getEventTime() - time));
 	    GobanEvent gobanEvent = new GobanEvent(gobanView, event);
 	    Log.d("GobanEventHandler", "gobanEvent: " + gobanEvent);
@@ -59,7 +58,7 @@ public class GobanEventHandler extends MultiTouchController<Object> implements V
 		time = event.getEventTime();
 		armed = true;
 		gobanView.setSelection(gobanEvent.getPoint());
-		return false;
+		return true;
 
 	    default:
 		time = event.getEventTime();
