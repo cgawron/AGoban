@@ -254,7 +254,11 @@ public class SGFProvider extends ContentProvider
 	    file = new File(SGF_DIRECTORY, uri.getPath());
 	}
 	Log.d("SGFProvider", String.format("openFile: file=%s", file));
-	return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_WRITE | ParcelFileDescriptor.MODE_CREATE);
+	int _mode = ParcelFileDescriptor.MODE_CREATE;
+	if (mode.contains("w")) _mode |= ParcelFileDescriptor.MODE_READ_WRITE;
+	if (mode.contains("t")) _mode |= ParcelFileDescriptor.MODE_TRUNCATE;
+	if (mode.contains("a")) _mode |= ParcelFileDescriptor.MODE_APPEND;
+	return ParcelFileDescriptor.open(file, _mode);
     }
 
     public static GameInfo getGameInfo(long id)
