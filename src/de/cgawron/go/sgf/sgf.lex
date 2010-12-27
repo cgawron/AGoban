@@ -1,7 +1,5 @@
 /**
  *
- * $Id: sgf.lex,v 1.7.2.6 2003/02/16 14:23:38 cgawron Exp $
- *
  * (C) 2010 Christian Gawron. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,9 +19,10 @@ package de.cgawron.go.sgf;
 
 import java.lang.System;
 import java.io.IOException;
+import java.util.logging.Logger;
+
 import de.cgawron.util.MiscEncodingReader;
-import org.apache.log4j.Logger;
-import android.util.Log;
+
 
 %%
 
@@ -53,7 +52,7 @@ import android.util.Log;
 %state PROPERTY
 
 %{
-    private static Logger logger = Logger.getLogger(Yylex.class);
+    private static Logger logger = Logger.getLogger(Yylex.class.getName());
     
     private int level = 0;
 
@@ -283,8 +282,8 @@ import android.util.Log;
 \r { }
 
 .  { 
-      Log.e("sgf.lex", String.format("Illegal character: text=%s, line=%d, column %d, char=%d", 
-				     yytext(), yyline, getColumn(), yychar));
+      logger.severe(String.format("Illegal character: text=%s, line=%d, column %d, char=%d", 
+				  yytext(), yyline, getColumn(), yychar));
       return new Token(Symbols.error, yytext(), yyline, yychar, null);
   //throw new ParseError("Illegal character <"+ yytext() + ">", this); 
    }

@@ -1,14 +1,19 @@
-/*
+/**
  *
- * $Id: AbstractValue.java 342 2005-10-16 12:09:00Z cgawron $
+ * (C) 2010 Christian Gawron. All rights reserved.
  *
- * © 2001 Christian Gawron. All rights reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
  */
 
 package de.cgawron.go.sgf;
@@ -18,7 +23,8 @@ import de.cgawron.go.Symmetry;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.regex.*;
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * An abstract base class for implementations of {@link Value}.
@@ -333,8 +339,7 @@ public abstract class AbstractValue implements Value
         {
             point = new de.cgawron.go.Point(pt);
             this.text = text;
-	    if (logger.isDebugEnabled())
-		logger.debug("Value.Label " + text);
+	    logger.fine("Value.Label " + text);
         }
 
 	public void transform(Symmetry s)
@@ -387,8 +392,7 @@ public abstract class AbstractValue implements Value
 
         public PointList(String text)
         {
-	    if (logger.isDebugEnabled())
-		logger.debug("PointList(" + text + ")");
+	    logger.fine("PointList(" + text + ")");
             if (text.length() == 0)
 	    {
 		// PointList is empty
@@ -442,8 +446,8 @@ public abstract class AbstractValue implements Value
                     for (y = yMin; y <= yMax; y++)
                         points.add(new de.cgawron.go.Point(x, y));
 
-		if (logger.isDebugEnabled())
-		    logger.debug("PointList: " + xMin + ", " + xMax + ", " + yMin + ", " + yMax + ", " + this);
+		if (logger.isLoggable(Level.FINE))
+		    logger.fine("PointList: " + xMin + ", " + xMax + ", " + yMin + ", " + yMax + ", " + this);
             }
             else
                 throw new ClassCastException(text + " is not a PointList");

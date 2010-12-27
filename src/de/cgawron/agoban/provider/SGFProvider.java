@@ -152,6 +152,7 @@ public class SGFProvider extends ContentProvider
 			    ex.printStackTrace();
 			    continue;
 			}
+			// needs version 8 of the API
 			long _id = db.insertWithOnConflict(SGFDBOpenHelper.SGF_TABLE_NAME, "", 
 							   gameInfo.getContentValues(), SQLiteDatabase.CONFLICT_REPLACE);
 		    }
@@ -253,12 +254,13 @@ public class SGFProvider extends ContentProvider
 	else {
 	    file = new File(SGF_DIRECTORY, uri.getPath());
 	}
-	Log.d("SGFProvider", String.format("openFile: file=%s", file));
+	Log.d("SGFProvider", String.format("openFile: file=%s, read=%b write=%b", file, file.canRead(), file.canWrite()));
 	int _mode = ParcelFileDescriptor.MODE_CREATE;
-	if (mode.contains("w")) _mode |= ParcelFileDescriptor.MODE_READ_WRITE;
-	else _mode |= ParcelFileDescriptor.MODE_READ_WRITE;
-	if (mode.contains("t")) _mode |= ParcelFileDescriptor.MODE_TRUNCATE;
-	if (mode.contains("a")) _mode |= ParcelFileDescriptor.MODE_APPEND;
+	if (mode.contains("w") && file.canWrite()) _mode |= ParcelFileDescriptor.MODE_READ_WRITE;
+	else _mode |= ParcelFileDescriptor.MODE_READ_ONLY;
+	if (mode.contains("t") && file.canWrite()) _mode |= ParcelFileDescriptor.MODE_TRUNCATE;
+	if (mode.contains("a") && file.canWrite()) _mode |= ParcelFileDescriptor.MODE_APPEND;
+	Log.d("SGFProvider", String.format("openFile: file=%s, mode=%s", file, _mode));
 	return ParcelFileDescriptor.open(file, _mode);
     }
 

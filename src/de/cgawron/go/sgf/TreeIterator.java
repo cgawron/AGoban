@@ -1,21 +1,26 @@
-/*
+/**
  *
- * $Id: TreeIterator.java 363 2005-12-15 23:28:33Z cgawron $
+ * (C) 2010 Christian Gawron. All rights reserved.
  *
- * © 2001 Christian Gawron. All rights reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
  */
 
 package de.cgawron.go.sgf;
 
 import java.util.*;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TreeIterator<N extends TreeNode> implements Iterator<N>
 {
@@ -83,7 +88,7 @@ public class TreeIterator<N extends TreeNode> implements Iterator<N>
 	    }
             Iterator<N> children = tmp.iterator();
 	    
-            logger.debug("BreadthFirstIterator " + this + ": node " + node);
+            logger.fine("BreadthFirstIterator " + this + ": node " + node);
 
             if (!iter.hasNext())
             {
@@ -231,7 +236,7 @@ public class TreeIterator<N extends TreeNode> implements Iterator<N>
         {
             Iterator<N> it = stack.peek();
             N node = it.next();
-            logger.debug("DepthFirstIterator " + this + ": node " + node);
+            logger.fine("DepthFirstIterator " + this + ": node " + node);
             Iterator<TreeNode> children = new EnumIterator<TreeNode>(node.children());
             if (!it.hasNext())
             {

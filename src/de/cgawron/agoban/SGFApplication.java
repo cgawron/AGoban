@@ -83,7 +83,7 @@ public class SGFApplication extends Application
 			}
 			catch (Exception ex) {
 			    Log.e("EditSGF", "Exception while parsing SGF", ex);
-			    gameTree = new GameTree();
+			    throw new RuntimeException("Exception while parsing SGF", ex);
 			}
 			Message msg = handler.obtainMessage();
 			Bundle b = new Bundle();

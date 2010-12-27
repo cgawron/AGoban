@@ -1,14 +1,19 @@
-/*
+/**
  *
- * $Id: SimpleMarkupModel.java 369 2006-04-14 17:04:02Z cgawron $
+ * (C) 2010 Christian Gawron. All rights reserved.
  *
- * © 2001 Christian Gawron. All rights reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
  */
 
 package de.cgawron.go.sgf;
@@ -23,12 +28,11 @@ import de.cgawron.go.SimpleGoban;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.*;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A simple implementation of the MarkupModel interface based on <code>SimpleGoban</code>
- * @version $Id: SimpleMarkupModel.java 369 2006-04-14 17:04:02Z cgawron $
  */
 public class SimpleMarkupModel extends SimpleGoban implements MarkupModel, PropertyChangeListener
 {
@@ -135,8 +139,8 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel, Prope
             for (j = 0; j < size; j++)
                 if (getStone(i, j) != BoardType.EMPTY)
 		{
-		    if (logger.isDebugEnabled())
-			logger.debug("reset markup: [" + i + ", " + j + "]: " + markup[i][j]);
+		    if (logger.isLoggable(Level.FINE))
+			logger.fine("reset markup: [" + i + ", " + j + "]: " + markup[i][j]);
                     markup[i][j] = new Stone(getStone(i, j));
 		}
                 else
@@ -196,7 +200,7 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel, Prope
             return;
 
         if (markup[x][y] == null || m == null 
-	    /* ohne den zweiten Teil funktionieren Label auf mit AB[] bzw. AW[] hinzugefügten Steinen nicht! */
+	    /* ohne den zweiten Teil funktionieren Label auf mit AB[] bzw. AW[] hinzugefuegten Steinen nicht! */
 	    || (markup[x][y] instanceof Stone && !(m instanceof Stone || m instanceof Move))
 	    || (markup[x][y] instanceof Stone && m instanceof Move && ((Stone)markup[x][y]).getColor().equals(((Move) m).getColor()))
 	    ) 
@@ -210,11 +214,11 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel, Prope
 	{
 	    if (markup[x][y] instanceof MarkupModel.Stone && !(markup[x][y] instanceof MarkupModel.ConflictMark))
 		markup[x][y] = getConflictLabel((MarkupModel.Stone) markup[x][y]);
-	    if (logger.isDebugEnabled())
-		logger.debug("Markup conflict at (" + x + ", " + y + "): " + m + ", " + markup[x][y]);
+	    if (logger.isLoggable(Level.FINE))
+		logger.fine("Markup conflict at (" + x + ", " + y + "): " + m + ", " + markup[x][y]);
 	    conflicts.add(new MarkupModel.Conflict(markup[x][y], m));
-	    if (logger.isDebugEnabled())
-		logger.debug("Markup conflicts: " + conflicts);
+	    if (logger.isLoggable(Level.FINE))
+		logger.fine("Markup conflicts: " + conflicts);
 	}
     }
     
@@ -234,14 +238,14 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel, Prope
     /** putStone method comment. */
     public void putStone(short x, short y, BoardType color)
     {
-	logger.debug("putStone: " + x + ", " + y + ", " + color);
+	logger.fine("putStone: " + x + ", " + y + ", " + color);
         super.putStone(x, y, color);
 	setMarkup(x, y, new Stone(color));
     }
 
     protected void setStone(short x, short y, BoardType color)
     {
-	logger.debug("setStone: " + x + ", " + y + ", " + color);
+	logger.fine("setStone: " + x + ", " + y + ", " + color);
         super.setStone(x, y, color);
     }
 
@@ -268,7 +272,7 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel, Prope
     public void setRegion(Region newRegion)
     {
         Region oldRegion = region;
-        logger.debug("Setting region to " + newRegion);
+        logger.fine("Setting region to " + newRegion);
         if (oldRegion != null)
             oldRegion.removePropertyChangeListener(this);
         region = newRegion;
@@ -284,7 +288,7 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel, Prope
 
     public SortedSet<Conflict> getConflicts()
     {
-        logger.debug("Conflicts: " + conflicts);
+        logger.fine("Conflicts: " + conflicts);
         return conflicts;
     }
 
@@ -303,8 +307,8 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel, Prope
 
     protected void fireRegionChanged()
     {
-	if (logger.isDebugEnabled())
-	    logger.debug("SimpleMarkupModel.fireRegionChanged");
+	if (logger.isLoggable(Level.FINE))
+	    logger.fine("SimpleMarkupModel.fireRegionChanged");
 
 	GobanEvent e = new GobanEvent(this);
         // Guaranteed to return a non-null array

@@ -1,14 +1,19 @@
-
-
-/*
+/**
  *
- * © 2001 Christian Gawron. All rights reserved.
+ * (C) 2010 Christian Gawron. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
  */
 
 package de.cgawron.go.sgf;
@@ -30,9 +35,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.log4j.Logger;
-import android.util.Log;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class represents an SGF property.
@@ -194,17 +198,17 @@ public class Property implements Cloneable
 	    if (propertyMap == null)
 		propertyMap = new HashMap<String, PropertyDescriptor>();
 
-	    Log.d("Property$Factory", "Factory()");
+	    logger.fine("Factory()");
             Properties properties = new Properties();
 
 	    Field[] fields = Property.class.getFields();
 	    for (Field field : fields) {
 		try {
-		    Log.d("Property$Factory", "field: " + field.getName() + " " + field.get(null));
+		    logger.fine("field: " + field.getName() + " " + field.get(null));
 		    SGFProperty annotation = field.getAnnotation(SGFProperty.class);
 		    if (annotation != null) {
 			Key key = (Key) field.get(null);
-			Log.d("Property$Factory", "key: " + key);
+			logger.fine("key: " + key);
 			propertyMap.put(key.toString(), new PropertyDescriptor(annotation));
 		    }
 		}
@@ -225,7 +229,7 @@ public class Property implements Cloneable
             }
             catch (ClassNotFoundException ex)
             {
-                logger.fatal("Class Key missing, installation is corrupt: " + ex.getMessage());
+                logger.severe("Class Key missing, installation is corrupt: " + ex.getMessage());
                 throw new RuntimeException("Class Key missing, installation is corrupt", ex);
             }
         }
@@ -256,13 +260,13 @@ public class Property implements Cloneable
             catch (Exception e)
             {
                 if (propertyClass != null) {
-                    logger.warn("Couldn't create a " + propertyClass.getName() + " for " + key + ": " + e);
+                    logger.warning("Couldn't create a " + propertyClass.getName() + " for " + key + ": " + e);
 		    if (e instanceof InvocationTargetException) {
-			logger.warn("Cause was: " + ((InvocationTargetException) e).getCause());
+			logger.warning("Cause was: " + ((InvocationTargetException) e).getCause());
 		    } 
 		}
                 else
-                    logger.warn("No class known for " + key);
+                    logger.warning("No class known for " + key);
 
                 return new Property(key);
             }
@@ -279,7 +283,7 @@ public class Property implements Cloneable
             }
             catch (ClassNotFoundException ex)
             {
-                logger.fatal("Class missing, installation is corrupt: " + ex.getMessage());
+                logger.severe("Class missing, installation is corrupt: " + ex.getMessage());
                 throw new RuntimeException("Class missing, installation is corrupt", ex);
             }
         }
@@ -292,22 +296,21 @@ public class Property implements Cloneable
             {
                 argv2[0] = key;
                 argv2[1] = s.substring(1, s.length()-1);
-		// logger.debug("Creating property for key " + argv2[0] + " " + argv2[1]);
                 propertyClass = getDescriptor(key).getPropertyClass();
-		Log.d("Property$Factory", "Creating property for key " + argv[0] + " " + argt[0]+ " " + propertyClass);
+		logger.fine("Creating property for key " + argv[0] + " " + argt[0]+ " " + propertyClass);
                 Constructor c = propertyClass.getConstructor(argt2);
                 return (Property)c.newInstance(argv2);
             }
             catch (Exception e)
             {
                 if (propertyClass != null) {
-                    logger.warn("Couldn't create a " + propertyClass.getName() + " for " + key + ": " + e);
+                    logger.warning("Couldn't create a " + propertyClass.getName() + " for " + key + ": " + e);
 		    if (e instanceof InvocationTargetException) {
-			logger.warn("Cause was: " + ((InvocationTargetException) e).getCause());
+			logger.warning("Cause was: " + ((InvocationTargetException) e).getCause());
 		    } 
 		}
                 else
-                    logger.warn("No class known for " + key);
+                    logger.warning("No class known for " + key);
 
                 return new Property(key);
             }
@@ -421,10 +424,10 @@ public class Property implements Cloneable
                     setValue((Value)vl.get(0));
                 }
                 else
-                    logger.warn("Move can't have a ValueList of size " + vl.size());
+                    logger.warning("Move can't have a ValueList of size " + vl.size());
             }
             else
-                logger.warn("Class is " + v.getClass().getName());
+                logger.warning("Class is " + v.getClass().getName());
         }
 	
 	/**
@@ -484,7 +487,7 @@ public class Property implements Cloneable
 	 */
 	public BoardType getColor()
 	{
-	    logger.debug("AddStones.getColor: " + this);
+	    logger.fine("AddStones.getColor: " + this);
 	    if (getKey().equals(Property.ADD_WHITE))
 		return BoardType.WHITE;
 	    else if (getKey().equals(Property.ADD_BLACK))
@@ -540,7 +543,7 @@ public class Property implements Cloneable
         public Label(Key key)
         {
             super(key);
-            logger.warn("Creating label " + key);
+            logger.warning("Creating label " + key);
         }
 
 	public void setValue(Value vl)
@@ -898,7 +901,7 @@ public class Property implements Cloneable
     {
         if (value == null)
         {
-            logger.warn("Property " + key + ": no value");
+            logger.warning("Property " + key + ": no value");
         }
         return value;
     }
@@ -959,7 +962,7 @@ public class Property implements Cloneable
 	    Matcher m = pattern.matcher(p.getValue().toString());
 	    
 	    if (!m.matches()) {
-		logger.warn("Unrecognized result value: " + p.getValue().toString());
+		logger.warning("Unrecognized result value: " + p.getValue().toString());
 		return p.getValue().toString();
 	    }
 	    else {

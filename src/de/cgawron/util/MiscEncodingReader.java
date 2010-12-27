@@ -22,8 +22,8 @@ import java.nio.channels.*;
 import java.nio.charset.CoderResult;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MiscEncodingReader extends Reader
 {
@@ -63,8 +63,8 @@ public class MiscEncodingReader extends Reader
     public int read(char[] cbuf, int off, int len) throws IOException
     {
 	int r = reader.read(cbuf, off, len);
-	if (logger.isDebugEnabled())
-	    logger.debug("Read: " + (new String(cbuf)) + ", " + off + ", " + len);
+	if (logger.isLoggable(Level.FINE))
+	    logger.fine("Read: " + (new String(cbuf)) + ", " + off + ", " + len);
 	return r;
     }
 
