@@ -18,6 +18,7 @@
 import java_cup.runtime.*;
 
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /* Preliminaries to set up and use the scanner.  */
@@ -44,7 +45,8 @@ parser code
 
     public void debug_message(String mess)
     {
-	logger.info(mess);
+        if (logger.isLoggable(Level.FINE))
+  	  logger.fine(mess);
     }
 
     public Symbol scan() throws java.lang.Exception 

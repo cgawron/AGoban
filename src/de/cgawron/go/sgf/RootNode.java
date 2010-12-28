@@ -120,7 +120,7 @@ public class RootNode extends Node implements PropertyChangeListener
 
     /** Get game signature of the game tree starting at this node. 
      * If the game tree does not represent a game but e.g. a problem, the Zobrist hash of the first node 
-     * with a board setupis returned instead.
+     * with a board setup is returned instead.
      * @return game id 
      */
     public String getSignature()

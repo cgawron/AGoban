@@ -131,7 +131,8 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel, Prope
 
     public void resetMarkup()
     {
-	logger.info("reset markup: " + this);
+	if (logger.isLoggable(Level.FINE))
+	    logger.fine("reset markup: " + this);
         short i;
         short j;
 

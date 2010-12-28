@@ -21,6 +21,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -106,31 +107,27 @@ public class Node
      */
     public static class VariationPath extends LinkedList<Node>
     {
-	VariationPath(Node node)
-	    {
-		super();
-		Node parent = node.getParent();
-		while (parent != null)
-		    {
-			if (parent.getIndex(node) != 0)
-			    add(0, node);
-			node = parent;
-			parent = node.getParent();
-		    }
+	VariationPath(Node node) {
+	    super();
+	    Node parent = node.getParent();
+	    while (parent != null) {
+		if (parent.getIndex(node) != 0)
+		    add(0, node);
+		node = parent;
+		parent = node.getParent();
 	    }
-
+	}
+	
 	@Override
-	    public String toString()
-	    {
-		StringBuffer sb = new StringBuffer();
-		for (Node n : this)
-		    {
-			if (sb.length() != 0)
-			    sb.append(", ");
-			sb.append(n.getParent().getMoveNo());
-		    }
-		return sb.toString();
+	public String toString() {
+	    StringBuffer sb = new StringBuffer();
+	    for (Node n : this) {
+		if (sb.length() != 0)
+		    sb.append(", ");
+		sb.append(n.getParent().getMoveNo());
 	    }
+	    return sb.toString();
+	}
     } 
 
     public VariationPath getVariationPath()
@@ -177,19 +174,17 @@ public class Node
 	MarkupModel mm = (MarkupModel) getGoban();
 	Property newView = Property.createProperty(Property.VIEW);
 	Value.ValueList value = AbstractValue.createValueList();
-	if (mm.getRegion() != null && oldView != newView)
-	    {
-		value.add(mm.getRegion().getPointList());
-		newView.setValue(value);
-		put(newView);
-		firePropertyChange("view", oldView, newView);
-	    }
-	else
-	    {
-		logger.warning("regionChanged: region is null");
-		remove(newView.getKey());
-		firePropertyChange("view", oldView, null);
-	    }
+	if (mm.getRegion() != null && oldView != newView) {
+	    value.add(mm.getRegion().getPointList());
+	    newView.setValue(value);
+	    put(newView);
+	    firePropertyChange("view", oldView, newView);
+	}
+	else {
+	    logger.warning("regionChanged: region is null");
+	    remove(newView.getKey());
+	    firePropertyChange("view", oldView, null);
+	}
     }
 
     /**
@@ -303,73 +298,68 @@ public class Node
 	    return -1;
 	else if (node.id == id)
 	    return 0;
-	else 
-	    if (isMainVariation())
-		{
-		    if (node.isMainVariation())
-			{
-			    TreePath myPath = getPath();
-			    TreePath theirPath = node.getPath();
-			    return myPath.getPathCount() < theirPath.getPathCount() ? -1 : 1;
-			}
-		    else
-			return -11;
+	else {
+	    if (isMainVariation()) {
+		if (node.isMainVariation()) {
+		    TreePath myPath = getPath();
+		    TreePath theirPath = node.getPath();
+		    return myPath.getPathCount() < theirPath.getPathCount() ? -1 : 1;
 		}
-	    else
-		{
-		    if (node.isMainVariation())
-			return 1;
-		    else
-			{
-			    TreePath myPath = getPath();
-			    TreePath theirPath = node.getPath();
-			    Node parent = (Node) myPath.getPathComponent(0);
-			    for (int i = 0; i < myPath.getPathCount() && i < theirPath.getPathCount(); i++)
-				{
-				    Node myNode = (Node) myPath.getPathComponent(i);
-				    Node theirNode = (Node) theirPath.getPathComponent(i);
-				    if (myNode != theirNode)
-					{
-					    return (parent.getIndex(myNode) < parent.getIndex(theirNode) ? 1 : -1);
-					}
-				    parent = myNode;
-				}
-			    return myPath.getPathCount() < theirPath.getPathCount() ? -1 : 1;
+		else
+		    return -1;
+	    }
+	    else {
+		if (node.isMainVariation())
+		    return 1;
+		else {
+		    TreePath myPath = getPath();
+		    TreePath theirPath = node.getPath();
+		    Node parent = (Node) myPath.getPathComponent(0);
+		    for (int i = 0; i < myPath.getPathCount() && i < theirPath.getPathCount(); i++) {
+			Node myNode = (Node) myPath.getPathComponent(i);
+			Node theirNode = (Node) theirPath.getPathComponent(i);
+			if (myNode != theirNode) {
+			    return (parent.getIndex(myNode) < parent.getIndex(theirNode) ? 1 : -1);
 			}
+			parent = myNode;
+		    }
+		    return myPath.getPathCount() < theirPath.getPathCount() ? -1 : 1;
 		}
+	    }
+	}
     }
 
     /**
      * Create a node without any properties.
      */
     public Node(GameTree gameTree)
-	{
-	    super();
-	    this.gameTree = gameTree;
-	    id = ++lastId;
-	    pcs = new PropertyChangeSupport(this);
-	}
+    {
+	super();
+	this.gameTree = gameTree;
+	id = ++lastId;
+	pcs = new PropertyChangeSupport(this);
+    }
 
     /**
      * Create a new node which inherits the properties of node n.
      * @param n A node from which the properties are copied.
      */
     protected Node(Node n)
-	{
-	    super(n);
-	    setInheritedProperties(n);
-	    this.gameTree = n.gameTree;
-	    id = ++lastId;
-	    pcs = new PropertyChangeSupport(this);
-	}
+    {
+	super(n);
+	setInheritedProperties(n);
+	this.gameTree = n.gameTree;
+	id = ++lastId;
+	pcs = new PropertyChangeSupport(this);
+    }
 
     Node(PropertyList pl)
-	{
-	    super(pl);
-	    setInheritedProperties(pl);
-	    id = ++lastId;
-	    pcs = new PropertyChangeSupport(this);
-	}
+    {
+	super(pl);
+	setInheritedProperties(pl);
+	id = ++lastId;
+	pcs = new PropertyChangeSupport(this);
+    }
 
 
 
@@ -382,10 +372,9 @@ public class Node
     {
 	this.gameTree = gameTree;
 	Iterator<Node> it = children.iterator();
-	while (it.hasNext())
-	    {
-		it.next().setGameTree(gameTree);
-	    }
+	while (it.hasNext()) {
+	    it.next().setGameTree(gameTree);
+	}
     }
 
     public GameTree getGameTree()
@@ -463,11 +452,10 @@ public class Node
 	Property.Key key = Property.BLACK;
 	if (this.contains(Property.BLACK))
 	    key = Property.WHITE;
-	for (Node child : children)
-	    {
-		if (p == child.getPoint(key))
-		    return child;
-	    }
+	for (Node child : children) {
+	    if (p == child.getPoint(key))
+		return child;
+	}
 	return null;
     }
 
@@ -475,15 +463,13 @@ public class Node
     {
 	if (logger.isLoggable(Level.FINE))
 	    logger.fine("getSiblingCount()");
-	if (parent != null)
-	    {
-		if (logger.isLoggable(Level.FINE))
-		    {
-			logger.fine("childCount: " + parent.getChildCount());
-			logger.fine("index: " + parent.getIndex(this));
-		    }
-		return parent.getChildCount() - parent.getIndex(this) - 1;
+	if (parent != null) {
+	    if (logger.isLoggable(Level.FINE)) {
+		logger.fine("childCount: " + parent.getChildCount());
+		logger.fine("index: " + parent.getIndex(this));
 	    }
+	    return parent.getChildCount() - parent.getIndex(this) - 1;
+	}
 	else 
 	    return 0;
     }
@@ -546,67 +532,60 @@ public class Node
 
 	logger.info("setDiagram(" + newValue + ") called for " + this);
 	boolean oldValue = isDiagram();
-	if (newValue)
-	    {
-		put(Property.createProperty(Property.FIGURE));
-		if (getRoot() != null)
+	if (newValue) {
+	    put(Property.createProperty(Property.FIGURE));
+	    if (getRoot() != null) {
+		TreeVisitor<GameTree, Node> visitor = 
+		    new TreeVisitor<GameTree, Node>(getRoot().getGameTree(), this) 
 		    {
-			TreeVisitor<GameTree, Node> visitor = 
-			    new TreeVisitor<GameTree, Node>(getRoot().getGameTree(), this) 
-			    {
-				@Override
-				protected void visitNode(Object o)
-				{
-				    Node n = (Node) o;
-
-				    Node p = n.getParent();
-				    Goban goban;
-				    if (p == null) 
-					{
-					    goban = gameTree.getGoban(n.getBoardSize());
-					    n.setMoveNo(n.isMove() ? 1 : 0);
+			@Override
+			protected void visitNode(Object o)
+			{
+			    Node n = (Node) o;
+			    
+			    Node p = n.getParent();
+			    Goban goban;
+			    if (p == null)  {
+				goban = gameTree.getGoban(n.getBoardSize());
+				n.setMoveNo(n.isMove() ? 1 : 0);
+			    }
+			    else {
+				goban = p.getGoban();
+				if (goban != null) {
+				    try {
+					goban = goban.clone();
+				    }
+				    catch (CloneNotSupportedException ex) {
+					throw new RuntimeException("goban should support clone() but doesn't", ex);
+				    }
+				    
+				    if (n.isBeginOfVariation() || p.isDiagram()) {
+					if (goban instanceof MarkupModel) { 
+					    //logger.info("ResetMarkup on move " + p.getMoveNo());
+					    //((MarkupModel) goban).resetMarkup();
+					    //doMarkup();
 					}
-				    else 
-					{
-					    goban = p.getGoban();
-					    if (goban != null)
-						{
-						    try {
-							goban = goban.clone();
-						    }
-						    catch (CloneNotSupportedException ex) {
-							throw new RuntimeException("goban should support clone() but doesn't", ex);
-						    }
-
-						    if (n.isBeginOfVariation() || p.isDiagram()) {
-							if (goban instanceof MarkupModel)
-							    { 
-								//logger.info("ResetMarkup on move " + p.getMoveNo());
-								//((MarkupModel) goban).resetMarkup();
-								//doMarkup();
-							    }
-							else
-							    logger.warning("ResetMarkup not called, no MarkupModel");
-						    }
-
-						    if (p.getIndex(n) != 0) 
-							n.setMoveNo(1);
-						}
-					    //else 
-					    //    n.setMoveNo(p.getMoveNo() + (n.isMove() ? 1 : 0));
-
-					    n.setGoban(null, false);
-					    n.setGoban(goban, true);
-					}
+					else
+					    logger.warning("ResetMarkup not called, no MarkupModel");
+				    }
+				    
+				    if (p.getIndex(n) != 0) 
+					n.setMoveNo(1);
 				}
-			    };
-			visitor.visit();
-		    }
+				//else 
+				//    n.setMoveNo(p.getMoveNo() + (n.isMove() ? 1 : 0));
+				
+				n.setGoban(null, false);
+				n.setGoban(goban, true);
+			    }
+			}
+		    };
+		visitor.visit();
 	    }
-	else
-	    {
-		remove(Property.FIGURE);
-	    }
+	}
+	else {
+	    remove(Property.FIGURE);
+	}
 	firePropertyChange("diagram", oldValue, newValue);
     }
 
@@ -615,45 +594,39 @@ public class Node
 	Object oldValue = get(Property.COMMENT).getValue();
 	Object newValue = c;
 	logger.info("Setting comment to " + c);
-	if (c.length() > 0)
-	    {
-		if (!newValue.equals(oldValue.toString()))
-		    {
-			Property p = Property.createProperty(Property.COMMENT);
-			p.setValue(AbstractValue.createValue(c));
-			put(p);
-			firePropertyChange("comment", oldValue, newValue);
-		    }
-	    }
-	else
-	    {
-		remove(Property.COMMENT);
+	if (c.length() > 0) {
+	    if (!newValue.equals(oldValue.toString())) {
+		Property p = Property.createProperty(Property.COMMENT);
+		p.setValue(AbstractValue.createValue(c));
+		put(p);
 		firePropertyChange("comment", oldValue, newValue);
 	    }
+	}
+	else {
+	    remove(Property.COMMENT);
+	    firePropertyChange("comment", oldValue, newValue);
+	}
     }
-
+    
     public void setValue(Property.Key key, String value)
     {
 	Property oldValue = get(key);
 	Property newValue = oldValue;
 	if (oldValue != null) oldValue = oldValue.clone();
-	if (newValue == null) 
-	    {
-		newValue = Property.createProperty(key);
-		add(newValue);
-	    }
-
+	if (newValue == null) {
+	    newValue = Property.createProperty(key);
+	    add(newValue);
+	}
+	
 	logger.info("Setting " + key + " to " + value);
-	if (value.length() > 0)
-	    {
-		newValue.setValue(value);
-		firePropertyChange("SGFProperty", oldValue, newValue);
-	    }
-	else
-	    {
-		remove(key);
-		firePropertyChange("SGFProperty", oldValue, null);
-	    }
+	if (value.length() > 0) {
+	    newValue.setValue(value);
+	    firePropertyChange("SGFProperty", oldValue, newValue);
+	}
+	else {
+	    remove(key);
+	    firePropertyChange("SGFProperty", oldValue, null);
+	}
     }
 
     public Goban getGoban()
@@ -668,166 +641,161 @@ public class Node
 
     private void doMarkup()
     {
-	logger.info("doMarkup: enter");
+	if (logger.isLoggable(Level.FINE))
+	    logger.fine("doMarkup: enter");
 	if (contains(Property.SIZE)) {
 	    Value.Number size = (Value.Number) (get(Property.SIZE)).getValue();
 	    goban.setBoardSize((short) size.intValue());
 	}
-	if (contains(Property.BLACK))
-	    {
-		Point pt = getPoint(Property.BLACK);
-		if (pt != null) {
-		    if (logger.isLoggable(Level.FINE))
-			logger.fine("Node " + this + ": Black move at " + pt);
-		    goban.move(pt, BoardType.BLACK, moveNo);
-		}
+	if (contains(Property.BLACK)) {
+	    Point pt = getPoint(Property.BLACK);
+	    if (pt != null) {
+		if (logger.isLoggable(Level.FINE))
+		    logger.fine("Node " + this + ": Black move at " + pt);
+		goban.move(pt, BoardType.BLACK, moveNo);
 	    }
-	else if (contains(Property.WHITE))
-	    {
-		Point pt = getPoint(Property.WHITE);
-		if (pt != null) {
-		    if (logger.isLoggable(Level.FINE))
-			logger.fine("Node " + this + ": White move at " + pt);
-		    goban.move(pt, BoardType.WHITE, moveNo);
-		}
+	}
+	else if (contains(Property.WHITE)) {
+	    Point pt = getPoint(Property.WHITE);
+	    if (pt != null) {
+		if (logger.isLoggable(Level.FINE))
+		    logger.fine("Node " + this + ": White move at " + pt);
+		goban.move(pt, BoardType.WHITE, moveNo);
 	    }
-	if (contains(Property.ADD_BLACK))
-	    {
-		Value.PointList pointList = getPointList(Property.ADD_BLACK);
-		Iterator it = pointList.iterator();
-		Point pt;
-		while (it.hasNext()) {
-		    pt = (Point) it.next();
-		    if (logger.isLoggable(Level.FINE))
-			logger.fine("Node " + this + ": AddBlack at " + pt);
-		    goban.putStone(pt, BoardType.BLACK);
-		}
+	}
+	if (contains(Property.ADD_BLACK)) {
+	    Value.PointList pointList = getPointList(Property.ADD_BLACK);
+	    Iterator it = pointList.iterator();
+	    Point pt;
+	    while (it.hasNext()) {
+		pt = (Point) it.next();
+		if (logger.isLoggable(Level.FINE))
+		    logger.fine("Node " + this + ": AddBlack at " + pt);
+		goban.putStone(pt, BoardType.BLACK);
 	    }
-	if (contains(Property.ADD_WHITE))
-	    {
-		Value.PointList pointList = getPointList(Property.ADD_WHITE);
-		Iterator it = pointList.iterator();
-		Point pt;
-		while (it.hasNext()) {
-		    pt = (Point) it.next();
-		    if (logger.isLoggable(Level.FINE))
-			logger.fine("Node " + this + ": AddWhite at " + pt);
-		    goban.putStone(pt, BoardType.WHITE);
-		}
+	}
+	if (contains(Property.ADD_WHITE)) {
+	    Value.PointList pointList = getPointList(Property.ADD_WHITE);
+	    Iterator it = pointList.iterator();
+	    Point pt;
+	    while (it.hasNext()) {
+		pt = (Point) it.next();
+		if (logger.isLoggable(Level.FINE))
+		    logger.fine("Node " + this + ": AddWhite at " + pt);
+		goban.putStone(pt, BoardType.WHITE);
 	    }
-	if (contains(Property.ADD_EMPTY))
-	    {
-		Value.PointList pointList = getPointList(Property.ADD_EMPTY);
-		Iterator it = pointList.iterator();
-		Point pt;
-		while (it.hasNext()) {
-		    pt = (Point) it.next();
-		    if (logger.isLoggable(Level.FINE))
-			logger.fine("Node " + this + ": AddEmpty at " + pt);
-		    goban.putStone(pt, BoardType.EMPTY);
-		}
+	}
+	if (contains(Property.ADD_EMPTY)) {
+	    Value.PointList pointList = getPointList(Property.ADD_EMPTY);
+	    Iterator it = pointList.iterator();
+	    Point pt;
+	    while (it.hasNext()) {
+		pt = (Point) it.next();
+		if (logger.isLoggable(Level.FINE))
+		    logger.fine("Node " + this + ": AddEmpty at " + pt);
+		goban.putStone(pt, BoardType.EMPTY);
 	    }
+	}
 
-	if (goban instanceof MarkupModel)
-	    {
-		MarkupModel markup = (MarkupModel)goban;
+	if (goban instanceof MarkupModel) {
+	    MarkupModel markup = (MarkupModel)goban;
 
-		if (isBeginOfVariation() || parent.isDiagram())
-		    markup.resetMarkup();
+	    if (isBeginOfVariation() || parent.isDiagram())
+		markup.resetMarkup();
 
-		Iterator propIt = values().iterator();
-		while (propIt.hasNext()) {
-		    Property property = (Property) propIt.next();
-		    {
-			if (property.getKey().equals(Property.VIEW)) {
-			    logger.fine("VIEW found");
-			    Value view = getValue(Property.VIEW);
-			    if (view instanceof Value.ValueList) {
-				Value.ValueList vl = (Value.ValueList) view;
-				if (logger.isLoggable(Level.FINE))
-				    logger.fine("ValueList: size=" + vl.size());
-				view = vl.get(0);
-			    }
-			    markup.setRegion(new SimpleRegion((Value.PointList) view));
+	    Iterator propIt = values().iterator();
+	    while (propIt.hasNext()) {
+		Property property = (Property) propIt.next();
+		{
+		    if (property.getKey().equals(Property.VIEW)) {
+			logger.fine("VIEW found");
+			Value view = getValue(Property.VIEW);
+			if (view instanceof Value.ValueList) {
+			    Value.ValueList vl = (Value.ValueList) view;
+			    if (logger.isLoggable(Level.FINE))
+				logger.fine("ValueList: size=" + vl.size());
+			    view = vl.get(0);
 			}
+			markup.setRegion(new SimpleRegion((Value.PointList) view));
+		    }
 
-			if (property instanceof Property.Move) {
-			    Point pt = getPoint(property.getKey());
-			    BoardType color = ((Property.Move) property).getColor();
-			    if (pt != null)
-				{
-				    logger.fine("setMarkup: " + pt + ", " + color + ", " + moveNo);
-				    markup.setMarkup(pt, new MarkupModel.Move(color, moveNo));
+		    if (property instanceof Property.Move) {
+			Point pt = getPoint(property.getKey());
+			BoardType color = ((Property.Move) property).getColor();
+			if (pt != null) {
+			    logger.fine("setMarkup: " + pt + ", " + color + ", " + moveNo);
+			    markup.setMarkup(pt, new MarkupModel.Move(color, moveNo));
+			}
+		    }
+
+		    if (property instanceof Property.AddStones) {
+			BoardType color = ((Property.AddStones) property).getColor();
+			Value.PointList pointList = getPointList(property.getKey());
+			Iterator it = pointList.iterator();
+			Point pt;
+			while (it.hasNext()) {
+			    pt = (Point) it.next();
+			    if (logger.isLoggable(Level.FINE))
+				logger.fine("setMarkup: " + pt + ", " + color);
+			    markup.setMarkup(pt, new MarkupModel.Stone(color));
+			}
+		    }
+		    if (property instanceof Property.Markup) {
+			if (property instanceof Property.Label) {
+			    Value vl = property.getValue();
+			    if (vl instanceof Value.ValueList) {
+				Iterator vi = ((Value.ValueList) vl).iterator();
+				while (vi.hasNext()) {
+				    Value v = (Value)vi.next();
+				    if (v instanceof Value.Label) {
+					Point point = ((Value.Label) v).getPoint();
+					String text = ((Value.Label) v).toString();
+					if (logger.isLoggable(Level.FINE))
+					    logger.fine("setMarkup: " + point + ", " + text);
+					markup.setMarkup(point, new MarkupModel.Text(text));
+				    }
 				}
+			    }
+			    else
+				if (logger.isLoggable(Level.FINE))
+				    logger.fine("Label has a value of " + vl.getClass().getName());
 			}
-
-			if (property instanceof Property.AddStones) {
-			    BoardType color = ((Property.AddStones) property).getColor();
+			else {
 			    Value.PointList pointList = getPointList(property.getKey());
 			    Iterator it = pointList.iterator();
 			    Point pt;
 			    while (it.hasNext()) {
 				pt = (Point) it.next();
 				if (logger.isLoggable(Level.FINE))
-				    logger.fine("setMarkup: " + pt + ", " + color);
-				markup.setMarkup(pt, new MarkupModel.Stone(color));
-			    }
-			}
-			if (property instanceof Property.Markup) {
-			    if (property instanceof Property.Label) {
-				Value vl = property.getValue();
-				if (vl instanceof Value.ValueList) {
-				    Iterator vi = ((Value.ValueList) vl).iterator();
-				    while (vi.hasNext()) {
-					Value v = (Value)vi.next();
-					if (v instanceof Value.Label) {
-					    Point point = ((Value.Label) v).getPoint();
-					    String text = ((Value.Label) v).toString();
-					    if (logger.isLoggable(Level.FINE))
-						logger.fine("setMarkup: " + point + ", " + text);
-					    markup.setMarkup(point, new MarkupModel.Text(text));
-					}
-				    }
+				    logger.fine("Node " + this + ": " + property.getKey() + " at " + pt);
+				if (property.getKey().equals(Property.TRIANGLE)) {
+				    markup.setMarkup(pt, new MarkupModel.Triangle());
 				}
-				else
-				    if (logger.isLoggable(Level.FINE))
-					logger.fine("Label has a value of " + vl.getClass().getName());
-			    }
-			    else {
-				Value.PointList pointList = getPointList(property.getKey());
-				Iterator it = pointList.iterator();
-				Point pt;
-				while (it.hasNext()) {
-				    pt = (Point) it.next();
-				    if (logger.isLoggable(Level.FINE))
-					logger.fine("Node " + this + ": " + property.getKey() + " at " + pt);
-				    if (property.getKey().equals(Property.TRIANGLE)) {
-					markup.setMarkup(pt, new MarkupModel.Triangle());
-				    }
-				    else if (property.getKey().equals(Property.SQUARE)) {
-					markup.setMarkup(pt, new MarkupModel.Square());
-				    }
-				    else if (property.getKey().equals(Property.CIRCLE)) {
-					markup.setMarkup(pt, new MarkupModel.Circle());
-				    }
-				    else if (property.getKey().equals(Property.MARK)) {
-					markup.setMarkup(pt, new MarkupModel.Mark());
-				    }
-				    else if (property.getKey().equals(Property.TERRITORY_WHITE)) {
-					markup.setMarkup(pt, new MarkupModel.WhiteTerritory());
-				    }
-				    else if (property.getKey().equals(Property.TERRITORY_BLACK)) {
-					markup.setMarkup(pt, new MarkupModel.BlackTerritory());
-				    }
+				else if (property.getKey().equals(Property.SQUARE)) {
+				    markup.setMarkup(pt, new MarkupModel.Square());
+				}
+				else if (property.getKey().equals(Property.CIRCLE)) {
+				    markup.setMarkup(pt, new MarkupModel.Circle());
+				}
+				else if (property.getKey().equals(Property.MARK)) {
+				    markup.setMarkup(pt, new MarkupModel.Mark());
+				}
+				else if (property.getKey().equals(Property.TERRITORY_WHITE)) {
+				    markup.setMarkup(pt, new MarkupModel.WhiteTerritory());
+				}
+				else if (property.getKey().equals(Property.TERRITORY_BLACK)) {
+				    markup.setMarkup(pt, new MarkupModel.BlackTerritory());
 				}
 			    }
 			}
 		    }
 		}
 	    }
+	}
 	//if (logger.isLoggable(Level.FINE))
 	//	logger.fine("Node: goban is " + goban);
-	logger.info("doMarkup: leave");
+	if (logger.isLoggable(Level.FINE))
+	    logger.fine("doMarkup: leave");
     }
 
     public void setGoban(Goban newGoban)
@@ -855,12 +823,11 @@ public class Node
 	public void add(Property p)
 	{
 	    super.add(p);
-	    if (p instanceof Property.Inheritable)
-		{
-		    logger.info("inherited: " + p);
-		    inheritedProperties.put(p.getKey(), p);
-		    setInheritedProperties(inheritedProperties);
-		}
+	    if (p instanceof Property.Inheritable) {
+		logger.info("inherited: " + p);
+		inheritedProperties.put(p.getKey(), p);
+		setInheritedProperties(inheritedProperties);
+	    }
 	}
 
     public boolean add(Node n)
@@ -902,20 +869,20 @@ public class Node
 	}
 
     @Override
-	public Property get(Object key)
-	{
-	    Property p;
-	    p = super.get(key);
-	    if (p == null && inheritedProperties != null)
-		p = inheritedProperties.get(key);
-	    return p;
-	}
+    public Property get(Object key)
+    {
+	Property p;
+	p = super.get(key);
+	if (p == null && inheritedProperties != null)
+	    p = inheritedProperties.get(key);
+	return p;
+    }
 
     @Override
-	public Value getValue(Property.Key k)
-	{
-	    return super.getValue(k);
-	}
+    public Value getValue(Property.Key k)
+    {
+	return super.getValue(k);
+    }
 
     public String getString(Property.Key k)
     {
@@ -937,10 +904,10 @@ public class Node
     }
 
     @Override
-	public Point getPoint(Property.Key k)
-	{
-	    return super.getPoint(k);
-	}
+    public Point getPoint(Property.Key k)
+    {
+	return super.getPoint(k);
+    }
 
     public String getGameName()
     {
@@ -948,28 +915,25 @@ public class Node
 
 	if (this != getRoot())
 	    return getRoot().getGameName();
-	else if (contains(Property.GAME_NAME))
-	    {
-		return getValue(Property.GAME_NAME).toString();
-	    }
-	else if (contains(Property.PLAYER_BLACK) && contains(Property.PLAYER_WHITE))
-	    {
-		Value black = getValue(Property.PLAYER_BLACK);
-		Value white = getValue(Property.PLAYER_WHITE);
-		assert black != null;
-		assert white != null;
-		return black.toString() + " - " + white.toString();
-	    }
+	else if (contains(Property.GAME_NAME)) {
+	    return getValue(Property.GAME_NAME).toString();
+	}
+	else if (contains(Property.PLAYER_BLACK) && contains(Property.PLAYER_WHITE)) {
+	    Value black = getValue(Property.PLAYER_BLACK);
+	    Value white = getValue(Property.PLAYER_WHITE);
+	    assert black != null;
+	    assert white != null;
+	    return black.toString() + " - " + white.toString();
+	}
 	else
 	    return "";
     }
 
     public String getName()
     {
-	if (contains(Property.NAME))
-	    {
-		return getValue(Property.NAME).toString();
-	    }
+	if (contains(Property.NAME)) {
+	    return getValue(Property.NAME).toString();
+	}
 	else if (contains(Property.BLACK))
 	    return "Black " + getMoveNo();
 	else if (contains(Property.WHITE))
@@ -981,24 +945,23 @@ public class Node
     }
 
     @Override
-	public String toString()
-	{
-	    StringBuffer buffer = new StringBuffer(16).append("Node ").append(getId());
-	    if (contains(Property.NAME))
-		buffer.append(" ").append(getValue(Property.NAME).toString());
-
-	    return buffer.toString();
-	}
+    public String toString()
+    {
+	StringBuffer buffer = new StringBuffer(16).append("Node ").append(getId());
+	if (contains(Property.NAME))
+	    buffer.append(" ").append(getValue(Property.NAME).toString());
+	
+	return buffer.toString();
+    }
 
     public int getMoveNo()
     {
 	Node n = this;
-	while (n != null && n.getParent() != null && !n.isMove())
-	    {
-		if (logger.isLoggable(Level.FINE))
-		    logger.fine("getMoveNo: not a move, get parent node");
-		n = n.getParent();
-	    }
+	while (n != null && n.getParent() != null && !n.isMove()) {
+	    if (logger.isLoggable(Level.FINE))
+		logger.fine("getMoveNo: not a move, get parent node");
+	    n = n.getParent();
+	}
 	return n.moveNo;
     }
 
@@ -1055,17 +1018,15 @@ public class Node
 	if (model == null)
 	    if (parent == null)
 		model = gameTree.getGoban(getBoardSize());
-	    else
-		{
-		    try {
-			model = parent.getGoban().clone();
-		    }
-		    catch (CloneNotSupportedException ex)
-			{
-			    throw new RuntimeException("This exception should not occur!", ex);
-			}
+	    else {
+		try {
+		    model = parent.getGoban().clone();
 		}
-
+		catch (CloneNotSupportedException ex) {
+		    throw new RuntimeException("Implementation error", ex);
+		}
+	    }
+	
 	if (!model.getStone(p).equals(c)) {
 	    if (c == BoardType.WHITE)
 		key = Property.ADD_WHITE;
@@ -1088,30 +1049,29 @@ public class Node
     }
 
     @Override
-	public boolean equals(Object o)
-	{
-	    if (o instanceof Node)
-		return id == ((Node)o).id;
-	    else
-		return false;
-	}
+    public boolean equals(Object o)
+    {
+	if (o instanceof Node)
+	    return id == ((Node)o).id;
+	else
+	    return false;
+    }
 
     @Override
-	public int hashCode()
-	{
-	    return id;
-	}
+    public int hashCode()
+    {
+	return id;
+    }
 
     public boolean isMainVariation()
     {
 	Node n = this;
-	while (n.parent != null && !(n instanceof RootNode) )
-	    {
-		if (n.parent.children.indexOf(n) != 0)
-		    return false;
-		else
-		    n = n.parent;
-	    }
+	while (n.parent != null && !(n instanceof RootNode)) {
+	    if (n.parent.children.indexOf(n) != 0)
+		return false;
+	    else
+		n = n.parent;
+	}
 	return true;
     }
 
@@ -1138,39 +1098,37 @@ public class Node
     }
 
     @Override
-	public void write(PrintWriter out)
-	{
-	    super.write(out);
-	    if (getChildCount() > 1)
-		{
-		    Iterator it = getChildren().iterator();
-		    while (it.hasNext())
-			{
-			    Node node = (Node)it.next();
-			    out.println("(");
-			    node.write(out);
-			    out.println(")");
-			}
-		}
-	    else if (getChildCount() == 1)
-		{
-		    Node node = (Node)getChildAt(0);
-		    node.write(out);
-		}
+    public void write(PrintWriter out)
+    {
+	super.write(out);
+	if (getChildCount() > 1) {
+	    Iterator it = getChildren().iterator();
+	    while (it.hasNext()) {
+		Node node = (Node)it.next();
+		out.println("(");
+		node.write(out);
+		out.println(")");
+	    }
 	}
+	else if (getChildCount() == 1) {
+	    Node node = (Node)getChildAt(0);
+	    node.write(out);
+	}
+    }
 
+    /** Todo: Provide a way to set application name and version in a more flexible way
+     */
     public void setDefaultRootProperties()
     {
 	setFileFormat(4);
 	setGame(1);
 	setProperty(Property.APPLICATION, "AGoban");
 	//setProperty(Property.APPLICATION, "GoDiagram:" + GoDiagram.getVersion());
-	/*
-	  Charset defaultCharset = Charset.forName(new OutputStreamWriter(System.out).getEncoding());
-	  if (defaultCharset == null)
-	  defaultCharset = Charset.forName("UTF-8");
-	  setProperty(Property.CHARACTER_SET, defaultCharset.name());
-	*/
+
+	Charset defaultCharset = Charset.defaultCharset();
+	if (defaultCharset == null)
+	    defaultCharset = Charset.forName("UTF-8");
+	setProperty(Property.CHARACTER_SET, defaultCharset.name());
     }
 
     public void setProperty(Property.Key key, Object newValue)
@@ -1253,37 +1211,30 @@ public class Node
     {
 	Map<Property.Key, Property> inheritable = null;
 
-	Iterator<Property.Key> it = keySet().iterator();
-	while (it.hasNext())
-	    {
-		Property.Key k = it.next();
-		if (get(k) instanceof Property.Inheritable)
-		    {
-			logger.info("inherited: " + get(k));
-			if (inheritable == null) inheritable = new TreeMap<Property.Key, Property>();
-			inheritable.put(k, get(k));
-		    }
+	for (Property.Key k : keySet()) {
+	    if (get(k) instanceof Property.Inheritable) {
+		if (logger.isLoggable(Level.FINE))
+		    logger.fine("inherited: " + get(k));
+		if (inheritable == null) inheritable = new TreeMap<Property.Key, Property>();
+		inheritable.put(k, get(k));
 	    }
-	it = p.keySet().iterator();
-	while (it.hasNext())
-	    {
-		Property.Key k = it.next();
-		if (get(k) instanceof Property.Inheritable)
-		    {
-			logger.info("inherited: " + get(k));
-			if (inheritable == null) inheritable = new TreeMap<Property.Key, Property>();
-			inheritable.put(k, get(k));
-		    }
-	    }
+	}
 
-	if (inheritable != null)
-	    {
-		inheritedProperties.putAll(inheritable);
+	for (Property.Key k : p.keySet()) {
+	    if (get(k) instanceof Property.Inheritable) {
+		if (logger.isLoggable(Level.FINE))
+		    logger.fine("inherited: " + get(k));
+		if (inheritable == null) inheritable = new TreeMap<Property.Key, Property>();
+		inheritable.put(k, get(k));
 	    }
+	}
 
-	for (Node n : children)
-	    {
-		n.setInheritedProperties(inheritedProperties);
-	    }
+	if (inheritable != null) {
+	    inheritedProperties.putAll(inheritable);
+	}
+
+	for (Node n : children) {
+	    n.setInheritedProperties(inheritedProperties);
+	}
     }
 }

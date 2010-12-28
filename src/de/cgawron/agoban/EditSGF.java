@@ -139,9 +139,6 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 			gameTreeControls.setGameTree(gameTree);
 						
 			seekBar.setMax(gameTree.getNoOfMoves());
-			
-			//Goban goban = gameTree.getRoot().getGoban();
-			//gobanView.setGoban(goban);
 		    }
 		}
 	    };

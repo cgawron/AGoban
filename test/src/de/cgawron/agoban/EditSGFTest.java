@@ -3,7 +3,9 @@ package de.cgawron.agoban;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Debug;
 import android.test.ActivityInstrumentationTestCase2;
+import android.util.Log;
 
 import de.cgawron.agoban.SGFApplication;
 import de.cgawron.agoban.provider.SGFProvider;
@@ -21,7 +23,9 @@ import de.cgawron.go.sgf.GameTree;
  * -e class de.cgawron.agoban.EditSGFTest \
  * de.cgawron.agoban.tests/android.test.InstrumentationTestRunner
  */
-public class EditSGFTest extends ActivityInstrumentationTestCase2<EditSGF> {
+public class EditSGFTest extends ActivityInstrumentationTestCase2<EditSGF> 
+{
+    private final String TAG = "EditSGF";
 
     public EditSGFTest() {
         super("de.cgawron.agoban", EditSGF.class);
@@ -40,7 +44,7 @@ public class EditSGFTest extends ActivityInstrumentationTestCase2<EditSGF> {
 
         // setActivityInitialTouchMode(false);
 
-	Uri data = SGFProvider.CONTENT_URI.buildUpon().appendPath("/sdcard/sgf/gross4.sgf").build();
+	Uri data = SGFProvider.CONTENT_URI.buildUpon().appendPath("gross4.sgf").build();
 	Intent intent = new Intent(Intent.ACTION_VIEW, data);
 	setActivityIntent(intent);
 	
@@ -52,7 +56,11 @@ public class EditSGFTest extends ActivityInstrumentationTestCase2<EditSGF> {
 
 	gameTreeControls = (GameTreeControls) activity.findViewById(R.id.controls);
 
-	gameTree = application.getGameTree();
+	while ((gameTree = application.getGameTree()) == null) {
+	    Log.d(TAG, "Waiting for SGF to be loaded ...");
+	    Thread.sleep(1000);
+	}
+	//Debug.dumpHprofData("/sdcard/sgf/dump.hprof");
     }
 
     public void testPreconditions() 

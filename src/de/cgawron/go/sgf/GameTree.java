@@ -104,15 +104,26 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
         public abstract boolean predicate(Node n);
 
         @Override
-		public void visitNode(Object o)
+	public void visitNode(Object o)
         {
             if (predicate((Node)o))
                 count++;
         }
     }
 
+    private void init(GameTree tree)
+    {
+	logger.info("init: this=" + this + ", tree=" + tree);
+	this.root = tree.root;
+
+	root.setGameTree(this);
+        root.setDefaultRootProperties();
+        setModified(false);
+    }
+
     private void init(Node root)
     {
+	logger.info("init: this=" + this + ", root=" + root);
 	if (root instanceof RootNode)
 	    setRoot((RootNode) root);
 	else
@@ -136,24 +147,6 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 	}
 	*/
     }
-
-    /*
-    private void init(Sequence root)
-    {
-	init(new RootNode(root.first));
-    }
-
-    private void init(CollectionRoot root)
-    {
-        setRoot(root);
-        setModified(false);
-    }
-
-    private void init(RootNode root)
-    {
-        setRoot(root);
-    }
-    */
 
     /**
      * Constructs an empty GameTree, consisting only of a <code>RootNode</code>
@@ -195,8 +188,8 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
      */
     public GameTree(final RandomAccessFile file) throws Exception
     {
-        this(new InputStream() { @Override
-		public int read() throws IOException {return file.read();}});
+        this(new InputStream() { 
+		@Override public int read() throws IOException {return file.read();}});
     }
 
     /**
@@ -219,7 +212,9 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
         listeners = new HashSet<EventListener>();
 	Yylex lexer = new Yylex(reader);
         Parser parser = new Parser(lexer);
+	logger.info("parsing " + reader + " ...");
         List roots = (List) parser.debug_parse().value;
+	logger.info("parsing done");
         if (roots.size() > 1) {
 	    init(new CollectionRoot(this));
 	    Iterator it = roots.iterator();
@@ -236,10 +231,11 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 	}
         else {
 	    GameTree tree = (GameTree) roots.get(0);
-	    Node node = tree.getRoot();
+	    init(tree);
+	    //Node node = tree.getRoot();
 	    //node.setRoot((Node)getRoot());
 	    //node.setRoot(node);
-	    init(node);
+	    //init(node);
 	}
         reader.close();
         setModified(false);
@@ -526,8 +522,11 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
     public void setRoot(final RootNode newRoot)
     {
         Node oldRoot = root;
-        if (oldRoot != null)
+        if (oldRoot != null) {
+	    if (oldRoot.equals(newRoot))
+		return;
             oldRoot.removePropertyChangeListener(this);
+	}
 
         logger.info("Setting root: " + newRoot);
         root = newRoot;
@@ -537,7 +536,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 		new TreeVisitor<GameTree, Node>(this) 
 		{
 		    @Override
-			protected void visitNode(Object o)
+		    protected void visitNode(Object o)
 		    {
 			Node n = (Node) o;
 			Goban goban = null;
