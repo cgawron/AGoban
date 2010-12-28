@@ -22,9 +22,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageItemInfo;
 import android.content.pm.PackageManager;
@@ -33,6 +35,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Looper;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -56,7 +59,8 @@ import de.cgawron.go.sgf.Node;
 /**
  * Provides an sgf editor.
  */
-public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener, GobanEventListener, GameTreeNavigationListener
+public class EditSGF extends Activity 
+    implements SeekBar.OnSeekBarChangeListener, GobanEventListener, GameTreeNavigationListener, SGFApplication.ExceptionHandler
 {
     public static Resources resources;
 
@@ -137,13 +141,12 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 		    gameTree = application.getGameTree(); 
 		    if (gameTree != null) {
 			gameTreeControls.setGameTree(gameTree);
-						
 			seekBar.setMax(gameTree.getNoOfMoves());
 		    }
 		}
 	    };
 
-	application.loadSGF(this, afterLoaded);
+	application.loadSGF(this, afterLoaded, this);
     }
 
     @Override
@@ -233,8 +236,9 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
     @Override
     protected void onStop() {
        super.onStop();
-
-       save();
+       
+       if (gameTree != null)
+	   save();
     }
 
     public void setCurrentNode(Node node) {
@@ -285,5 +289,23 @@ public class EditSGF extends Activity implements SeekBar.OnSeekBarChangeListener
 
 	Log.d("EditSGF", "thread: " + Thread.currentThread().getId() + " " + viewGameInfo.getClass().toString());
 	startActivity(viewGameInfo);
+    }
+
+    public void handleException(final String message, Throwable ex)
+    {
+	Runnable runnable = new Runnable() {
+		public void run() {
+		    AlertDialog.Builder builder = new AlertDialog.Builder(EditSGF.this);
+		    builder.setMessage(message)
+			.setCancelable(false)
+			.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+				    EditSGF.this.finish();
+				}
+			    });
+		    AlertDialog alert = builder.show();
+		}
+	    };
+	runOnUiThread(runnable);
     }
 }

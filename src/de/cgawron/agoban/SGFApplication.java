@@ -46,6 +46,10 @@ import java.util.UUID;
  */
 public class SGFApplication extends Application
 {
+    public interface ExceptionHandler {
+	public void handleException(String message, Throwable t);
+    }
+
     public static String KEY_DEFAULT = "default";
 
     private GameTree gameTree;
@@ -61,7 +65,7 @@ public class SGFApplication extends Application
      * Initialize the application and load an SGF file if a data URI has been set.
      * Due to the small default stack size, this has to be done in a worker thread.
      */
-    public void loadSGF(Context context, final Runnable loadedCB)
+    public void loadSGF(Context context, final Runnable loadedCB, final ExceptionHandler exceptionHandler)
     {
 	if (data != null)
 	{
@@ -83,7 +87,7 @@ public class SGFApplication extends Application
 			}
 			catch (Exception ex) {
 			    Log.e("EditSGF", "Exception while parsing SGF", ex);
-			    throw new RuntimeException("Exception while parsing SGF", ex);
+			    exceptionHandler.handleException("Exception while parsing SGF", ex);
 			}
 			Message msg = handler.obtainMessage();
 			Bundle b = new Bundle();
