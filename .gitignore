@@ -1,7 +1,11 @@
 AndroidManifest.xml
 bin/**
 gen/**
+tools/*
+test/bin/**
 res/raw/git
 CATALOG
 .*
 *~
+*.apk
+*.hprof
