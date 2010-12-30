@@ -57,7 +57,7 @@ public class MiscEncodingReader extends Reader
     public void close() throws IOException
     {
 	logger.info("close()");
-	//reader.close();
+	reader.close();
     }
 
     public int read(char[] cbuf, int off, int len) throws IOException

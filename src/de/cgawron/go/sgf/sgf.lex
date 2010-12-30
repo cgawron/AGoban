@@ -34,13 +34,12 @@ import de.cgawron.util.MiscEncodingReader;
 %char
 %line
 %unicode
+%buffer 4096
 //%debug
 
 %eof{
   logger.info("eof reached");
 %eof}
-
-%eofclose
 
 %state TOP
 %state NODE
@@ -89,7 +88,6 @@ import de.cgawron.util.MiscEncodingReader;
     {
 	MiscEncodingReader mer = (MiscEncodingReader) zzReader;
 	try {
-	  //mer.setCharset(charSetName, zzcurrentPos);
 	  mer.setCharset(charSetName, zzMarkedPos);
 	  zzReader = null;
 	  yyclose();

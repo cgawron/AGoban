@@ -101,6 +101,7 @@ public class ChooseSGF extends Activity implements ViewBinder
 
 	ContentResolver resolver = getContentResolver();
 	cursor = resolver.query(intent.getData(), null, null, null, null);
+	Log.d("ChooseSGF", String.format("query: returned cursor with %d rows", cursor.getCount()));
 
 	String[] from = new String[] {GameInfo.KEY_FILENAME, GameInfo.KEY_MODIFIED_DATE, 
 				      GameInfo.KEY_PLAYER_WHITE, GameInfo.KEY_PLAYER_BLACK, GameInfo.KEY_RESULT};

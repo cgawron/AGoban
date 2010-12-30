@@ -96,6 +96,8 @@ public class SGFProvider extends ContentProvider
 	return cursor;
     }
 
+    Thread updateThread = null;
+    
     private void updateDatabase() {
 	Runnable runnable = new Runnable() {
 		public void run() {
@@ -103,8 +105,12 @@ public class SGFProvider extends ContentProvider
 		}
 	    };
 
-	Thread thread = new Thread(Thread.currentThread().getThreadGroup(), runnable, "updateDatabase", 64*1024);
-	thread.start();
+	synchronized (this) {
+	    if (updateThread == null) {
+		updateThread = new Thread(Thread.currentThread().getThreadGroup(), runnable, "updateDatabase", 64*1024);
+		updateThread.start();
+	    }
+	}
     }
 
     public void doUpdateDatabase()
@@ -168,7 +174,7 @@ public class SGFProvider extends ContentProvider
 	    }
 	}
 	lastChecked = System.currentTimeMillis();
-	Debug.stopMethodTracing();
+	updateThread = null;
     }
 
 
