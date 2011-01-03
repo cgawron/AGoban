@@ -205,7 +205,7 @@ import de.cgawron.util.MiscEncodingReader;
 
 <TEXT> \\[^\n\r] { 
     Token next = (Token) next_token();
-    return new Token(Symbols.Value, yytext().substring(1) + next.m_text, yyline, yychar, AbstractValue.createValue(yytext().substring(1) + next.m_text));
+    return new Token(Symbols.Value, yytext() + next.m_text, yyline, yychar, AbstractValue.createValue(yytext() + next.m_text));
 }
 
 <TEXT> "]" { 
