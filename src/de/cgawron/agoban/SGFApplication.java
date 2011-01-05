@@ -24,9 +24,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceActivity;
 import android.util.Log;
 import android.net.Uri;
 
@@ -50,6 +52,14 @@ public class SGFApplication extends Application
 
     public interface ExceptionHandler {
 	public void handleException(String message, Throwable t);
+    }
+
+    public static class EditPreferences extends PreferenceActivity {
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+	    super.onCreate(savedInstanceState);
+	    addPreferencesFromResource(R.xml.prefs);
+	}
     }
 
     public static String KEY_DEFAULT = "default";

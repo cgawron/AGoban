@@ -175,6 +175,10 @@ public class ChooseSGF extends Activity implements ViewBinder
 	    newGame();
 	    return true;
 
+	case R.id.preferences:
+	    editPreferences();
+	    return true;
+
 	case R.id.about:
 	    Context context = getApplicationContext();
 	    CharSequence text = String.format("AGoban, (c)2010 Christian Gawron\nGit-Id: %s", gitId);
@@ -191,6 +195,13 @@ public class ChooseSGF extends Activity implements ViewBinder
 	Intent sgfIntent = new Intent(Intent.ACTION_EDIT, application.getNewGameUri());
 	startActivity(sgfIntent);
 	finish();
+    }
+
+    public void editPreferences() 
+    {
+	Intent intent = new Intent(this, SGFApplication.EditPreferences.class);
+	Log.d(TAG, "Starting " + intent);
+	startActivity(intent);
     }
 
     public void googleSync()

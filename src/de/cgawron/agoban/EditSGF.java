@@ -62,6 +62,8 @@ import de.cgawron.go.sgf.Node;
 public class EditSGF extends Activity 
     implements GobanEventListener, GameTreeNavigationListener, SGFApplication.ExceptionHandler
 {
+    private static String TAG = "EditSGF";
+
     public static Resources resources;
 
     private GobanView gobanView;
@@ -88,7 +90,7 @@ public class EditSGF extends Activity
 	{
 	    throw new RuntimeException("git-id", e);
 	}
-	Log.d("EditSGF", "git-id: " + gitId);
+	Log.d(TAG, "git-id: " + gitId);
 
 	setContentView(R.layout.main);
 
@@ -105,7 +107,7 @@ public class EditSGF extends Activity
 	if (Intent.ACTION_EDIT.equals(intent.getAction()))
 	    application.setReadOnly(false);
 
-	Log.d("EditSGF", "Uri: " + intent.getData());
+	Log.d(TAG, "Uri: " + intent.getData());
 	if (intent.getData() == null) {
 	    Intent searchSGF = new Intent(Intent.ACTION_SEARCH, SGFProvider.CONTENT_URI, this, ChooseSGF.class);
 	    startActivity(searchSGF);
@@ -131,7 +133,7 @@ public class EditSGF extends Activity
     @Override
     public void onStart() {
 	super.onStart();
-	Log.d("EditSGF", "OnStart");
+	Log.d(TAG, "OnStart");
 
 	final Runnable afterLoaded = new Runnable() {
 		public void run() {
@@ -176,6 +178,10 @@ public class EditSGF extends Activity
 	    googleSync();
 	    return true;
 
+	case R.id.preferences:
+	    editPreferences();
+	    return true;
+
 	case R.id.about:
 	    Context context = getApplicationContext();
 	    CharSequence text = String.format("AGoban, (c)2010 Christian Gawron\nGit-Id: %s", gitId);
@@ -188,17 +194,17 @@ public class EditSGF extends Activity
     }
 
     public void onGobanEvent(GobanEvent gobanEvent) {
-	Log.d("EditSGF", "onGobanEvent: " + gobanEvent);
+	Log.d(TAG, "onGobanEvent: " + gobanEvent);
 	if (currentNode != null && application.checkNotReadOnly(this)) {
 	    Node node = new Node(gameTree);
 	    try {
 		node.setGoban(currentNode.getGoban().clone());
 	    }
 	    catch (CloneNotSupportedException ex) {
-		Log.e("EditSGF", "onGobanEvent", ex);
+		Log.e(TAG, "onGobanEvent", ex);
 	    }
 	    currentNode.add(node);
-	    Log.d("EditSGF", "addMove: " + node + ", " + currentNode);
+	    Log.d(TAG, "addMove: " + node + ", " + currentNode);
 	    node.move(gobanEvent.getPoint());	
 	    setCurrentNode(node);
 	}
@@ -206,7 +212,7 @@ public class EditSGF extends Activity
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
-	Log.d("EditSGF", "onCreateContextMenu");
+	Log.d(TAG, "onCreateContextMenu");
 	MenuInflater inflater = getMenuInflater();
 	inflater.inflate(R.menu.stone_context_menu, menu);
     }
@@ -234,7 +240,7 @@ public class EditSGF extends Activity
 	    if (currentNode != null) {
 		Goban goban = currentNode.getGoban();
 		if (currentNode.getSiblingCount() > 0) {
-		    Log.d("EditSGF", "siblingCount: " + currentNode.getSiblingCount());
+		    Log.d(TAG, "siblingCount: " + currentNode.getSiblingCount());
 		}
 		gobanView.setGoban(goban);
 		commentView.setText(currentNode.getComment());
@@ -248,9 +254,16 @@ public class EditSGF extends Activity
 	application.save();
     }
 
+    public void editPreferences() 
+    {
+	Intent intent = new Intent(this, SGFApplication.EditPreferences.class);
+	Log.d(TAG, "Starting " + intent);
+	startActivity(intent);
+    }
+
     public void open() 
     {
-	Log.d("EditSGF", "open()");
+	Log.d(TAG, "open()");
     }
 
     public void newGame()
@@ -271,11 +284,11 @@ public class EditSGF extends Activity
 
     public void showGameInfo() 
     {
-	Log.d("EditSGF", "Show game info");
+	Log.d(TAG, "Show game info");
 	Intent viewGameInfo = new Intent(Intent.ACTION_VIEW, application.getData());
 	viewGameInfo.setClassName("de.cgawron.agoban", "de.cgawron.agoban.ShowGameInfo");
 
-	Log.d("EditSGF", "thread: " + Thread.currentThread().getId() + " " + viewGameInfo.getClass().toString());
+	Log.d(TAG, "thread: " + Thread.currentThread().getId() + " " + viewGameInfo.getClass().toString());
 	startActivity(viewGameInfo);
     }
 

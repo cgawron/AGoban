@@ -5,6 +5,8 @@
           android:title="Open" />
     <item android:id="@+id/new_game"
           android:title="New Game" />
+    <item android:id="@+id/preferences"
+          android:title="Edit Preferences" />
     <item android:id="@+id/google_sync"
           android:title="Google Sync" />
     <item android:id="@+id/game_info"
