@@ -66,6 +66,7 @@ import com.google.api.client.xml.atom.AtomContent;
 import com.google.api.client.xml.atom.AtomParser;
 
 import de.cgawron.agoban.SGFApplication;
+import static de.cgawron.agoban.SGFApplication.PREF;
 import de.cgawron.agoban.provider.GameInfo;
 import static de.cgawron.agoban.provider.GameInfo.KEY_ID;
 import static de.cgawron.agoban.provider.GameInfo.KEY_FILENAME;
@@ -96,8 +97,6 @@ public final class GoogleSync extends Activity
     private static final int CONTEXT_LOGGING = 2;
 
     private static final int REQUEST_AUTHENTICATE = 0;
-
-    private static final String PREF = "AGoban";
 
     private static final int DIALOG_ACCOUNTS = 0;
     

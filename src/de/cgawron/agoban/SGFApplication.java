@@ -48,7 +48,8 @@ import java.util.UUID;
  */
 public class SGFApplication extends Application
 {
-    private final String TAG = "SGFApplication";
+    private static final String TAG  = "SGFApplication";
+    public  static final String PREF = "AGoban";
 
     public interface ExceptionHandler {
 	public void handleException(String message, Throwable t);
@@ -58,6 +59,7 @@ public class SGFApplication extends Application
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
+	    getPreferenceManager().setSharedPreferencesName(PREF);
 	    addPreferencesFromResource(R.xml.prefs);
 	}
     }
