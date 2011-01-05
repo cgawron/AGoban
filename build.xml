@@ -80,4 +80,21 @@
 
   <setup/>
 
+  <path id="cup.path">
+    <pathelement path="tools/java-cup-11a.jar" />
+  </path>
+
+  <taskdef name="cup"
+	   classname="java_cup.anttask.CUPTask"
+	   classpathref="cup.path"
+	   />
+
+  <target name="cup">
+    <cup srcfile="${source.absolute.dir}/de/cgawron/go/sgf/sgf.cup"
+	 destdir="${source.dir}/de/cgawron/go/sgf"
+	 interface="true"
+	 parser="Parser"
+	 symbols="Symbols"
+	 />
+  </target>
 </project>

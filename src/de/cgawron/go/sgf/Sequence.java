@@ -67,6 +67,19 @@ public class Sequence extends Node
 	return first;
     }
 
+    /** Get the GameTree associated with this Node.
+     *  Use lazy initialization to reduce overhead during parsing.
+     *  We can assume that the RootNode always has a GameTree (the constructors ensure that).
+     *  @returns the GameTree associated with this Node.
+     */
+    public GameTree getGameTree()
+    {
+	if (gameTree == null) {
+	    gameTree = first.getGameTree();
+	}
+	return gameTree;
+    }
+
     public String toString()
     {
         String s = "Sequence: length " + size() + ": ";

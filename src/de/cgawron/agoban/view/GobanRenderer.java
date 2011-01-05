@@ -19,7 +19,10 @@ package de.cgawron.agoban.view;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.Log;
+import de.cgawron.go.sgf.MarkupModel;
+import de.cgawron.go.sgf.MarkupModel.Markup;
 import de.cgawron.go.Goban;
 import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
@@ -31,6 +34,8 @@ import de.cgawron.go.Point;
  */
 public class GobanRenderer 
 {
+    private static String TAG = "GobanRenderer";
+
     private static float STONE_RADIUS = 0.47f;
     private static float HOSHI_RADIUS = 0.15f;
     private static float HIGHLIGHT_RADIUS = 0.2f;
@@ -69,6 +74,10 @@ public class GobanRenderer
 	    for (short i=0; i<size; i++) {
 		for (short j=0; j<size; j++) {
 		    BoardType stone = goban.getStone(i, j);
+		    Markup markup = null;
+		    if (goban instanceof MarkupModel) {
+			markup = ((MarkupModel) goban).getMarkup(i, j);
+		    }
 		    switch (stone) {
 		    case BLACK:
 		    case WHITE:
@@ -79,6 +88,12 @@ public class GobanRenderer
 			break;
 		    case EMPTY:
 			break;
+		    }
+		    if (markup != null) {
+			Log.d(TAG, String.format("markup: (%d, %d) -> %s (%s)", i, j, markup.toString(), markup.getClass().getName()));
+			if (markup instanceof MarkupModel.Text) {
+			    drawText(i, j, stone, markup.toString(), canvas);
+			}
 		    }
 		    if (view.isSelected(i, j))
 			drawSelection(i, j, canvas);
@@ -177,6 +192,42 @@ public class GobanRenderer
 	paint.setColor(SELECTION_COLOR);
 	paint.setStyle(Paint.Style.STROKE);
 	canvas.drawRect(x+0.5f, y+0.5f, x+1.5f, y+1.5f, paint);
+    }
+
+    void drawText(int x, int y, BoardType stone, String text, Canvas canvas)
+    {
+	Paint paint = new Paint();
+	paint.setAntiAlias(true);
+	paint.setTextAlign(Paint.Align.CENTER);
+
+	float size = paint.getTextSize();
+	Paint.FontMetrics fm = paint.getFontMetrics();
+	Rect bounds = new Rect();
+	paint.getTextBounds(text, 0, text.length(), bounds);
+	int h = bounds.height();
+	int w = bounds.width();
+	size /= (fm.top > 0) ? fm.top : -fm.top;
+	size *= 0.8;
+	paint.setTextSize(size);
+	
+	Log.d(TAG, String.format("drawText: h=%d, w=%d, a=%f, t=%f", h, w, fm.ascent, fm.top));
+	
+	paint.setStyle(Paint.Style.FILL);
+
+	switch (stone) {
+	case BLACK:
+	    paint.setARGB(255, 255, 255, 255);
+	    break;
+
+	case EMPTY:
+	    paint.setARGB(255, 255, 255, 10);
+	    canvas.drawCircle(x+1f, y+1f, 0.5f, paint);
+	    // fall through
+	case WHITE:
+	    paint.setARGB(255, 0, 0, 0);
+	    break;
+	}
+	canvas.drawText(text, x+1f, y+1.25f, paint);
     }
 
 }

@@ -24,6 +24,7 @@
       android:layout_weight="2" 
       android.choiceMode="singleChoice"/>
 
+<!--
   <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 		android:background="@android:drawable/title_bar"
 		android:textColor="?android:textColorPrimary"
@@ -44,6 +45,7 @@
 	android:layout_width="fill_parent" 
 	android:layout_height="wrap_content"/>
   </LinearLayout>
+-->
 
 </LinearLayout>
 

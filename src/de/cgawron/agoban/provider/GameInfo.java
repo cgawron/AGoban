@@ -80,7 +80,11 @@ public class GameInfo
     public GameInfo(File file) throws Exception
     {
 	this.file = file;
-	GameTree gameTree = new GameTree(file);
+	GameTree gameTree = null;
+	// The cup parser (or my code around it?) seems to have a multithreading problem
+	synchronized(de.cgawron.go.sgf.Parser.class) {
+	    gameTree = new GameTree(file);
+	}
 	init(gameTree);
     }
 

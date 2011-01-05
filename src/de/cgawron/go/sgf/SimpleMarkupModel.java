@@ -239,14 +239,16 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel, Prope
     /** putStone method comment. */
     public void putStone(short x, short y, BoardType color)
     {
-	logger.fine("putStone: " + x + ", " + y + ", " + color);
+	if (logger.isLoggable(Level.FINE))
+	    logger.fine("putStone: " + x + ", " + y + ", " + color);
         super.putStone(x, y, color);
 	setMarkup(x, y, new Stone(color));
     }
 
     protected void setStone(short x, short y, BoardType color)
     {
-	logger.fine("setStone: " + x + ", " + y + ", " + color);
+	if (logger.isLoggable(Level.FINE))
+	    logger.fine("setStone: " + x + ", " + y + ", " + color);
         super.setStone(x, y, color);
     }
 
@@ -273,7 +275,8 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel, Prope
     public void setRegion(Region newRegion)
     {
         Region oldRegion = region;
-        logger.fine("Setting region to " + newRegion);
+	if (logger.isLoggable(Level.FINE))
+	    logger.fine("Setting region to " + newRegion);
         if (oldRegion != null)
             oldRegion.removePropertyChangeListener(this);
         region = newRegion;
@@ -289,7 +292,8 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel, Prope
 
     public SortedSet<Conflict> getConflicts()
     {
-        logger.fine("Conflicts: " + conflicts);
+	if (logger.isLoggable(Level.FINE))
+	    logger.fine("Conflicts: " + conflicts);
         return conflicts;
     }
 

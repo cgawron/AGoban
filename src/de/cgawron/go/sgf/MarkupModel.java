@@ -1,6 +1,6 @@
 /*
  *
- * $Id: MarkupModel.java 369 2006-04-14 17:04:02Z cgawron $
+ * $Id$
  *
  * (c) 2001 Christian Gawron. All rights reserved.
  *
@@ -21,7 +21,7 @@ import java.util.SortedSet;
  * Represents markup on a goban - move numbers, letters, views.
  * @see GobanModel
  * @see Goban
- * @version $Id: MarkupModel.java 369 2006-04-14 17:04:02Z cgawron $
+ * @version $Id$
  */
 public interface MarkupModel extends Goban
 {

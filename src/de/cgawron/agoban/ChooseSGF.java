@@ -56,6 +56,7 @@ import de.cgawron.agoban.sync.GoogleSync;
  */
 public class ChooseSGF extends Activity implements ViewBinder
 {
+    private static String TAG = "ChooseSGF";
     private static DateFormat dateFormat = DateFormat.getDateInstance();
 
     private SGFApplication application;
@@ -83,37 +84,36 @@ public class ChooseSGF extends Activity implements ViewBinder
     	{
     		throw new RuntimeException("git-id", e);
     	}
-    	Log.d("ChooseSGF", "git-id: " + gitId);
+    	Log.d(TAG, "git-id: " + gitId);
 
     	intent = getIntent();
-    	Log.d("ChooseSGF", String.format("onCreate: intent=%s", intent));
+    	Log.d(TAG, String.format("onCreate: intent=%s", intent));
     	setContentView(R.layout.choose_sgf_dialog);
 
     	textView = (TextView) findViewById(R.id.text);
     	listView = (ListView) findViewById(R.id.list);
-    	footerView = (ViewGroup) findViewById(R.id.footer);
+    	//footerView = (ViewGroup) findViewById(R.id.footer);
     }
 
     @Override
-    public void onStart() {
+    public void onStart() 
+    {
 	super.onStart();
-	Log.d("ChooseSGF", "OnStart");
+	Log.d(TAG, "OnStart");
 
 	ContentResolver resolver = getContentResolver();
 	cursor = resolver.query(intent.getData(), null, null, null, null);
-	Log.d("ChooseSGF", String.format("query: returned cursor with %d rows", cursor.getCount()));
+	Log.d(TAG, String.format("query: returned cursor with %d rows, position=%d", cursor.getCount(), cursor.getPosition()));
 
 	String[] from = new String[] {GameInfo.KEY_FILENAME, GameInfo.KEY_MODIFIED_DATE, 
 				      GameInfo.KEY_PLAYER_WHITE, GameInfo.KEY_PLAYER_BLACK, GameInfo.KEY_RESULT};
 	
 	int[] to = new int[] {R.id.filename, R.id.modified, R.id.player_white, R.id.player_black, R.id.result};
 	
-	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
-							      R.layout.game_list, cursor, from, to);
+	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.game_list, cursor, from, to);
 	adapter.setViewBinder(this);
 
-	if (listView != null)
-	    listView.setAdapter(adapter);
+	listView.setAdapter(adapter);
 
 	listView.setOnItemLongClickListener(new OnItemLongClickListener() {
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -144,7 +144,7 @@ public class ChooseSGF extends Activity implements ViewBinder
 
     @Override
     protected void onStop() {
-	Log.d("ChooseSGF", "onStop");
+	Log.d(TAG, "onStop");
 	super.onStop();
 	if (cursor != null)
 	    cursor.close();
@@ -152,7 +152,7 @@ public class ChooseSGF extends Activity implements ViewBinder
 
     @Override
     protected void onPause() {
-	Log.d("ChooseSGF", "onPause");
+	Log.d(TAG, "onPause");
 	super.onPause();
     }
 
@@ -202,9 +202,10 @@ public class ChooseSGF extends Activity implements ViewBinder
 
     public boolean setViewValue(View view, Cursor cursor, int columnIndex)
     {
+	Log.d(TAG, "setViewValue: " + cursor + ", position=" + cursor.getPosition());
 	String columnName = cursor.getColumnName(columnIndex);
 	int colDate = cursor.getColumnIndex(GameInfo.KEY_DATE);
-	Log.d("ChooseSGF", "setViewValue: " + cursor + ", position=" + cursor.getPosition() + ", column=" + columnName);
+	Log.d(TAG, "setViewValue: " + cursor + ", position=" + cursor.getPosition() + ", column=" + columnName);
 	
 	if (view.getId() == R.id.modified) {
 	    TextView text = (TextView) view;
@@ -219,11 +220,12 @@ public class ChooseSGF extends Activity implements ViewBinder
     }
 
     private void updateFooter(Cursor cursor, int position) {
-	Log.d("ChooseSGF", String.format("updateFooter(%s, %d)", cursor, position));
+	Log.d(TAG, String.format("updateFooter(%s, %d)", cursor, position));
 
-	for (int i=0; i<footerView.getChildCount(); i++) {
-	    PropertyView view = (PropertyView) footerView.getChildAt(i);
-	    //view.setValue(cursor, position);
-	}
+	if (footerView != null) 
+	    for (int i=0; i<footerView.getChildCount(); i++) {
+		PropertyView view = (PropertyView) footerView.getChildAt(i);
+		view.setValue(cursor, position);
+	    }
     }
 }

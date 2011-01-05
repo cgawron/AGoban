@@ -43,7 +43,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import de.cgawron.agoban.view.GameTreeControls;
@@ -60,12 +60,12 @@ import de.cgawron.go.sgf.Node;
  * Provides an sgf editor.
  */
 public class EditSGF extends Activity 
-    implements SeekBar.OnSeekBarChangeListener, GobanEventListener, GameTreeNavigationListener, SGFApplication.ExceptionHandler
+    implements GobanEventListener, GameTreeNavigationListener, SGFApplication.ExceptionHandler
 {
     public static Resources resources;
 
     private GobanView gobanView;
-    private SeekBar seekBar;
+    private TextView commentView;
     private GameTree gameTree;
     private GameTreeControls gameTreeControls;
     private Node currentNode;
@@ -96,10 +96,7 @@ public class EditSGF extends Activity
 	gobanView.addGobanEventListener(this);
 	registerForContextMenu(gobanView);
 
-	seekBar = (SeekBar) findViewById(R.id.seekBar);
-	seekBar.setOnSeekBarChangeListener(this);
-	seekBar.setKeyProgressIncrement(1);
-	seekBar.requestFocus();
+	commentView = (TextView) findViewById(R.id.comment);
 
 	gameTreeControls = (GameTreeControls) findViewById(R.id.controls);
 	gameTreeControls.setGameTreeNavigationListener(this);
@@ -141,7 +138,7 @@ public class EditSGF extends Activity
 		    gameTree = application.getGameTree(); 
 		    if (gameTree != null) {
 			gameTreeControls.setGameTree(gameTree);
-			seekBar.setMax(gameTree.getNoOfMoves());
+			//seekBar.setMax(gameTree.getNoOfMoves());
 		    }
 		}
 	    };
@@ -190,17 +187,6 @@ public class EditSGF extends Activity
 	return false;
     }
 
-    public void onProgressChanged(SeekBar  seekBar, int moveNo, boolean fromUser) {
-	Log.d("EditSGF", "move " + moveNo);
-	setCurrentNode(gameTree.getMove(moveNo));
-    }
-
-    public void onStartTrackingTouch(SeekBar seekBar) {
-    }
-
-    public void onStopTrackingTouch(SeekBar seekBar) {
-    }
-
     public void onGobanEvent(GobanEvent gobanEvent) {
 	Log.d("EditSGF", "onGobanEvent: " + gobanEvent);
 	if (currentNode != null && application.checkNotReadOnly(this)) {
@@ -241,7 +227,8 @@ public class EditSGF extends Activity
 	   save();
     }
 
-    public void setCurrentNode(Node node) {
+    public void setCurrentNode(Node node) 
+    {
 	if (!node.equals(currentNode)) {
 	    currentNode = node;
 	    if (currentNode != null) {
@@ -250,6 +237,7 @@ public class EditSGF extends Activity
 		    Log.d("EditSGF", "siblingCount: " + currentNode.getSiblingCount());
 		}
 		gobanView.setGoban(goban);
+		commentView.setText(currentNode.getComment());
 	    }
 	    gameTreeControls.setCurrentNode(node);
 	}

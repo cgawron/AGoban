@@ -46,6 +46,8 @@ import java.util.UUID;
  */
 public class SGFApplication extends Application
 {
+    private final String TAG = "SGFApplication";
+
     public interface ExceptionHandler {
 	public void handleException(String message, Throwable t);
     }
@@ -83,10 +85,13 @@ public class SGFApplication extends Application
 		    public void run() {
 			try {
 			    InputStream is = getContentResolver().openInputStream(data);
-			    gameTree = new GameTree(is);
+			    // The cup parser (or my code around it?) seems to have a multithreading problem
+			    synchronized(de.cgawron.go.sgf.Parser.class) {
+				gameTree = new GameTree(is);
+			    }
 			}
 			catch (Exception ex) {
-			    Log.e("EditSGF", "Exception while parsing SGF", ex);
+			    Log.e(TAG, "Exception while parsing SGF", ex);
 			    exceptionHandler.handleException("Exception while parsing SGF", ex);
 			}
 			Message msg = handler.obtainMessage();
@@ -110,7 +115,9 @@ public class SGFApplication extends Application
 
     public Uri getNewGameUri()
     {
-	return getContentResolver().insert(SGFProvider.CONTENT_URI, null);
+	Uri uri = getContentResolver().insert(SGFProvider.CONTENT_URI, null);
+	Log.d(TAG, "getNewGameUri: uri=" + uri);
+	return uri;
     }
 
     public void setData(Uri data)
@@ -140,20 +147,26 @@ public class SGFApplication extends Application
      */
     public void save(boolean async) 
     {
+	if (gameTree == null)
+	    return;
+	if (!gameTree.isModified()) {
+	    Log.i(TAG, "not saving unmodified GameTree");
+	}
+
 	if (data == null) {
 	    setData(null);
 	}
 
 	Runnable runnable = new Runnable() {
 		public void run() {
-		    Log.d("SGFApplication", "saving " + data);
+		    Log.d(TAG, "saving " + data);
 		    try {
 			OutputStream os = getContentResolver().openOutputStream(data, "rwt");
 			gameTree.save(os);
 			os.close();
 		    }
 		    catch (Exception ex) {
-			Log.e("SGFApplication", "Exception while saving SGF", ex);
+			Log.e(TAG, "Exception while saving SGF", ex);
 		    }
 		}
 	    };

@@ -227,6 +227,7 @@ public class SGFProvider extends ContentProvider
 	Log.d("SGFProvider", "onCreate");
 	dbHelper = new SGFDBOpenHelper(getContext());
 	db = dbHelper.getWritableDatabase();
+	db.setLockingEnabled(true);
 	return true;
     }
     

@@ -119,6 +119,8 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
      */
     public void setGoban(Goban goban) 
     {
+	if (goban == null)
+	    throw new NullPointerException("setGoban: goban must not be null!");
         this.goban = goban;
         invalidate();
     }

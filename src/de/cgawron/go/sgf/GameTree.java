@@ -43,6 +43,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Before;
@@ -414,7 +415,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
     public void setModified(boolean newValue)
     {
         boolean oldValue = modified;
-        logger.fine("GameTree.setModified: " + oldValue + ", " + newValue);
+	    logger.fine("GameTree.setModified: " + oldValue + ", " + newValue);
         if (newValue != modified) {
 	    modified = newValue;
 	    firePropertyChange("modified", oldValue, newValue);
@@ -463,7 +464,8 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 	    return node.getChildAt(index);
 	}
         else {
-	    logger.fine("GameTreeModel.getChild: " + parent + " [" + parent.getClass() + "]");
+	    if (logger.isLoggable(Level.FINE))
+		logger.fine("GameTreeModel.getChild: " + parent + " [" + parent.getClass() + "]");
 	    return null;
 	}
     }
@@ -530,8 +532,9 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 
         logger.info("Setting root: " + newRoot);
         root = newRoot;
+	root.setGameTree(this);
 
-	if (!rootOnly) {
+	if (false && !rootOnly) {
 	    TreeVisitor<GameTree, Node> visitor = 
 		new TreeVisitor<GameTree, Node>(this) 
 		{
@@ -541,7 +544,8 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 			Node n = (Node) o;
 			Goban goban = null;
 			
-			logger.fine("setRoot(" + newRoot + "): visiting " + n);
+			if (logger.isLoggable(Level.FINE))
+			    logger.fine("setRoot(" + newRoot + "): visiting " + n);
 			Node p = n.getParent();
 			
 			if (p == null) {
@@ -549,7 +553,8 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 			    n.setMoveNo(n.isMove() ? 1 : 0);
 			}
 			else {
-			    logger.fine(n.toString() + ": inheriting Board from " + p.toString());
+			    if (logger.isLoggable(Level.FINE))
+				logger.fine(n.toString() + ": inheriting Board from " + p.toString());
 			    goban = getGoban(p.getGoban());
 			    
 			    
@@ -563,7 +568,8 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 				    else
 					no = (Value.Number) value;
 				    
-				    logger.fine("Setting moveNo on node " + n + " to " + no.intValue());
+				    if (logger.isLoggable(Level.FINE))
+					logger.fine("Setting moveNo on node " + n + " to " + no.intValue());
 				    n.setMoveNo(no.intValue());
 				}
 				catch (Throwable e) {
@@ -572,11 +578,13 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 				}
 			    }
 			    else if (p.getIndex(n) != 0) {
-				logger.fine("Setting moveNo on node " + n + " to 1");
+				if (logger.isLoggable(Level.FINE))
+				    logger.fine("Setting moveNo on node " + n + " to 1");
 				n.setMoveNo(1);
 			    }
 			    else {
-				logger.fine("Setting moveNo on node " + n + " to " + p.getMoveNo() + " + " + (n.isMove() ? 1 : 0));
+				if (logger.isLoggable(Level.FINE))
+				    logger.fine("Setting moveNo on node " + n + " to " + p.getMoveNo() + " + " + (n.isMove() ? 1 : 0));
 				n.setMoveNo(p.getMoveNo() + (n.isMove() ? 1 : 0));
 			    }
 			}
@@ -714,7 +722,8 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 		@Override
 		protected void visitNode(Object o)
 		{
-		    logger.fine("getLeafs: visiting " + o);
+		    if (logger.isLoggable(Level.FINE))
+			logger.fine("getLeafs: visiting " + o);
 		    Node node = (Node) o;
 		    if (node.isLeaf())
 			leafs.add(node);

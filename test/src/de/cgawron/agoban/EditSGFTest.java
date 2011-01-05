@@ -51,9 +51,7 @@ public class EditSGFTest extends ActivityInstrumentationTestCase2<EditSGF>
         activity = getActivity();
 
 	application = (SGFApplication) activity.getApplication();
-
         gobanView = (GobanView) activity.findViewById(de.cgawron.agoban.R.id.goban);
-
 	gameTreeControls = (GameTreeControls) activity.findViewById(R.id.controls);
 
 	while ((gameTree = application.getGameTree()) == null) {

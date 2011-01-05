@@ -113,7 +113,7 @@ import de.cgawron.util.MiscEncodingReader;
 {
     yybegin(TOP);
     level++;
-    return (new Token(Symbols.Open, yytext(), yyline, yychar));
+    return (new Token(Symbols.Open, "(", yyline, yychar));
 }
 
 <YYINITIAL>  .   
@@ -123,22 +123,23 @@ import de.cgawron.util.MiscEncodingReader;
 ";"    
 {
     yybegin(TOP);
-    return (new Token(Symbols.Semi, yytext(), yyline, yychar)); 
+    return (new Token(Symbols.Semi, ";", yyline, yychar)); 
 }
 
-<TOP> "("    { level++; return (new Token(Symbols.Open, yytext(), yyline, yychar)); }
-<TOP> ")"    { level--; /*if (level==0) yybegin(YYINITIAL); */ return (new Token(Symbols.Close, yytext(), yyline, yychar)); }
+<TOP> "("    { level++; return (new Token(Symbols.Open, "(", yyline, yychar)); }
+<TOP> ")"    { level--; /*if (level==0) yybegin(YYINITIAL); */ return (new Token(Symbols.Close, ")", yyline, yychar)); }
 
 <MOVE> "]" 
 {
     yybegin(TOP);
-    return new Token(Symbols.Value, yytext(), yyline, yychar, AbstractValue.createValue(null));
+    return new Token(Symbols.Value, "]", yyline, yychar, AbstractValue.createValue(null));
 }
 
 <MOVE> [a-z][a-z]"]" 
 {
     yybegin(TOP);
-    return new Token(Symbols.Value, yytext(), yyline, yychar, AbstractValue.createPoint(yytext().substring(0,2)));
+    String text = yytext();
+    return new Token(Symbols.Value, text, yyline, yychar, AbstractValue.createPoint(text.substring(0,2)));
 }
 
 <POINTS> "["
@@ -147,21 +148,23 @@ import de.cgawron.util.MiscEncodingReader;
 
 <POINTS> [a-z][a-z]"]" 
 {
-    return new Token(Symbols.Value, yytext(), yyline, yychar, AbstractValue.createPointList(yytext().substring(0,2)));
+    String text = yytext();
+    return new Token(Symbols.Value, text, yyline, yychar, AbstractValue.createPointList(text.substring(0,2)));
 }
 
 <POINTS> "]" 
 {
-    return new Token(Symbols.Value, yytext(), yyline, yychar, AbstractValue.createPointList(""));
+    return new Token(Symbols.Value, "]", yyline, yychar, AbstractValue.createPointList(""));
 }
 
 <POINTS> [a-z][a-z]":"[a-z][a-z]"]" 
 {
-    return new Token(Symbols.Value, yytext(), yyline, yychar, AbstractValue.createPointList(yytext().substring(0,5)));
+    String text = yytext();
+    return new Token(Symbols.Value, text, yyline, yychar, AbstractValue.createPointList(text.substring(0,5)));
 }
 
-<POINTS> "("    { return (new Token(Symbols.Open, yytext(), yyline, yychar)); }
-<POINTS> ")"    { return (new Token(Symbols.Close, yytext(), yyline, yychar)); }
+<POINTS> "("    { return (new Token(Symbols.Open, "(", yyline, yychar)); }
+<POINTS> ")"    { return (new Token(Symbols.Close, ")", yyline, yychar)); }
 
 <LABEL> "["
 {
@@ -169,11 +172,12 @@ import de.cgawron.util.MiscEncodingReader;
 
 <LABEL> [a-z][a-z]":"[^\]]+"]" 
 {
-    return new Token(Symbols.Value, yytext(), yyline, yychar, AbstractValue.createLabel(yytext().substring(0,2), yytext().substring(3, yytext().length()-1)));
+    String text = yytext();
+    return new Token(Symbols.Value, text, yyline, yychar, AbstractValue.createLabel(text.substring(0,2), text.substring(3, text.length()-1)));
 }
 
-<LABEL> "("    { return (new Token(Symbols.Open, yytext(), yyline, yychar)); }
-<LABEL> ")"    { return (new Token(Symbols.Close, yytext(), yyline, yychar)); }
+<LABEL> "("    { return (new Token(Symbols.Open, "(", yyline, yychar)); }
+<LABEL> ")"    { return (new Token(Symbols.Close, ")", yyline, yychar)); }
 
 <NODE> "[" {
     String text = yytext();
@@ -192,20 +196,24 @@ import de.cgawron.util.MiscEncodingReader;
 }
 
 <TEXT> (\r(\n)?)|(\n(\r)?) { 
-    String text = "\n";
+    StringBuffer tb = new StringBuffer("\n");
     Token next = (Token) next_token();
-    return new Token(Symbols.Value, text + next.m_text, yyline, yychar, AbstractValue.createValue(text + next.m_text));
+    String text = tb.append(next.m_text).toString();
+    return new Token(Symbols.Value, text, yyline, yychar, AbstractValue.createValue(text));
 }
 
 <TEXT> ([^\]\r\n\\])* { 
-    String text = yytext();
+    StringBuffer tb = new StringBuffer(yytext());
     Token next = (Token) next_token();
-    return new Token(Symbols.Value, text + next.m_text, yyline, yychar, AbstractValue.createValue(text + next.m_text));
+    String text = tb.append(next.m_text).toString();
+    return new Token(Symbols.Value, text, yyline, yychar, AbstractValue.createValue(text));
 }
 
 <TEXT> \\[^\n\r] { 
+    StringBuffer tb = new StringBuffer(yytext().substring(1));
     Token next = (Token) next_token();
-    return new Token(Symbols.Value, yytext() + next.m_text, yyline, yychar, AbstractValue.createValue(yytext() + next.m_text));
+    String text = tb.append(next.m_text).toString();
+    return new Token(Symbols.Value, text, yyline, yychar, AbstractValue.createValue(text));
 }
 
 <TEXT> "]" { 
@@ -215,18 +223,21 @@ import de.cgawron.util.MiscEncodingReader;
 
 <PROPERTY> ([^\]])*"]"([ \r\n\t])*"["
 {
-    return new Token(Symbols.Value, yytext(), yyline, yychar, AbstractValue.createValue(yytext()));
+    String text = yytext();
+    return new Token(Symbols.Value, text, yyline, yychar, AbstractValue.createValue(text));
 }
 
 <PROPERTY> ([^\]])*"]"
 {
     yybegin(TOP);
-    return new Token(Symbols.Value, yytext(), yyline, yychar, AbstractValue.createValue(yytext().substring(0, yytext().length()-1)));
+    String text = yytext();
+    return new Token(Symbols.Value, text, yyline, yychar, AbstractValue.createValue(text.substring(0, text.length()-1)));
 }
 
 [a-z]*[A-Z][a-z]*[A-Z]*[a-z]*"[" 
 {
-    Property property = Property.createProperty(yytext().substring(0, yytext().length()-1));
+    String text = yytext();
+    Property property = Property.createProperty(text.substring(0, text.length()-1));
     if (property instanceof Property.Move)
     {
 	yybegin(MOVE);
@@ -271,7 +282,7 @@ import de.cgawron.util.MiscEncodingReader;
     {
 	yybegin(PROPERTY);
     }
-    return new Token(Symbols.Property, yytext(), yyline, yychar, property);
+    return new Token(Symbols.Property, text, yyline, yychar, property);
 }
 
 " " { }

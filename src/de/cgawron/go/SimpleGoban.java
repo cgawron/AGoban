@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.EventListener;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -289,7 +290,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable
         // those that are interested in this event
         for (GobanListener listener : listeners)
         {
-            logger.fine("Notifying listener ...");
+	    if (logger.isLoggable(Level.FINE))
+		logger.fine("Notifying listener ...");
 	    // Lazily create the event:
 	    if (e == null)
 		e = new GobanEvent(this, x, y, c);
@@ -310,7 +312,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable
         // those that are interested in this event
         for (GobanListener listener : listeners)
         {
-            logger.fine("Notifying listener ...");
+	    if (logger.isLoggable(Level.FINE))
+		logger.fine("Notifying listener ...");
 	    // Lazily create the event:
 	    if (e == null)
 		e = new GobanEvent(this);
@@ -393,7 +396,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable
     {
         if (size != s)
         {
-	    logger.fine("setBoardSize: " + s);
+	    if (logger.isLoggable(Level.FINE))
+		logger.fine("setBoardSize: " + s);
             size = s;
             boardRep = new BoardType[size][size];
             tmpBoard = new int[size][size];
@@ -418,7 +422,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable
     {
         if (size != s)
         {
-	    logger.fine("setBoardSize: " + s);
+	    if (logger.isLoggable(Level.FINE))
+		logger.fine("setBoardSize: " + s);
             size = s;
             boardRep = new BoardType[size][size];
             tmpBoard = new int[size][size];

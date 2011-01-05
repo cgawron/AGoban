@@ -236,7 +236,8 @@ public class TreeIterator<N extends TreeNode> implements Iterator<N>
         {
             Iterator<N> it = stack.peek();
             N node = it.next();
-            logger.fine("DepthFirstIterator " + this + ": node " + node);
+	    if (logger.isLoggable(Level.FINE))
+		logger.fine("DepthFirstIterator " + this + ": node " + node);
             Iterator<TreeNode> children = new EnumIterator<TreeNode>(node.children());
             if (!it.hasNext())
             {

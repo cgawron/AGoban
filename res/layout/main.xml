@@ -13,17 +13,22 @@
       android:clickable="true"
       app:textColor="@drawable/red"
       app:text="Hello World, EditSGF"/>
-  <SeekBar 
-      android:text="move" 
-      android:id="@+id/seekBar"  
-      android:focusable="true"
-      android:layout_width="fill_parent" 
-      android:layout_height="wrap_content"/>
   <de.cgawron.agoban.view.GameTreeControls 
       android:id="@+id/controls"  
       android:focusable="true"
       android:layout_width="wrap_content" 
       android:layout_height="wrap_content"
       android:layout_gravity="center_horizontal"/>
+  <ScrollView
+      android:layout_width="wrap_content" 
+      android:layout_height="fill_parent">
+    <TextView
+	android:id="@+id/comment"  
+	android:focusable="true"
+	android:scrollbars="vertical"
+	android:editable="true"
+	android:layout_width="wrap_content" 
+	android:layout_height="fill_parent"/>
+  </ScrollView>
 </LinearLayout>
 

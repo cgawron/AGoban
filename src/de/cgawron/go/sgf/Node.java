@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -56,9 +57,9 @@ public class Node
      * The children of this node.
      */
     protected List<Node> children = new LinkedList<Node>();
+    protected GameTree gameTree = null;
 
     private Node parent = null;
-    private GameTree gameTree = null;
     private Goban goban = null;
     private int moveNo = 0;
     private final int id;
@@ -371,14 +372,25 @@ public class Node
     public void setGameTree(GameTree gameTree)
     {
 	this.gameTree = gameTree;
+	// This initialization seems to be quite inefficient as it creates a lot of new Objects.
+	/*
 	Iterator<Node> it = children.iterator();
 	while (it.hasNext()) {
 	    it.next().setGameTree(gameTree);
 	}
+	*/
     }
 
+    /** Get the GameTree associated with this Node.
+     *  Use lazy initialization to reduce overhead during parsing.
+     *  We can assume that the RootNode always has a GameTree (the constructors ensure that).
+     *  @returns the GameTree associated with this Node.
+     */
     public GameTree getGameTree()
     {
+	if (gameTree == null) {
+	    gameTree = parent.getGameTree();
+	}
 	return gameTree;
     }
 
@@ -589,6 +601,18 @@ public class Node
 	firePropertyChange("diagram", oldValue, newValue);
     }
 
+    public String getComment()
+    {
+	Property p = get(Property.COMMENT);
+	if (p == null)
+	    return "";
+	Value comment = p.getValue();
+	if (comment != null)
+	    return comment.toString();
+	else
+	    return "";
+    }
+    
     public void setComment(String c)
     {
 	Object oldValue = get(Property.COMMENT).getValue();
@@ -631,12 +655,57 @@ public class Node
 
     public Goban getGoban()
     {
+	if (goban == null) {
+	    initGoban();
+	}
 	return goban;
     }
 
     public int getId()
     {
 	return id;
+    }
+
+    public void initGoban()
+    {
+	if (gameTree == null)
+	    gameTree = parent.getGameTree();
+
+	if (parent == null) {
+	    setGoban(gameTree.getGoban(getBoardSize()));
+	}
+	else {
+	    setGoban(gameTree.getGoban(parent.getGoban()));
+	}
+
+
+	if (contains(Property.MOVE_NO)) {
+	    Value.Number no = null;
+
+	    Value value = (get(Property.MOVE_NO)).getValue();
+	    logger.info("value is " + value + " " + value.getClass());
+	    if (value instanceof Value.ValueList)
+		no = (Value.Number) ((Value.ValueList) value).get(0);
+	    else
+		no = (Value.Number) value;
+	    
+	    if (logger.isLoggable(Level.FINE))
+		logger.fine("Setting moveNo on node " + this + " to " + no.intValue());
+	    setMoveNo(no.intValue());
+	}
+	else if (parent == null) {
+	    setMoveNo(isMove() ? 1 : 0);
+	}
+	else if (parent.getIndex(this) != 0) {
+	    if (logger.isLoggable(Level.FINE))
+		logger.fine("Setting moveNo on node " + this + " to 1");
+	    setMoveNo(1);
+	}
+	else {
+	    if (logger.isLoggable(Level.FINE))
+		logger.fine("Setting moveNo on node " + this + " to " + parent.getMoveNo() + " + " + (isMove() ? 1 : 0));
+	    setMoveNo(parent.getMoveNo() + (isMove() ? 1 : 0));
+	}
     }
 
     private void doMarkup()
@@ -723,7 +792,8 @@ public class Node
 			Point pt = getPoint(property.getKey());
 			BoardType color = ((Property.Move) property).getColor();
 			if (pt != null) {
-			    logger.fine("setMarkup: " + pt + ", " + color + ", " + moveNo);
+			    if (logger.isLoggable(Level.FINE))
+				logger.fine("setMarkup: " + pt + ", " + color + ", " + moveNo);
 			    markup.setMarkup(pt, new MarkupModel.Move(color, moveNo));
 			}
 		    }
@@ -820,15 +890,15 @@ public class Node
     }
 
     @Override
-	public void add(Property p)
-	{
-	    super.add(p);
-	    if (p instanceof Property.Inheritable) {
-		logger.info("inherited: " + p);
-		inheritedProperties.put(p.getKey(), p);
-		setInheritedProperties(inheritedProperties);
-	    }
+    public void add(Property p)
+    {
+	super.add(p);
+	if (p instanceof Property.Inheritable) {
+	    logger.info("inherited: " + p);
+	    inheritedProperties.put(p.getKey(), p);
+	    setInheritedProperties(inheritedProperties);
 	}
+    }
 
     public boolean add(Node n)
     {

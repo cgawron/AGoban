@@ -65,6 +65,7 @@ public class Property implements Cloneable
     {
         String k;
 	String userFriendlyName;
+	int    priority = -1;
 
 	/**
 	 * Construct a key from a given string.
@@ -98,6 +99,14 @@ public class Property implements Cloneable
 	    return userFriendlyName;
 	}
 
+	public int getPriority() 
+	{
+	    if (priority < 0) {
+		priority = getDescriptor(this) != null ? getDescriptor(this).getPriority() : 0;
+	    }
+	    return priority;
+	}
+
 	/**
 	 * Compare this key to another key.
 	 * @param o the object to be compared
@@ -108,14 +117,15 @@ public class Property implements Cloneable
         public int compareTo(Object o) throws ClassCastException
         {
             Key key = (Key) o;
-	    Integer myPrio = getDescriptor(this) != null ? getDescriptor(this).getPriority() : 0;
-	    Integer theirPrio = getDescriptor(key) != null ? getDescriptor(key).getPriority() : 0;
+	    int myPrio = getPriority();
+	    int theirPrio = key.getPriority();
 
-	    int c = myPrio.compareTo(theirPrio);
-	    if (c == 0)
+	    if (myPrio == theirPrio)
                 return k.compareTo(key.k);
-            else
-                return -c;
+            else if (myPrio > theirPrio)
+                return -1;
+	    else
+		return 1;
         }
 
 	/**
@@ -543,12 +553,10 @@ public class Property implements Cloneable
         public Label(Key key)
         {
             super(key);
-            logger.warning("Creating label " + key);
         }
 
 	public void setValue(Value vl)
 	{
-	    logger.info("Setting label text to " + vl.toString());
 	    super.setValue(vl);
 	}
     }
@@ -683,7 +691,6 @@ public class Property implements Cloneable
 
 	public void setValue(Value v)
 	{
-	    logger.info("Setting value to " + v);
 	    if (v instanceof Value.ValueList) {
                 Value.ValueList vl = (Value.ValueList) v;
                 if (vl.size() == 1) {
@@ -707,7 +714,6 @@ public class Property implements Cloneable
 
 	public void setValue(Value v)
 	{
-	    logger.info("Setting value to " + v);
 	    if (v instanceof Value.ValueList) {
                 Value.ValueList vl = (Value.ValueList) v;
                 if (vl.size() == 1) {
