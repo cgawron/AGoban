@@ -40,6 +40,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.UUID;
 
 /**
@@ -69,6 +70,7 @@ public class SGFApplication extends Application
     private GameTree gameTree;
     private Uri data;
     private boolean readOnly = true;
+    private Map<Uri, GameTree> gameMap = new WeakHashMap<Uri, GameTree>();
 
     public SGFApplication()
     {
@@ -83,39 +85,47 @@ public class SGFApplication extends Application
     {
 	if (data != null)
 	{
-	    final ProgressDialog progressDialog = ProgressDialog.show(context, "", "Loading " + data, false, false);
-
-	    final Handler handler = new Handler() {
-		    public void handleMessage(Message msg) {
-			progressDialog.dismiss();
-			if (loadedCB != null)
-			    loadedCB.run();
-		    }
-		};
-	    
-	    Runnable runnable = new Runnable() {
-		    public void run() {
-			try {
-			    InputStream is = getContentResolver().openInputStream(data);
-			    // The cup parser (or my code around it?) seems to have a multithreading problem
-			    synchronized(de.cgawron.go.sgf.Parser.class) {
-				gameTree = new GameTree(is);
+	    gameTree = gameMap.get(data);
+	    if (gameTree == null) {
+		final ProgressDialog progressDialog = ProgressDialog.show(context, "", "Loading " + data, false, false);
+		
+		final Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+			    progressDialog.dismiss();
+			    if (loadedCB != null)
+				loadedCB.run();
+			}
+		    };
+		
+		Runnable runnable = new Runnable() {
+			public void run() {
+			    try {
+				InputStream is = getContentResolver().openInputStream(data);
+				// The cup parser (or my code around it?) seems to have a multithreading problem
+				synchronized(de.cgawron.go.sgf.Parser.class) {
+				    gameTree = new GameTree(is);
+				    gameMap.put(data, gameTree);
+				}
 			    }
+			    catch (Exception ex) {
+				Log.e(TAG, "Exception while parsing SGF", ex);
+				exceptionHandler.handleException("Exception while parsing SGF", ex);
+			    }
+			    Message msg = handler.obtainMessage();
+			    Bundle b = new Bundle();
+			    b.putInt("total", 100);
+			    msg.setData(b);
+			    handler.sendMessage(msg);
 			}
-			catch (Exception ex) {
-			    Log.e(TAG, "Exception while parsing SGF", ex);
-			    exceptionHandler.handleException("Exception while parsing SGF", ex);
-			}
-			Message msg = handler.obtainMessage();
-			Bundle b = new Bundle();
-			b.putInt("total", 100);
-			msg.setData(b);
-			handler.sendMessage(msg);
-		    }
-		};
-	    
-	    Thread thread = new Thread(Thread.currentThread().getThreadGroup(), runnable, "loadSGF", 64*1024);
-	    thread.start();
+		    };
+		
+		Thread thread = new Thread(Thread.currentThread().getThreadGroup(), runnable, "loadSGF", 64*1024);
+		thread.start();
+	    }
+	    else {
+		if (loadedCB != null)
+		    loadedCB.run();
+	    }
 	}
 	else gameTree = new GameTree(); 
     }
@@ -163,6 +173,7 @@ public class SGFApplication extends Application
 	    return;
 	if (!gameTree.isModified()) {
 	    Log.i(TAG, "not saving unmodified GameTree");
+	    return;
 	}
 
 	if (data == null) {

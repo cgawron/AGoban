@@ -129,7 +129,8 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
     public void setGameTree(GameTree gameTree) {
 	Log.d(TAG, "setGameTree: " + gameTree);
 	this.gameTree = gameTree;
-	setCurrentNode(gameTree.getRoot());
+	if (currentNode == null || currentNode.getGameTree() != gameTree)
+	    setCurrentNode(gameTree.getRoot());
     }
 
     public void setCurrentNode(Node node) {

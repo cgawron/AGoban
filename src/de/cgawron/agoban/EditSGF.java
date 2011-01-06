@@ -237,13 +237,35 @@ public class EditSGF extends Activity
     public boolean onContextItemSelected(MenuItem item)
     {
 	GobanContextMenuInfo info = (GobanContextMenuInfo) item.getMenuInfo();
-	Log.d("onContextMenuItemSelected", item.toString() + " " + info);
+	Log.d(TAG, item.toString() + " " + info);
 	return true;
+    }
+
+    @Override
+    protected void onResume() {
+       super.onResume();
+       Log.i(TAG, "onResume");
+    }
+
+    @Override
+    protected void onRestart() {
+       super.onRestart();
+       Log.i(TAG, "onRestart");
+    }
+
+    @Override
+    protected void onPause() {
+       super.onPause();
+       Log.i(TAG, "onPause");
+
+       if (gameTree != null)
+	   save();
     }
 
     @Override
     protected void onStop() {
        super.onStop();
+       Log.i(TAG, "onStop");
        
        if (gameTree != null)
 	   save();
