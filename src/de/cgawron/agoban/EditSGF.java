@@ -56,6 +56,7 @@ import de.cgawron.agoban.view.GobanView.GobanContextMenuInfo;
 import de.cgawron.agoban.provider.SGFProvider;
 import de.cgawron.agoban.sync.GoogleSync;
 import de.cgawron.go.Goban;
+import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
 import de.cgawron.go.sgf.GameTree;
 import de.cgawron.go.sgf.Node;
@@ -207,9 +208,19 @@ public class EditSGF extends Activity
 	if (currentNode != null) {
 	    Point point = gobanEvent.getPoint();
 	    Log.d(TAG, "onGobanEvent: variations: " + variations.keySet());
+	    // click on a variation - select it
 	    if (variations.containsKey(point)) {
 		setCurrentNode(variations.get(point));
 	    }
+	    // click on an existing stone - go to node
+	    else if (currentNode.getGoban().getStone(point) != BoardType.EMPTY) {
+		Node node = currentNode;
+		while (node.getParent() != null && !point.equals(node.getGoban().getLastMove())) {
+		    node = node.getParent();
+		}
+		setCurrentNode(node);
+	    }
+	    // click on an empty intersection - move
 	    else if (application.checkNotReadOnly(this)) {
 		Node node = new Node(gameTree);
 		try {
