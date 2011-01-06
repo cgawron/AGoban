@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -45,7 +46,6 @@ import de.cgawron.util.MementoOriginator;
 /**
  * An instance of this class represents a node in a sgf game tree.
  * @author Christian Gawron
- * @version $Id$
  */
 public class Node 
     extends PropertyList 
@@ -62,6 +62,7 @@ public class Node
     private Node parent = null;
     private Goban goban = null;
     private int moveNo = 0;
+    private int depth = -1;
     private final int id;
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
@@ -100,6 +101,43 @@ public class Node
 	    else if (h1 > h2) 
 		return 1;
 	    else return 0;
+	}
+    }
+
+    public class SiblingsIterator implements Iterator<Node>
+    {
+	private int i = 0;
+
+	public SiblingsIterator() 
+	{
+	    while (i < parent.children.size() && parent.children.get(i) == Node.this)
+		i++;
+	}
+	
+	public boolean hasNext() 
+	{
+	    return i < parent.children.size();
+	}
+
+	public Node next()
+	{
+	    Node node = parent.children.get(i++);
+	    while (i < parent.children.size() && parent.children.get(i) == Node.this)
+		i++;
+	    return node;
+	}
+
+	public void remove()
+	{
+	    throw new UnsupportedOperationException();
+	}
+    }
+
+    public class SiblingsIterable implements Iterable<Node>
+    {
+	public Iterator<Node> iterator()
+	{
+	    return new SiblingsIterator();
 	}
     }
 
@@ -471,6 +509,11 @@ public class Node
 	return null;
     }
 
+    public Iterable<Node> getSiblings()
+    {
+	return new SiblingsIterable();
+    }
+
     public int getSiblingCount()
     {
 	if (logger.isLoggable(Level.FINE))
@@ -480,16 +523,18 @@ public class Node
 		logger.fine("childCount: " + parent.getChildCount());
 		logger.fine("index: " + parent.getIndex(this));
 	    }
-	    return parent.getChildCount() - parent.getIndex(this) - 1;
+	    return parent.children.size() - 1;
 	}
 	else 
 	    return 0;
     }
 
+    /*
     public Node getSiblingAt(int n)
     {
 	return (Node) parent.getChildAt(n + parent.getIndex(this) + 1);
     }
+    */
 
     public int getIndex(Node n)
     {
@@ -903,6 +948,20 @@ public class Node
     public boolean add(Node n)
     {
 	n.setParent(this);
+	if (n.depth < 0) {
+	    Node p = n;
+	    while (p.parent != null) {
+		p = p.parent;
+		p.depth = -1;
+	    }
+	}
+	else {
+	    Node p = n;
+	    while (p.parent != null && p.parent.depth <= p.depth) {
+		p.parent.depth = p.depth + 1;
+		p = p.parent;
+	    }
+	}
 	return children.add(n);
     }
 
@@ -927,16 +986,16 @@ public class Node
     }
 
     @Override
-	public boolean contains(Object o)
-	{
-	    assert o instanceof Property.Key;
-	    if (super.containsKey(o))
-		return true;
-	    else if (inheritedProperties != null)
-		return inheritedProperties.containsKey(o);
-	    else
-		return false;
-	}
+    public boolean contains(Object o)
+    {
+	assert o instanceof Property.Key;
+	if (super.containsKey(o))
+	    return true;
+	else if (inheritedProperties != null)
+	    return inheritedProperties.containsKey(o);
+	else
+	    return false;
+    }
 
     @Override
     public Property get(Object key)
@@ -1275,6 +1334,39 @@ public class Node
 	    else
 		myChild.join(theirChild);
 	}
+    }
+
+    /**
+     * Calculate the depth of the sub-tree rooted at this node by recursion over all children.
+     * The result is cached for later use.
+     * @returns the depth of the sub-tree rooted at this node.
+     */
+    public int getDepth()
+    {
+	if (depth < 0) {
+	    Queue<Node> subRoots = new LinkedList<Node>();
+	    Node n = this;
+
+	    while (n != null) {
+		if (n.children.size() == 0) {
+		    // found a leaf; go up
+		    n.depth = 0;
+		    while (n.parent != null && n.depth >= n.parent.depth) {
+			n.parent.depth = n.depth + 1;
+			n = n.parent;
+		    }
+		    n = subRoots.poll();
+		}
+		else if (n.children.size() == 1) {
+		    n = n.children.get(0);
+		}
+		else {
+		    subRoots.addAll(n.children);
+		    n = subRoots.poll();
+		}
+	    }
+	}
+	return depth;
     }
 
     void setInheritedProperties(PropertyList p)

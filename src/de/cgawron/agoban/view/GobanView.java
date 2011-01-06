@@ -35,6 +35,7 @@ import de.cgawron.agoban.GobanEvent;
 import de.cgawron.agoban.GobanEventListener;
 import de.cgawron.agoban.R;
 import de.cgawron.go.Goban;
+import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
 import demo.MultiTouchController.PointInfo;
 import demo.MultiTouchController.PositionAndScale;
@@ -50,6 +51,7 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
     private final List<GobanEventListener> listeners = new ArrayList<GobanEventListener>();
     private GobanEventHandler gobanEventHandler ;
     private Point selection;
+    private List<GobanRenderer.Markup> markupList = new ArrayList<GobanRenderer.Markup>();
 
     private final float xOff = 0.0f, yOff = 0.0f, relativeScale = 1.0f;
 
@@ -100,6 +102,26 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
         //setTextColor(a.getColor(R.styleable.GobanView_textColor, 0xFF000000));
 
         a.recycle();
+    }
+
+    public void addVariation(Point p)
+    {
+	markupList.add(renderer.new VariationMark(p));
+    }
+
+    public void markLastMove(Point p, BoardType color)
+    {
+	markupList.add(renderer.new LastMoveMark(p, color));
+    }
+
+    public void resetMarkup()
+    {
+	markupList.clear();
+    }
+
+    public Iterable<GobanRenderer.Markup> getMarkup()
+    {
+	return markupList;
     }
 
     private final void initGobanView() 
@@ -161,18 +183,6 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
 	canvas.translate(-0.5f, -0.5f);
 	renderer.render(goban, canvas);
     }
-
-
-    /*
-    @Override
-    public boolean onTouchEvent(MotionEvent event) 
-    {
-	if (!gobanEventHandler.onTouchEvent(event))
-	    return super.onTouchEvent(event);
-	else
-	    return true;
-    }
-    */
 
     @Override
     public boolean onTrackballEvent(MotionEvent event) 

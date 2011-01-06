@@ -22,7 +22,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
 import de.cgawron.go.sgf.MarkupModel;
-import de.cgawron.go.sgf.MarkupModel.Markup;
 import de.cgawron.go.Goban;
 import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
@@ -44,8 +43,74 @@ public class GobanRenderer
     private static float BOARD_STROKEWIDTH = 0.0f;
     private static float SELECTION_STROKEWIDTH = 0.05f;
     private static int   SELECTION_COLOR = Color.RED;
+    private static int   VARIATION_COLOR = Color.argb(128, 128, 128, 128);
 
     private final GobanView view;
+
+    public abstract class Markup
+    {
+	public abstract void draw(Canvas canvas);
+    }
+
+    public class VariationMark extends Markup
+    {
+	private Point point;
+
+	public VariationMark(Point point)
+	{
+	    this.point = point;
+	}
+
+	public void draw(Canvas canvas)
+	{
+	    Log.d(TAG, "VariationMark: draw@" + point);
+	    short x = point.getX();
+	    short y = point.getY();
+	    Paint paint = new Paint();
+	    paint.setAntiAlias(true);
+	    paint.setStrokeWidth(SELECTION_STROKEWIDTH);
+	    paint.setColor(VARIATION_COLOR);
+	    paint.setStyle(Paint.Style.FILL);
+	    canvas.drawCircle(x+1f, y+1f, STONE_RADIUS, paint);
+	}
+    }
+
+    public class LastMoveMark extends Markup
+    {
+	private Point point;
+	private BoardType stone;
+
+	public LastMoveMark(Point point, BoardType stone)
+	{
+	    this.point = point;
+	    this.stone = stone;
+	}
+
+	public void draw(Canvas canvas)
+	{
+	    Log.d(TAG, "LastMoveMark: draw@" + point);
+	    short x = point.getX();
+	    short y = point.getY();
+
+	    Paint paint = new Paint();
+	    paint.setAntiAlias(true);
+	    paint.setStrokeWidth(HIGHLIGHT_STROKEWIDTH);
+	    paint.setStyle(Paint.Style.STROKE);
+
+	    switch (stone) {
+	    case BLACK:
+		paint.setARGB(255, 255, 255, 255);
+		canvas.drawCircle(x+1f, y+1f, HIGHLIGHT_RADIUS, paint);
+		break;
+	    case WHITE:
+		paint.setARGB(255, 0, 0, 0);
+		canvas.drawCircle(x+1f, y+1f, HIGHLIGHT_RADIUS, paint);
+		break;
+	    default:
+		break;
+	    }
+	}
+    }
 
     public GobanRenderer(GobanView view)
     {
@@ -56,7 +121,6 @@ public class GobanRenderer
     {
 	Paint paint = new Paint();
 	int size = goban.getBoardSize();
-	Point lastMove = goban.getLastMove();
 
 	paint.setARGB(255, 255, 255, 10);
 	canvas.drawRect(0.5f, 0.5f, size+0.5f, size+0.5f, paint);
@@ -74,16 +138,13 @@ public class GobanRenderer
 	    for (short i=0; i<size; i++) {
 		for (short j=0; j<size; j++) {
 		    BoardType stone = goban.getStone(i, j);
-		    Markup markup = null;
+		    MarkupModel.Markup markup = null;
 		    if (goban instanceof MarkupModel) {
 			markup = ((MarkupModel) goban).getMarkup(i, j);
 		    }
 		    switch (stone) {
 		    case BLACK:
 		    case WHITE:
-			if (lastMove != null && lastMove.equals(i, j))
-			    drawStoneHighlighted(i, j, stone, canvas);
-			else
 			    drawStone(i, j, stone, canvas);
 			break;
 		    case EMPTY:
@@ -98,6 +159,9 @@ public class GobanRenderer
 		    if (view.isSelected(i, j))
 			drawSelection(i, j, canvas);
 		}
+	    }
+	    for (Markup markup : view.getMarkup()) {
+		markup.draw(canvas);
 	    }
 	}
     }
@@ -122,29 +186,6 @@ public class GobanRenderer
 	    paint.setARGB(255, 0, 0, 0);
 	    paint.setStyle(Paint.Style.STROKE);
 	    canvas.drawCircle(i+1f, j+1f, STONE_RADIUS, paint);
-	    break;
-	default:
-	    break;
-	}
-    }
-
-    void drawStoneHighlighted(int i, int j, BoardType stone, Canvas canvas) 
-    {
-	drawStone(i, j, stone, canvas);
-
-	Paint paint = new Paint();
-	paint.setAntiAlias(true);
-	paint.setStrokeWidth(HIGHLIGHT_STROKEWIDTH);
-	paint.setStyle(Paint.Style.STROKE);
-
-	switch (stone) {
-	case BLACK:
-	    paint.setARGB(255, 255, 255, 255);
-	    canvas.drawCircle(i+1f, j+1f, HIGHLIGHT_RADIUS, paint);
-	    break;
-	case WHITE:
-	    paint.setARGB(255, 0, 0, 0);
-	    canvas.drawCircle(i+1f, j+1f, HIGHLIGHT_RADIUS, paint);
 	    break;
 	default:
 	    break;

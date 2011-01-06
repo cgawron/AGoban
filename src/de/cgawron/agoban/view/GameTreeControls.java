@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -32,6 +33,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import de.cgawron.agoban.R;
+import de.cgawron.agoban.SGFApplication;
 import de.cgawron.go.sgf.GameTree;
 import de.cgawron.go.sgf.Node;
 
@@ -44,8 +46,12 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
     public interface GameTreeNavigationListener 
     {
 	public void setCurrentNode(Node node);
+
     }
 
+    private static String TAG = "GameTreeControls";
+
+    private SharedPreferences settings; 
     private final Button buttonNext;
     private final Button buttonPrev;
     private final Button buttonNextMarkup;
@@ -55,10 +61,12 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
     private GameTree gameTree;
     private GameTreeNavigationListener listener;
     private Node currentNode;
-    
+
     public GameTreeControls(Context context, AttributeSet attrs) 
     {
         super(context, attrs);
+	settings = context.getSharedPreferences(SGFApplication.PREF, 0);
+
 	buttonNext = new Button(context);
 	buttonPrev = new Button(context);
 	buttonNextMarkup = new Button(context);
@@ -96,19 +104,19 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
     public void onClick(View v)
     {
 	if (buttonPrev.equals(v)) {
-	    Log.d("GameTreeControls", "button pressed: prev");
+	    Log.d(TAG, "button pressed: prev");
 	    prevNode();
 	}
 	else if (buttonPrevMarkup.equals(v)) {
-	    Log.d("GameTreeControls", "button pressed: prevMarkup");
+	    Log.d(TAG, "button pressed: prevMarkup");
 	    prevMarkupNode();
 	}
 	else if (buttonNext.equals(v)) {
-	    Log.d("GameTreeControls", "button pressed: next");
+	    Log.d(TAG, "button pressed: next");
 	    nextNode();
 	}
 	else if (buttonNextMarkup.equals(v)) {
-	    Log.d("GameTreeControls", "button pressed: nextMarkup");
+	    Log.d(TAG, "button pressed: nextMarkup");
 	    nextMarkupNode();
 	}
     }
@@ -119,13 +127,13 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
     }
 
     public void setGameTree(GameTree gameTree) {
-	Log.d("GameTreeControls", "setGameTree: " + gameTree);
+	Log.d(TAG, "setGameTree: " + gameTree);
 	this.gameTree = gameTree;
 	setCurrentNode(gameTree.getRoot());
     }
 
     public void setCurrentNode(Node node) {
-	Log.d("GameTreeControls", "setCurrentNode: " + node);
+	Log.d(TAG, "setCurrentNode: " + node);
 	this.currentNode = node;
 	moveNoView.setText(Integer.toString(node.getMoveNo()));
 	if (listener != null)
@@ -135,6 +143,25 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
     public void nextNode() 
     {
 	if (currentNode != null && currentNode.getChildCount() > 0) {
+	    if (settings.getBoolean("sortVariations", false)) {
+		Log.d(TAG, "nextNode: sort children by depth");
+		final List<Node> children = currentNode.getChildren();
+
+		final java.util.Comparator<Node> comparator = new java.util.Comparator<Node> () {
+		    @Override
+		    public int compare(Node n1, Node n2) 
+		    {
+			int d1 = n1.getDepth();
+			int d2 = n2.getDepth();
+			
+			if (d1 > d2) return -1;
+			else if (d1 < d2) return +1;
+			else return 0;
+		    }
+		};
+
+		java.util.Collections.sort(children, comparator);
+	    }
 	    setCurrentNode(currentNode.getChildAt(0));
 	}
     }

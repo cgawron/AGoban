@@ -1,6 +1,6 @@
 /*
  *
- * $Id: Point.java 289 2005-08-15 09:44:31Z cgawron $
+ * $Id$
  *
  * (c) 2001 Christian Gawron. All rights reserved.
  *
@@ -84,6 +84,7 @@ public class Point implements Comparable<Point>
      * @param p - the <code>Point</code> to compare to
      * @return -1 if o is smaller (i.e. left or below) this point, 0 if o and this point are equal and +1 if o is bigger.
      */
+    @Override
     public int compareTo(Point p) throws ClassCastException
     {
         if (p.x > x) return -1;
@@ -98,6 +99,7 @@ public class Point implements Comparable<Point>
      * @param o - object to compare to.
      * @return true if o represents the same point on a goban.
      */
+    @Override
     public boolean equals(Object o) 
     {
 	if (!(o instanceof Point))
@@ -119,6 +121,11 @@ public class Point implements Comparable<Point>
 	return (x == this.x) && (y == this.y);
     }
 
+    @Override
+    public int hashCode()
+    {
+	return 19*x + y;
+    }
 
     /*
      * Insert the method's description here.

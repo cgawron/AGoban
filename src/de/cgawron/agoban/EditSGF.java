@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Map;
+import java.util.HashMap;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -28,6 +30,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageItemInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -53,8 +56,10 @@ import de.cgawron.agoban.view.GobanView.GobanContextMenuInfo;
 import de.cgawron.agoban.provider.SGFProvider;
 import de.cgawron.agoban.sync.GoogleSync;
 import de.cgawron.go.Goban;
+import de.cgawron.go.Point;
 import de.cgawron.go.sgf.GameTree;
 import de.cgawron.go.sgf.Node;
+import de.cgawron.go.sgf.Property;
 
 /**
  * Provides an sgf editor.
@@ -71,8 +76,10 @@ public class EditSGF extends Activity
     private GameTree gameTree;
     private GameTreeControls gameTreeControls;
     private Node currentNode;
+    private Map<Point, Node> variations = new HashMap<Point, Node>();
     private String gitId;
     private SGFApplication application;
+    private SharedPreferences settings; 
 
     /** Called when the activity is first created. */
     @Override
@@ -81,6 +88,7 @@ public class EditSGF extends Activity
         super.onCreate(savedInstanceState);
 	application = (SGFApplication) getApplication();
 	resources = getResources();
+	settings = getSharedPreferences(SGFApplication.PREF, 0);
 	try {
 	    PackageItemInfo info = getPackageManager().getActivityInfo(new ComponentName(this, EditSGF.class), 
 								       PackageManager.GET_META_DATA);
@@ -193,20 +201,28 @@ public class EditSGF extends Activity
 	return false;
     }
 
-    public void onGobanEvent(GobanEvent gobanEvent) {
+    public void onGobanEvent(GobanEvent gobanEvent) 
+    {
 	Log.d(TAG, "onGobanEvent: " + gobanEvent);
-	if (currentNode != null && application.checkNotReadOnly(this)) {
-	    Node node = new Node(gameTree);
-	    try {
-		node.setGoban(currentNode.getGoban().clone());
+	if (currentNode != null) {
+	    Point point = gobanEvent.getPoint();
+	    Log.d(TAG, "onGobanEvent: variations: " + variations.keySet());
+	    if (variations.containsKey(point)) {
+		setCurrentNode(variations.get(point));
 	    }
-	    catch (CloneNotSupportedException ex) {
-		Log.e(TAG, "onGobanEvent", ex);
+	    else if (application.checkNotReadOnly(this)) {
+		Node node = new Node(gameTree);
+		try {
+		    node.setGoban(currentNode.getGoban().clone());
+		}
+		catch (CloneNotSupportedException ex) {
+		    Log.e(TAG, "onGobanEvent", ex);
+		}
+		currentNode.add(node);
+		Log.d(TAG, "addMove: " + node + ", " + currentNode);
+		node.move(point);	
+		setCurrentNode(node);
 	    }
-	    currentNode.add(node);
-	    Log.d(TAG, "addMove: " + node + ", " + currentNode);
-	    node.move(gobanEvent.getPoint());	
-	    setCurrentNode(node);
 	}
     }
 
@@ -237,15 +253,42 @@ public class EditSGF extends Activity
     {
 	if (!node.equals(currentNode)) {
 	    currentNode = node;
+	    variations.clear();
+	    gobanView.resetMarkup();
 	    if (currentNode != null) {
 		Goban goban = currentNode.getGoban();
 		if (currentNode.getSiblingCount() > 0) {
-		    Log.d(TAG, "siblingCount: " + currentNode.getSiblingCount());
+		    for (Node sibling : currentNode.getSiblings()) {
+			Log.d(TAG, "sibling: " + sibling);
+			if (sibling.isMove()) {
+			    markVariation(gobanView, sibling);
+			}
+		    }
 		}
+		Point lastMove = goban.getLastMove();
+		if (lastMove != null)
+		    gobanView.markLastMove(lastMove, goban.getStone(lastMove));
+
 		gobanView.setGoban(goban);
 		commentView.setText(currentNode.getComment());
 	    }
 	    gameTreeControls.setCurrentNode(node);
+	}
+    }
+
+    private void markVariation(GobanView view, Node node)
+    {
+	Point point = null;
+	if (node.contains(Property.BLACK)) {
+	    point = node.getPoint(Property.BLACK);
+	}
+	else if (node.contains(Property.WHITE)) {
+	    point = node.getPoint(Property.WHITE);
+	}
+
+	if (point != null) {
+	    variations.put(point, node);
+	    view.addVariation(point);
 	}
     }
 

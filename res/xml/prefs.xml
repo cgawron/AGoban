@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-  <CheckBoxPreference android:title="Enable Google Sync" android:key="doSync" android:defaultValue="false"/>
-  <de.cgawron.agoban.sync.AccountPreference android:title="Google Docs Account" android:key="accountName" />
+  <PreferenceScreen
+      android:key="first_preferencescreen"
+      android:title="Appearance">
+    <CheckBoxPreference android:title="Sort variations by tree depth" android:key="sortVariations" android:defaultValue="true"/>
+  </PreferenceScreen>
+  <PreferenceScreen
+      android:key="second_preferencescreen"
+      android:title="Sync settings">
+    <CheckBoxPreference android:title="Enable Google sync" android:key="doSync" android:defaultValue="false"/>
+    <de.cgawron.agoban.sync.AccountPreference android:title="Google Docs account" android:key="accountName" />
+  </PreferenceScreen>
 </PreferenceScreen>

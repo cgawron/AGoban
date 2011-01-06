@@ -50,6 +50,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.cgawron.go.Goban;
+import de.cgawron.go.SimpleGoban;
 import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Symmetry;
 import de.cgawron.util.Memento;
@@ -282,7 +283,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 	if (factory != null)
 	    return factory.getGoban(boardSize);
 	else
-	    return new SimpleMarkupModel(boardSize);
+	    return new SimpleGoban(boardSize);
     }
 
     Goban getGoban(Goban m)
@@ -290,7 +291,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 	if (factory != null)
 	    return factory.getGoban(m);
 	else
-	    return new SimpleMarkupModel(m);
+	    return new SimpleGoban(m);
     }
 
     public Memento createMemento()
