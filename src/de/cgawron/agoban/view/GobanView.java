@@ -37,6 +37,10 @@ import de.cgawron.agoban.R;
 import de.cgawron.go.Goban;
 import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
+import de.cgawron.go.sgf.Property;
+import de.cgawron.go.sgf.Property.Markup;
+import de.cgawron.go.sgf.Value;
+
 import demo.MultiTouchController.PointInfo;
 import demo.MultiTouchController.PositionAndScale;
 
@@ -46,6 +50,8 @@ import demo.MultiTouchController.PositionAndScale;
  */
 public class GobanView extends View implements demo.MultiTouchController.MultiTouchObjectCanvas<Object> 
 {
+    private static String TAG = "GobanView";
+
     private Goban goban;
     private GobanRenderer renderer;
     private final List<GobanEventListener> listeners = new ArrayList<GobanEventListener>();
@@ -104,14 +110,42 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
         a.recycle();
     }
 
+    public void addMarkup(Goban goban, Markup property)
+    {
+	if (property instanceof Property.Label) {
+	    Value.ValueList vl = (Value.ValueList) property.getValue();
+	    for (Value v : vl) {
+		if (v instanceof Value.Label) {
+		    Point point = ((Value.Label) v).getPoint();
+		    String text = ((Value.Label) v).toString();
+		    Log.d(TAG, "adding " + text + " at " + point);
+		    addLabel(point, text);
+		}
+	    }
+	}
+	else {
+	    Value.PointList pointList = property.getPointList();
+	    for (Point point : pointList) {
+		Goban.BoardType stone = goban.getStone(point); 
+		Log.d(TAG, "adding " + property.getKey() + " at " + point);
+		markupList.add(renderer.new SGFMarkup(point, stone, property.getType()));
+	    }
+	}
+    }
+
+    public void addLabel(Point p, String text)
+    {
+	markupList.add(renderer.new Label(p, text));
+    }
+
     public void addVariation(Point p)
     {
 	markupList.add(renderer.new VariationMark(p));
     }
 
-    public void markLastMove(Point p, BoardType color)
+    public void markLastMove(Point p)
     {
-	markupList.add(renderer.new LastMoveMark(p, color));
+	markupList.add(renderer.new LastMoveMark(p));
     }
 
     public void resetMarkup()

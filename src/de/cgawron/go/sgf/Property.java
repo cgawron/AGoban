@@ -520,10 +520,20 @@ public class Property implements Cloneable
 
     public static class Markup extends Property implements MarkupModel.Markup, Joinable
     {
+	protected MarkupModel.Type type;
+
 	/** See {@link Property#Property(Property.Key)}. */
         public Markup(Key key)
         {
             super(key);
+	    
+	    if (key.equals(TRIANGLE)) type = MarkupModel.Type.TRIANGLE;
+	    else if (key.equals(SQUARE)) type = MarkupModel.Type.SQUARE;
+	    else if (key.equals(CIRCLE)) type = MarkupModel.Type.CIRCLE;
+	    else if (key.equals(TERRITORY_WHITE)) type = MarkupModel.Type.TERRITORY_WHITE;
+	    else if (key.equals(TERRITORY_BLACK)) type = MarkupModel.Type.TERRITORY_BLACK;
+	    else type = MarkupModel.Type.UNKNOWN;
+
         }
 
 	public int compareTo(MarkupModel.Markup m)
@@ -544,6 +554,11 @@ public class Property implements Cloneable
 		setValue(vl);
 	    }
 	}
+	
+	public MarkupModel.Type getType()
+	{
+	    return type;
+	}
     }
 
 
@@ -553,6 +568,7 @@ public class Property implements Cloneable
         public Label(Key key)
         {
             super(key);
+	    this.type = MarkupModel.Type.LABEL;
         }
 
 	public void setValue(Value vl)
@@ -953,6 +969,20 @@ public class Property implements Cloneable
 	return p;
     }
     
+    public Value.PointList getPointList()
+    {
+	Value value = getValue();
+	// logger.finest("getPointList: " + value + ": " + value.getClass().getName());
+	if (value instanceof Value.ValueList)
+            {
+                Value.ValueList list = (Value.ValueList) value;
+                // logger.finest("getPointList: " + list.size());
+                assert list.size() == 1;
+                return (Value.PointList) list.get(0);
+            }
+	return (Value.PointList) value;
+    }
+
     public static String formatResult(Object o)
     {
 	return formatResult((Property) o);

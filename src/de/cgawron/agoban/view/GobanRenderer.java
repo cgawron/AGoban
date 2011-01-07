@@ -21,10 +21,13 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
-import de.cgawron.go.sgf.MarkupModel;
 import de.cgawron.go.Goban;
 import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
+import de.cgawron.go.sgf.MarkupModel;
+import de.cgawron.go.sgf.MarkupModel.Type;
+import de.cgawron.go.sgf.Property;
+import de.cgawron.go.sgf.Value;
 
 /**
  * A {@code GobanRenderer} can render a {@link Goban} on a {@link Canvas}.
@@ -49,7 +52,7 @@ public class GobanRenderer
 
     public abstract class Markup
     {
-	public abstract void draw(Canvas canvas);
+	public abstract void draw(Canvas canvas, Goban goban);
     }
 
     public class VariationMark extends Markup
@@ -61,7 +64,7 @@ public class GobanRenderer
 	    this.point = point;
 	}
 
-	public void draw(Canvas canvas)
+	public void draw(Canvas canvas, Goban goban)
 	{
 	    Log.d(TAG, "VariationMark: draw@" + point);
 	    short x = point.getX();
@@ -78,16 +81,15 @@ public class GobanRenderer
     public class LastMoveMark extends Markup
     {
 	private Point point;
-	private BoardType stone;
 
-	public LastMoveMark(Point point, BoardType stone)
+	public LastMoveMark(Point point)
 	{
 	    this.point = point;
-	    this.stone = stone;
 	}
 
-	public void draw(Canvas canvas)
+	public void draw(Canvas canvas, Goban goban)
 	{
+	    BoardType stone = goban.getStone(point);
 	    Log.d(TAG, "LastMoveMark: draw@" + point);
 	    short x = point.getX();
 	    short y = point.getY();
@@ -109,6 +111,84 @@ public class GobanRenderer
 	    default:
 		break;
 	    }
+	}
+    }
+
+    public class SGFMarkup extends Markup
+    {
+	private Point point;
+	private BoardType stone;
+	private MarkupModel.Type type;
+	
+
+	public SGFMarkup(Point point, BoardType stone, MarkupModel.Type type)
+	{
+	    this.point = point;
+	    this.stone = stone;
+	    this.type  = type;
+	}
+
+	public void draw(Canvas canvas, Goban goban) 
+	{
+	    Log.d(TAG, String.format("SGFMarkup: draw %s@%s", type, point));
+	    switch(type) {
+	    case TRIANGLE:
+		Log.d(TAG, String.format("SGFMarkup: draw %s@%s", type, point));
+		break;
+	    }
+	}
+    }
+
+    public class Label extends Markup
+    {
+	private Point point;
+	private String text;
+
+	public Label(Point point, String text)
+	{
+	    this.point = point;
+	    this.text  = text;
+	}
+
+	public void draw(Canvas canvas, Goban goban)
+	{
+	    Log.d(TAG, "VariationMark: draw@" + point);
+	    short x = point.getX();
+	    short y = point.getY();
+	    BoardType stone = goban.getStone(point);
+
+	    Paint paint = new Paint();
+	    paint.setAntiAlias(true);
+	    paint.setTextAlign(Paint.Align.CENTER);
+	    
+	    float size = paint.getTextSize();
+	    Paint.FontMetrics fm = paint.getFontMetrics();
+	    Rect bounds = new Rect();
+	    paint.getTextBounds(text, 0, text.length(), bounds);
+	    int h = bounds.height();
+	    int w = bounds.width();
+	    size /= (fm.top > 0) ? fm.top : -fm.top;
+	    size *= 0.8;
+	    paint.setTextSize(size);
+	    
+	    Log.d(TAG, String.format("drawText: h=%d, w=%d, a=%f, t=%f", h, w, fm.ascent, fm.top));
+	    
+	    paint.setStyle(Paint.Style.FILL);
+	    
+	    switch (stone) {
+	    case BLACK:
+		paint.setARGB(255, 255, 255, 255);
+		break;
+		
+	    case EMPTY:
+		paint.setARGB(255, 255, 255, 10);
+		canvas.drawCircle(x+1f, y+1f, 0.5f, paint);
+		// fall through
+	    case WHITE:
+		paint.setARGB(255, 0, 0, 0);
+		break;
+	    }
+	    canvas.drawText(text, x+1f, y+1.25f, paint);
 	}
     }
 
@@ -150,18 +230,20 @@ public class GobanRenderer
 		    case EMPTY:
 			break;
 		    }
+		    /*
 		    if (markup != null) {
 			Log.d(TAG, String.format("markup: (%d, %d) -> %s (%s)", i, j, markup.toString(), markup.getClass().getName()));
 			if (markup instanceof MarkupModel.Text) {
 			    drawText(i, j, stone, markup.toString(), canvas);
 			}
 		    }
+		    */
 		    if (view.isSelected(i, j))
 			drawSelection(i, j, canvas);
 		}
 	    }
 	    for (Markup markup : view.getMarkup()) {
-		markup.draw(canvas);
+		markup.draw(canvas, goban);
 	    }
 	}
     }
@@ -233,42 +315,6 @@ public class GobanRenderer
 	paint.setColor(SELECTION_COLOR);
 	paint.setStyle(Paint.Style.STROKE);
 	canvas.drawRect(x+0.5f, y+0.5f, x+1.5f, y+1.5f, paint);
-    }
-
-    void drawText(int x, int y, BoardType stone, String text, Canvas canvas)
-    {
-	Paint paint = new Paint();
-	paint.setAntiAlias(true);
-	paint.setTextAlign(Paint.Align.CENTER);
-
-	float size = paint.getTextSize();
-	Paint.FontMetrics fm = paint.getFontMetrics();
-	Rect bounds = new Rect();
-	paint.getTextBounds(text, 0, text.length(), bounds);
-	int h = bounds.height();
-	int w = bounds.width();
-	size /= (fm.top > 0) ? fm.top : -fm.top;
-	size *= 0.8;
-	paint.setTextSize(size);
-	
-	Log.d(TAG, String.format("drawText: h=%d, w=%d, a=%f, t=%f", h, w, fm.ascent, fm.top));
-	
-	paint.setStyle(Paint.Style.FILL);
-
-	switch (stone) {
-	case BLACK:
-	    paint.setARGB(255, 255, 255, 255);
-	    break;
-
-	case EMPTY:
-	    paint.setARGB(255, 255, 255, 10);
-	    canvas.drawCircle(x+1f, y+1f, 0.5f, paint);
-	    // fall through
-	case WHITE:
-	    paint.setARGB(255, 0, 0, 0);
-	    break;
-	}
-	canvas.drawText(text, x+1f, y+1.25f, paint);
     }
 
 }

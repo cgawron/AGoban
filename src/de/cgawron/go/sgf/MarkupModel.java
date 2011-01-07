@@ -25,6 +25,11 @@ import java.util.SortedSet;
  */
 public interface MarkupModel extends Goban
 {
+    public enum Type 
+    {
+	TRIANGLE, SQUARE, CIRCLE, LABEL, TERRITORY_WHITE, TERRITORY_BLACK, UNKNOWN
+    }
+
 
     /** A marker interface for all classes which represent a certain type of markups */
     public interface Markup extends Comparable<Markup>

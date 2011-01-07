@@ -61,6 +61,7 @@ import de.cgawron.go.Point;
 import de.cgawron.go.sgf.GameTree;
 import de.cgawron.go.sgf.Node;
 import de.cgawron.go.sgf.Property;
+import de.cgawron.go.sgf.Value;
 
 /**
  * Provides an sgf editor.
@@ -300,12 +301,23 @@ public class EditSGF extends Activity
 		}
 		Point lastMove = goban.getLastMove();
 		if (lastMove != null)
-		    gobanView.markLastMove(lastMove, goban.getStone(lastMove));
-
+		    gobanView.markLastMove(lastMove);
+		
+		doMarkup(gobanView, currentNode);
 		gobanView.setGoban(goban);
 		commentView.setText(currentNode.getComment());
 	    }
 	    gameTreeControls.setCurrentNode(node);
+	}
+    }
+
+    private void doMarkup(GobanView view, Node node)
+    {
+	Goban goban = node.getGoban();
+	for (Property property : node.values()) {
+	    if (property instanceof Property.Markup) {
+		view.addMarkup(goban, (Property.Markup) property);
+	    }
 	}
     }
 
