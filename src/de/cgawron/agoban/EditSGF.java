@@ -150,6 +150,7 @@ public class EditSGF extends Activity
 		    gameTree = application.getGameTree(); 
 		    if (gameTree != null) {
 			gameTreeControls.setGameTree(gameTree);
+			getWindow().setTitle(gameTree.getGameName());
 			//seekBar.setMax(gameTree.getNoOfMoves());
 		    }
 		}

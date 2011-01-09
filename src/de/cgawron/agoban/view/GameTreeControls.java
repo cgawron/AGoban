@@ -25,6 +25,7 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -65,8 +66,16 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
     public GameTreeControls(Context context, AttributeSet attrs) 
     {
         super(context, attrs);
+	LayoutInflater.from(context).inflate(R.layout.game_control, this);
 	settings = context.getSharedPreferences(SGFApplication.PREF, 0);
+	
+	buttonNext = (Button) findViewById(R.id.nextNode);
+	buttonPrev = (Button) findViewById(R.id.prevNode);
+	buttonNextMarkup = (Button) findViewById(R.id.nextMarkup);
+	buttonPrevMarkup = (Button) findViewById(R.id.prevMarkup);
+	moveNoView = (TextView) findViewById(R.id.moveNo);
 
+	/*
 	buttonNext = new Button(context);
 	buttonPrev = new Button(context);
 	buttonNextMarkup = new Button(context);
@@ -77,6 +86,7 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 	buttonNextMarkup.setText("nm");
 	buttonPrevMarkup.setText("pm");
 	moveNoView.setText("-");
+	*/
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.GobanView);
 
@@ -86,18 +96,18 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 
     private void initView(Context context)
     {
-	LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
-	params.gravity  = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
-	addView(buttonPrev, params);
+	//LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
+	//params.gravity  = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
+	//addView(buttonPrev, params);
 	buttonPrev.setOnClickListener(this);
-	addView(buttonPrevMarkup, params);
+	//addView(buttonPrevMarkup, params);
 	buttonPrevMarkup.setOnClickListener(this);
-	params.gravity = Gravity.CENTER;
-	addView(moveNoView, params);
-	params.gravity = Gravity.CENTER_VERTICAL | Gravity.LEFT;
-	addView(buttonNextMarkup, params);
+	//params.gravity = Gravity.CENTER;
+	//addView(moveNoView, params);
+	//params.gravity = Gravity.CENTER_VERTICAL | Gravity.LEFT;
+	//addView(buttonNextMarkup, params);
 	buttonNextMarkup.setOnClickListener(this);
-	addView(buttonNext, params);
+	//addView(buttonNext, params);
 	buttonNext.setOnClickListener(this);
     }
 

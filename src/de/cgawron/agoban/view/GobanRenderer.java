@@ -19,6 +19,7 @@ package de.cgawron.agoban.view;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
 import android.util.Log;
 import de.cgawron.go.Goban;
@@ -42,9 +43,13 @@ public class GobanRenderer
     private static float HOSHI_RADIUS = 0.15f;
     private static float HIGHLIGHT_RADIUS = 0.2f;
     private static float HIGHLIGHT_STROKEWIDTH = 0.06f;
+    private static float MARKUP_STROKEWIDTH = 0.05f;
+    private static float MARKUP_RADIUS = 0.45f;
     private static float STONE_STROKEWIDTH = 0.03f;
     private static float BOARD_STROKEWIDTH = 0.0f;
     private static float SELECTION_STROKEWIDTH = 0.05f;
+    private static float COS30 = (float) Math.sqrt(0.75);
+    private static float SIN30 = 0.5f;
     private static int   SELECTION_COLOR = Color.RED;
     private static int   VARIATION_COLOR = Color.argb(128, 128, 128, 128);
 
@@ -130,12 +135,41 @@ public class GobanRenderer
 
 	public void draw(Canvas canvas, Goban goban) 
 	{
+	    Path path = null;
+	    short x = point.getX();
+	    short y = point.getY();
+	    Paint paint = new Paint();
+
+	    paint.setAntiAlias(true);
+	    paint.setStyle(Paint.Style.STROKE);
+	    paint.setStrokeJoin(Paint.Join.ROUND);
+	    paint.setStrokeWidth(MARKUP_STROKEWIDTH);
+	    switch (stone) {
+	    case WHITE:
+		paint.setARGB(255, 0, 0, 0);
+		break;
+	    case BLACK:
+	    default:
+		paint.setARGB(255, 255, 255, 255);
+		break;
+	    }
+
 	    Log.d(TAG, String.format("SGFMarkup: draw %s@%s", type, point));
 	    switch(type) {
 	    case TRIANGLE:
 		Log.d(TAG, String.format("SGFMarkup: draw %s@%s", type, point));
+		path = new Path();
+		path.moveTo(x + 1f, y + 1f - 0.5f);
+		path.lineTo(x + 1f + MARKUP_RADIUS*COS30, y + 1f + MARKUP_RADIUS*SIN30);
+		path.lineTo(x + 1f - MARKUP_RADIUS*COS30, y + 1f + MARKUP_RADIUS*SIN30);
+		path.close();
 		break;
+	    default:
+		Log.e(TAG, String.format("SGFMarkup: draw %s@%s (not implemented)", type, point));
+		break;		
 	    }
+	    if (path != null)
+		canvas.drawPath(path, paint);
 	}
     }
 

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"         
+    xmlns:app="http://schemas.android.com/apk/res/de.cgawron.agoban"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="40dip">
+
+  <Button
+      android:id="@+id/prevNode"  
+      android:layout_height="match_parent"
+      android:layout_width="wrap_content"
+      android:text="prev"/>
+  <Button
+      android:id="@+id/prevMarkup"  
+      android:layout_height="match_parent"
+      android:layout_width="wrap_content"
+      android:text="prev"/>
+  <TextView
+      android:id="@+id/moveNo"
+      android:layout_height="match_parent"
+      android:layout_width="wrap_content"
+      android:gravity="center"
+      android:text=""/>
+  <Spinner
+      android:id="@+id/variations"
+      android:layout_height="match_parent"
+      android:layout_width="wrap_content"
+      android:prompt="Choose Variation"
+      android:gravity="center" />
+  <Button
+      android:id="@+id/nextMarkup"  
+      android:layout_height="match_parent"
+      android:layout_width="wrap_content"
+      android:text="next"/>
+  <Button
+      android:id="@+id/nextNode"  
+      android:layout_height="match_parent"
+      android:layout_width="wrap_content"
+      android:text="next"/>
+
+</LinearLayout>
+
