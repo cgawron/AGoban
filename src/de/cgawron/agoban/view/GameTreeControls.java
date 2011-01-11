@@ -28,9 +28,12 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import de.cgawron.agoban.R;
@@ -42,12 +45,62 @@ import de.cgawron.go.sgf.Node;
  * {@code GameTreeControls} allow to navigate through a game tree.
  *
  */
-public class GameTreeControls extends LinearLayout implements View.OnClickListener
+public class GameTreeControls extends LinearLayout implements View.OnClickListener, AdapterView.OnItemSelectedListener
 {
+
     public interface GameTreeNavigationListener 
     {
 	public void setCurrentNode(Node node);
 
+    }
+
+    private class VariationAdapter extends BaseAdapter implements GameTreeNavigationListener 
+    {
+	Node currentNode = null;
+
+	public long getItemId(int position) 
+	{
+	    return position;
+	}
+
+	public int getCount() 
+	{
+	    Log.d(TAG, "getCount: " + (currentNode != null ? currentNode.getSiblingCount() : 0));
+	    if (currentNode != null && currentNode.getParent() != null && currentNode.getParent().getChildren() != null)
+		return currentNode.getParent().getChildren().size();
+	    else
+		return 0;
+	}
+
+	public Object getItem(int position)
+	{
+	    Log.d(TAG, "getItem: " + position);
+	    return currentNode.getParent().getChildren().get(position);
+	}
+
+	public View getView(int position, View convertView, ViewGroup parent)
+	{
+	    TextView view = (TextView) getDropDownView(position, convertView, parent);
+	    view.setEms(3);
+	    return view;
+	}
+
+	public View getDropDownView(int position, View convertView, ViewGroup parent)
+	{
+	    Node node = (Node) getItem(position);
+	    Log.d(TAG, "getView: " + position + " " + node);
+	    if (convertView == null) {
+		convertView = new TextView(GameTreeControls.this.getContext());
+	    }
+	    ((TextView) convertView).setText(node.getName());
+	    return convertView;
+	}
+	
+	public void setCurrentNode(Node node)
+	{
+	    currentNode = node;
+	    notifyDataSetChanged();
+	}
     }
 
     private static String TAG = "GameTreeControls";
@@ -58,9 +111,11 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
     private final Button buttonNextMarkup;
     private final Button buttonPrevMarkup;
     private final TextView moveNoView;
+    private final Spinner variations;
 
     private GameTree gameTree;
-    private GameTreeNavigationListener listener;
+    private VariationAdapter variationAdapter;
+    private List<GameTreeNavigationListener> listeners = new ArrayList<GameTreeNavigationListener>();
     private Node currentNode;
 
     public GameTreeControls(Context context, AttributeSet attrs) 
@@ -74,19 +129,11 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 	buttonNextMarkup = (Button) findViewById(R.id.nextMarkup);
 	buttonPrevMarkup = (Button) findViewById(R.id.prevMarkup);
 	moveNoView = (TextView) findViewById(R.id.moveNo);
+	variations = (Spinner) findViewById(R.id.variations);
 
-	/*
-	buttonNext = new Button(context);
-	buttonPrev = new Button(context);
-	buttonNextMarkup = new Button(context);
-	buttonPrevMarkup = new Button(context);
-	moveNoView = new TextView(context);
-	buttonNext.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.arrow_up_float, 0, 0, 0);
-	buttonPrev.setCompoundDrawablesWithIntrinsicBounds(0, 0, android.R.drawable.arrow_down_float, 0);
-	buttonNextMarkup.setText("nm");
-	buttonPrevMarkup.setText("pm");
-	moveNoView.setText("-");
-	*/
+	variationAdapter = new VariationAdapter();
+	variations.setAdapter(variationAdapter);
+	addGameTreeNavigationListener((GameTreeNavigationListener) variationAdapter);
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.GobanView);
 
@@ -96,19 +143,21 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 
     private void initView(Context context)
     {
-	//LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
-	//params.gravity  = Gravity.CENTER_VERTICAL | Gravity.RIGHT;
-	//addView(buttonPrev, params);
 	buttonPrev.setOnClickListener(this);
-	//addView(buttonPrevMarkup, params);
 	buttonPrevMarkup.setOnClickListener(this);
-	//params.gravity = Gravity.CENTER;
-	//addView(moveNoView, params);
-	//params.gravity = Gravity.CENTER_VERTICAL | Gravity.LEFT;
-	//addView(buttonNextMarkup, params);
 	buttonNextMarkup.setOnClickListener(this);
-	//addView(buttonNext, params);
 	buttonNext.setOnClickListener(this);
+	variations.setOnItemSelectedListener(this);
+    }
+
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) 
+    {
+	Node node = (Node) variationAdapter.getItem(position);
+	setCurrentNode(node);
+    }
+
+    public void onNothingSelected(AdapterView<?> parent)
+    {
     }
 
     public void onClick(View v)
@@ -131,9 +180,9 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 	}
     }
 
-    public void setGameTreeNavigationListener(GameTreeNavigationListener listener) 
+    public void addGameTreeNavigationListener(GameTreeNavigationListener listener) 
     {
-	this.listener = listener;
+	this.listeners.add(listener);
     }
 
     public void setGameTree(GameTree gameTree) {
@@ -147,8 +196,9 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 	Log.d(TAG, "setCurrentNode: " + node);
 	this.currentNode = node;
 	moveNoView.setText(Integer.toString(node.getMoveNo()));
-	if (listener != null)
+	for (GameTreeNavigationListener listener : listeners) {
 	    listener.setCurrentNode(node);
+	}
     }
 
     public void nextNode() 

@@ -6,4 +6,5 @@
     <string name="PB">Black</string>
     <string name="player">Player</string>
     <string name="choose_file">Choose file</string>
+    <string name="choose_variation">Choose variation</string>
 </resources>

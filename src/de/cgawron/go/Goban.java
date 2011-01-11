@@ -1,6 +1,6 @@
 /*
  *
- * $Id: Point.java 289 2005-08-15 09:44:31Z cgawron $
+ * $Id$
  *
  * (c) 2001 Christian Gawron. All rights reserved.
  *
@@ -18,7 +18,7 @@ import java.beans.PropertyChangeListener;
 /**
  * Represents the state (i.e. the position of all the stones on the board) of a goban.
  * @author Christian Gawron
- * @version $Id: GobanModel.java 369 2006-04-14 17:04:02Z cgawron $
+ * @version $Id$
  * @see Goban
  */
 public interface Goban extends Cloneable

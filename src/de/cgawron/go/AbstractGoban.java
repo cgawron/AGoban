@@ -1,6 +1,6 @@
 /*
  *
- * $Id: AbstractGobanModel.java 155 2005-01-04 10:47:49Z cgawron $
+ * $Id$
  *
  * (c) 2001 Christian Gawron. All rights reserved.
  *
@@ -20,7 +20,7 @@ import java.beans.PropertyChangeSupport;
 /**
  * A {@link Goban} providing <code>PropertyChangeSupport</code>.
  * @author Christian Gawron
- * @version $Id: AbstractGoban.java 155 2005-01-04 10:47:49Z cgawron $
+ * @version $Id$
  * @see PropetrtyChangeSupport
  */
 public abstract class AbstractGoban implements Goban

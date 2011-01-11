@@ -50,6 +50,7 @@ public class GobanRenderer
     private static float SELECTION_STROKEWIDTH = 0.05f;
     private static float COS30 = (float) Math.sqrt(0.75);
     private static float SIN30 = 0.5f;
+    private static float SIN45 = (float) Math.sqrt(0.5);
     private static int   SELECTION_COLOR = Color.RED;
     private static int   VARIATION_COLOR = Color.argb(128, 128, 128, 128);
 
@@ -159,9 +160,19 @@ public class GobanRenderer
 	    case TRIANGLE:
 		Log.d(TAG, String.format("SGFMarkup: draw %s@%s", type, point));
 		path = new Path();
-		path.moveTo(x + 1f, y + 1f - 0.5f);
+		path.moveTo(x + 1f, y + 1f - MARKUP_RADIUS);
 		path.lineTo(x + 1f + MARKUP_RADIUS*COS30, y + 1f + MARKUP_RADIUS*SIN30);
 		path.lineTo(x + 1f - MARKUP_RADIUS*COS30, y + 1f + MARKUP_RADIUS*SIN30);
+		path.close();
+		break;
+	    case SQUARE:
+		Log.d(TAG, String.format("SGFMarkup: draw %s@%s", type, point));
+		float d = MARKUP_RADIUS*SIN45;
+		path = new Path();
+		path.moveTo(x + 1f + d, y + 1f + d);
+		path.lineTo(x + 1f + d, y + 1f - d);
+		path.lineTo(x + 1f - d, y + 1f - d);
+		path.lineTo(x + 1f - d, y + 1f + d);
 		path.close();
 		break;
 	    default:

@@ -111,7 +111,7 @@ public class EditSGF extends Activity
 	commentView = (TextView) findViewById(R.id.comment);
 
 	gameTreeControls = (GameTreeControls) findViewById(R.id.controls);
-	gameTreeControls.setGameTreeNavigationListener(this);
+	gameTreeControls.addGameTreeNavigationListener(this);
 	
 	Intent intent = getIntent();
 	if (Intent.ACTION_EDIT.equals(intent.getAction()))

@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -133,11 +134,27 @@ public class Node
 	}
     }
 
-    public class SiblingsIterable implements Iterable<Node>
+    public class SiblingsList extends AbstractList<Node>
     {
 	public Iterator<Node> iterator()
 	{
 	    return new SiblingsIterator();
+	}
+
+	public int size()
+	{
+	    return parent.children.size() - 1;
+	}
+
+	public Node get(int index)
+	{
+	    Iterator<Node> it = iterator();
+	    Node n = it.next();
+
+	    for (int i=0; i<index; i++)
+		n = it.next();
+
+	    return n;
 	}
     }
 
@@ -509,9 +526,9 @@ public class Node
 	return null;
     }
 
-    public Iterable<Node> getSiblings()
+    public List<Node> getSiblings()
     {
-	return new SiblingsIterable();
+	return new SiblingsList();
     }
 
     public int getSiblingCount()

@@ -26,7 +26,7 @@
       android:id="@+id/variations"
       android:layout_height="match_parent"
       android:layout_width="wrap_content"
-      android:prompt="Choose Variation"
+      android:prompt="@string/choose_variation"
       android:gravity="center" />
   <Button
       android:id="@+id/nextMarkup"  
