@@ -80,21 +80,31 @@
 
   <setup/>
 
-  <path id="cup.path">
+  <path id="tool.path">
     <pathelement path="tools/java-cup-11a.jar" />
+    <pathelement path="tools/jflex/lib/JFlex.jar" />
   </path>
 
   <taskdef name="cup"
 	   classname="java_cup.anttask.CUPTask"
-	   classpathref="cup.path"
-	   />
+	   classpathref="tool.path" />
+
+  <taskdef name="jflex"
+	   classname="JFlex.anttask.JFlexTask"
+	   classpathref="tool.path" />
 
   <target name="cup">
     <cup srcfile="${source.absolute.dir}/de/cgawron/go/sgf/sgf.cup"
 	 destdir="${source.dir}/de/cgawron/go/sgf"
 	 interface="true"
 	 parser="Parser"
-	 symbols="Symbols"
-	 />
+	 symbols="Symbols" />
   </target>
+
+  <target name="jflex">
+    <jflex file="${source.absolute.dir}/de/cgawron/go/sgf/sgf.lex"
+	 destdir="${source.dir}"
+	 nobak="true" />
+  </target>
+
 </project>

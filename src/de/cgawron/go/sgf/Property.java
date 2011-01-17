@@ -530,6 +530,7 @@ public class Property implements Cloneable
 	    if (key.equals(TRIANGLE)) type = MarkupModel.Type.TRIANGLE;
 	    else if (key.equals(SQUARE)) type = MarkupModel.Type.SQUARE;
 	    else if (key.equals(CIRCLE)) type = MarkupModel.Type.CIRCLE;
+	    else if (key.equals(MARK)) type = MarkupModel.Type.MARK;
 	    else if (key.equals(TERRITORY_WHITE)) type = MarkupModel.Type.TERRITORY_WHITE;
 	    else if (key.equals(TERRITORY_BLACK)) type = MarkupModel.Type.TERRITORY_BLACK;
 	    else type = MarkupModel.Type.UNKNOWN;

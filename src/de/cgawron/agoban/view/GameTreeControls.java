@@ -22,6 +22,7 @@ import java.util.List;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -47,6 +48,20 @@ import de.cgawron.go.sgf.Node;
  */
 public class GameTreeControls extends LinearLayout implements View.OnClickListener, AdapterView.OnItemSelectedListener
 {
+    private static String TAG = "GameTreeControls";
+
+    private SharedPreferences settings; 
+    private final Button buttonNext;
+    private final Button buttonPrev;
+    private final Button buttonNextMarkup;
+    private final Button buttonPrevMarkup;
+    private final TextView moveNoView;
+    private final Spinner variations;
+
+    private GameTree gameTree;
+    private VariationAdapter variationAdapter;
+    private List<GameTreeNavigationListener> listeners = new ArrayList<GameTreeNavigationListener>();
+    private Node currentNode;
 
     public interface GameTreeNavigationListener 
     {
@@ -66,7 +81,8 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 	public int getCount() 
 	{
 	    Log.d(TAG, "getCount: " + (currentNode != null ? currentNode.getSiblingCount() : 0));
-	    if (currentNode != null && currentNode.getParent() != null && currentNode.getParent().getChildren() != null)
+	    if (currentNode != null && currentNode.getParent() != null && 
+		currentNode.getParent().getChildren() != null && currentNode.getParent().getChildren().size() > 1)
 		return currentNode.getParent().getChildren().size();
 	    else
 		return 0;
@@ -93,6 +109,8 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 		convertView = new TextView(GameTreeControls.this.getContext());
 	    }
 	    ((TextView) convertView).setText(node.getName());
+	    if (node.equals(currentNode))
+		((TextView) convertView).setTextColor(Color.BLACK);
 	    return convertView;
 	}
 	
@@ -103,20 +121,6 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 	}
     }
 
-    private static String TAG = "GameTreeControls";
-
-    private SharedPreferences settings; 
-    private final Button buttonNext;
-    private final Button buttonPrev;
-    private final Button buttonNextMarkup;
-    private final Button buttonPrevMarkup;
-    private final TextView moveNoView;
-    private final Spinner variations;
-
-    private GameTree gameTree;
-    private VariationAdapter variationAdapter;
-    private List<GameTreeNavigationListener> listeners = new ArrayList<GameTreeNavigationListener>();
-    private Node currentNode;
 
     public GameTreeControls(Context context, AttributeSet attrs) 
     {

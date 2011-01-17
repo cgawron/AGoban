@@ -44,7 +44,7 @@ public class GobanRenderer
     private static float HIGHLIGHT_RADIUS = 0.2f;
     private static float HIGHLIGHT_STROKEWIDTH = 0.06f;
     private static float MARKUP_STROKEWIDTH = 0.05f;
-    private static float MARKUP_RADIUS = 0.45f;
+    private static float MARKUP_RADIUS = 0.41f;
     private static float STONE_STROKEWIDTH = 0.03f;
     private static float BOARD_STROKEWIDTH = 0.0f;
     private static float SELECTION_STROKEWIDTH = 0.05f;
@@ -146,16 +146,17 @@ public class GobanRenderer
 	    paint.setStrokeJoin(Paint.Join.ROUND);
 	    paint.setStrokeWidth(MARKUP_STROKEWIDTH);
 	    switch (stone) {
-	    case WHITE:
-		paint.setARGB(255, 0, 0, 0);
-		break;
 	    case BLACK:
-	    default:
 		paint.setARGB(255, 255, 255, 255);
+		break;
+	    case WHITE:
+	    default:
+		paint.setARGB(255, 0, 0, 0);
 		break;
 	    }
 
 	    Log.d(TAG, String.format("SGFMarkup: draw %s@%s", type, point));
+	    float d = MARKUP_RADIUS*SIN45;
 	    switch(type) {
 	    case TRIANGLE:
 		Log.d(TAG, String.format("SGFMarkup: draw %s@%s", type, point));
@@ -167,13 +168,36 @@ public class GobanRenderer
 		break;
 	    case SQUARE:
 		Log.d(TAG, String.format("SGFMarkup: draw %s@%s", type, point));
-		float d = MARKUP_RADIUS*SIN45;
 		path = new Path();
 		path.moveTo(x + 1f + d, y + 1f + d);
 		path.lineTo(x + 1f + d, y + 1f - d);
 		path.lineTo(x + 1f - d, y + 1f - d);
 		path.lineTo(x + 1f - d, y + 1f + d);
 		path.close();
+		break;
+	    case MARK:
+		Log.d(TAG, String.format("SGFMarkup: draw %s@%s", type, point));
+		path = new Path();
+		path.moveTo(x + 1f + d, y + 1f + d);
+		path.lineTo(x + 1f - d, y + 1f - d);
+		path.moveTo(x + 1f + d, y + 1f - d);
+		path.lineTo(x + 1f - d, y + 1f + d);
+		path.close();
+		break;
+	    case CIRCLE:
+		Log.d(TAG, String.format("SGFMarkup: draw %s@%s", type, point));
+		path = new Path();
+		path.addCircle(x + 1f, y + 1f, 0.25f, Path.Direction.CW);
+		break;
+	    case TERRITORY_BLACK:
+		paint.setARGB(196, 0, 0, 0);
+		paint.setStyle(Paint.Style.FILL_AND_STROKE);
+		canvas.drawCircle(x+1f, y+1f, 0.25f, paint);
+		break;
+	    case TERRITORY_WHITE:
+		paint.setARGB(196, 255, 255, 255);
+		paint.setStyle(Paint.Style.FILL_AND_STROKE);
+		canvas.drawCircle(x+1f, y+1f, 0.25f, paint);
 		break;
 	    default:
 		Log.e(TAG, String.format("SGFMarkup: draw %s@%s (not implemented)", type, point));

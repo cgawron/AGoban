@@ -134,6 +134,6 @@ PropertyList ::= PropertyList:pl Property:p  ValueList:vl
 ValueList    ::= ValueList:vl Value:v 
 	         {: ((Value.ValueList)vl).add((Value) v); 
 	            RESULT = vl; :} 
-	       | Value:v
-	         {: RESULT = AbstractValue.createValueList((Value) v); :} 
+	       | ValueList:vl
+	         {: RESULT = AbstractValue.createValueList(); :} 
 ;

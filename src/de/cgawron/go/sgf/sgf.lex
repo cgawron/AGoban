@@ -33,6 +33,7 @@ import de.cgawron.util.MiscEncodingReader;
 %unicode
 %char
 %line
+%column
 %unicode
 %buffer 4096
 //%debug
@@ -49,6 +50,7 @@ import de.cgawron.util.MiscEncodingReader;
 %state NUMBER
 %state TEXT
 %state PROPERTY
+%state PROPERTY_NEXT
 
 %{
     private static Logger logger = Logger.getLogger(Yylex.class.getName());
@@ -163,8 +165,6 @@ import de.cgawron.util.MiscEncodingReader;
     return new Token(Symbols.Value, text, yyline, yychar, AbstractValue.createPointList(text.substring(0,5)));
 }
 
-<POINTS> "("    { return (new Token(Symbols.Open, "(", yyline, yychar)); }
-<POINTS> ")"    { return (new Token(Symbols.Close, ")", yyline, yychar)); }
 
 <LABEL> "["
 {
@@ -175,9 +175,6 @@ import de.cgawron.util.MiscEncodingReader;
     String text = yytext();
     return new Token(Symbols.Value, text, yyline, yychar, AbstractValue.createLabel(text.substring(0,2), text.substring(3, text.length()-1)));
 }
-
-<LABEL> "("    { return (new Token(Symbols.Open, "(", yyline, yychar)); }
-<LABEL> ")"    { return (new Token(Symbols.Close, ")", yyline, yychar)); }
 
 <NODE> "[" {
     String text = yytext();
@@ -221,18 +218,9 @@ import de.cgawron.util.MiscEncodingReader;
     return new Token(Symbols.Value, "", yyline, yychar, AbstractValue.createValue(""));
 }
 
-<PROPERTY> ([^\]])*"]"([ \r\n\t])*"["
-{
-    String text = yytext();
-    return new Token(Symbols.Value, text, yyline, yychar, AbstractValue.createValue(text));
-}
 
-<PROPERTY> ([^\]])*"]"
-{
-    yybegin(TOP);
-    String text = yytext();
-    return new Token(Symbols.Value, text, yyline, yychar, AbstractValue.createValue(text.substring(0, text.length()-1)));
-}
+"("    { return (new Token(Symbols.Open, "(", yyline, yychar)); }
+")"    { return (new Token(Symbols.Close, ")", yyline, yychar)); }
 
 [a-z]*[A-Z][a-z]*[A-Z]*[a-z]*"[" 
 {
@@ -280,9 +268,55 @@ import de.cgawron.util.MiscEncodingReader;
     }
     else
     {
-	yybegin(PROPERTY);
+      logger.warning("Unknown property: " + text);
+      yybegin(PROPERTY);
     }
     return new Token(Symbols.Property, text, yyline, yychar, property);
+}
+
+
+// Fallback rules for unknown properties for which we can't specify a property type 
+<PROPERTY_NEXT>"]" [ \t\r\n]* "["
+{
+  yybegin(PROPERTY);
+}
+
+<PROPERTY_NEXT>"]"
+{
+  yybegin(TOP);
+}
+
+<PROPERTY> [a-z][a-z] / [ \t\r\n]* "]"
+{
+    String text = yytext();
+    yybegin(PROPERTY_NEXT);
+    return new Token(Symbols.Value, text, yyline, yychar, AbstractValue.createPointList(text));
+}
+
+<PROPERTY> [a-z][a-z]":"[a-z][a-z] / [ \t\r\n]* "]"
+{
+    String text = yytext();
+    yybegin(PROPERTY_NEXT);
+    return new Token(Symbols.Value, text, yyline, yychar, AbstractValue.createPointList(text));
+}
+
+<PROPERTY> [^()\]]+ / [ \t\r\n]* "]"
+{
+    String text = yytext();
+    yybegin(PROPERTY_NEXT);
+    return new Token(Symbols.Value, text, yyline, yychar, AbstractValue.createValue(text));
+}
+
+<PROPERTY>"]["
+{
+  yybegin(PROPERTY);
+  return new Token(Symbols.Value, "", yyline, yychar, AbstractValue.createValue(""));
+}
+
+<PROPERTY>"]"
+{
+  yybegin(TOP);
+  return new Token(Symbols.Value, "", yyline, yychar, AbstractValue.createValue(""));
 }
 
 " " { }
