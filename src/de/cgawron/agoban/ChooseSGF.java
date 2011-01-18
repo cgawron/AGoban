@@ -192,7 +192,7 @@ public class ChooseSGF extends Activity implements ViewBinder
 
     public void newGame()
     {
-	Intent sgfIntent = new Intent(Intent.ACTION_EDIT, application.getNewGameUri());
+	Intent sgfIntent = new Intent(Intent.ACTION_INSERT, application.getNewGameUri());
 	startActivity(sgfIntent);
 	finish();
     }

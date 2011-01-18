@@ -33,12 +33,15 @@ import android.util.Log;
 import android.net.Uri;
 
 import de.cgawron.go.sgf.GameTree;
+import de.cgawron.go.sgf.Node;
+import de.cgawron.go.sgf.Property;
 import de.cgawron.agoban.provider.SGFProvider;
 
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.UUID;
@@ -127,12 +130,49 @@ public class SGFApplication extends Application
 		    loadedCB.run();
 	    }
 	}
-	else gameTree = new GameTree(); 
+	else {
+	    gameTree = new GameTree(); 
+	    initProperties(gameTree);
+	}
+    }
+
+    /**
+     * Initialize properties of a new {@code GameTree}.
+     * This routine sets the following properties:
+     * <ul>
+     *   <li> DaTe
+     *   <li> PlaCe
+     *   <li> GaMe
+     *   <li> SiZe
+     *   <li> APplication
+     *   <li> FileFormat
+     * </ul>
+     */
+    protected void initProperties(GameTree gameTree)
+    {
+	Log.d(TAG, "initProperties");
+	Node root = gameTree.getRoot();
+
+	root.setFileFormat(4);
+	root.setGame(1);
+	root.setProperty(Property.APPLICATION, "AGoban");
+	//setProperty(Property.APPLICATION, "GoDiagram:" + GoDiagram.getVersion());
+
+	Charset defaultCharset = Charset.defaultCharset();
+	if (defaultCharset == null)
+	    defaultCharset = Charset.forName("UTF-8");
+	root.setProperty(Property.CHARACTER_SET, defaultCharset.name());
+
     }
 
     public GameTree getGameTree()
     {
 	return gameTree;
+    }
+
+    public void setGameTree(GameTree gameTree)
+    {
+	this.gameTree = gameTree;
     }
 
     public Uri getNewGameUri()

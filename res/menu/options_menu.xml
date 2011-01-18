@@ -1,18 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/save"
-          android:title="Save" />
+          android:title="@string/save" />
     <item android:id="@+id/open"
-          android:title="Open" />
+          android:title="@string/open" />
     <item android:id="@+id/new_game"
-          android:title="New Game" />
+          android:title="@string/new_game" />
     <item android:id="@+id/preferences"
-          android:title="Edit Preferences" />
+          android:title="@string/edit_preferences" />
     <item android:id="@+id/google_sync"
-          android:title="Google Sync" />
+          android:title="@string/google_sync" />
     <item android:id="@+id/game_info"
-          android:title="Game Info" />
+          android:title="@string/game_info" />
     <item android:id="@+id/quit"
-          android:title="Quit" />
+          android:title="@string/quit" />
     <item android:id="@+id/about"
-          android:title="About" />
+          android:title="@string/about" />
 </menu>

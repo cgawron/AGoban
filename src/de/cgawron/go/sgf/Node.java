@@ -1262,21 +1262,6 @@ public class Node
 	}
     }
 
-    /** Todo: Provide a way to set application name and version in a more flexible way
-     */
-    public void setDefaultRootProperties()
-    {
-	setFileFormat(4);
-	setGame(1);
-	setProperty(Property.APPLICATION, "AGoban");
-	//setProperty(Property.APPLICATION, "GoDiagram:" + GoDiagram.getVersion());
-
-	Charset defaultCharset = Charset.defaultCharset();
-	if (defaultCharset == null)
-	    defaultCharset = Charset.forName("UTF-8");
-	setProperty(Property.CHARACTER_SET, defaultCharset.name());
-    }
-
     public void setProperty(Property.Key key, Object newValue)
     {
 	assert newValue != null;

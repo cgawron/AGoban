@@ -119,13 +119,12 @@ public class EditSGF extends Activity
 
 	Log.d(TAG, "Uri: " + intent.getData());
 	if (intent.getData() == null) {
-	    Intent searchSGF = new Intent(Intent.ACTION_SEARCH, SGFProvider.CONTENT_URI, this, ChooseSGF.class);
-	    startActivity(searchSGF);
-	    finish();
+	    application.setData(application.getNewGameUri());
+	    application.setReadOnly(false);
 	}
-
-	application.setData(intent.getData());
-
+	else {
+	    application.setData(intent.getData());
+	}
 	gameTree = null;
     }
 
@@ -145,18 +144,25 @@ public class EditSGF extends Activity
 	super.onStart();
 	Log.d(TAG, "OnStart");
 
-	final Runnable afterLoaded = new Runnable() {
-		public void run() {
-		    gameTree = application.getGameTree(); 
-		    if (gameTree != null) {
-			gameTreeControls.setGameTree(gameTree);
-			getWindow().setTitle(gameTree.getGameName());
-			//seekBar.setMax(gameTree.getNoOfMoves());
+	Intent intent = getIntent();
+	if (intent.getData() == null || Intent.ACTION_INSERT.equals(intent.getAction())) {
+	    Log.d(TAG, "onStart: INSERT");
+	    setGameTree(new GameTree());
+	}
+	else
+	{
+	    Log.d(TAG, "onStart: EDIT");
+	    final Runnable afterLoaded = new Runnable() {
+		    public void run() {
+			gameTree = application.getGameTree(); 
+			if (gameTree != null) {
+			    setGameTree(gameTree);
+			}
 		    }
-		}
-	    };
-
-	application.loadSGF(this, afterLoaded, this);
+		};
+	    
+	    application.loadSGF(this, afterLoaded, this);
+	}
     }
 
     @Override
@@ -353,13 +359,24 @@ public class EditSGF extends Activity
     public void open() 
     {
 	Log.d(TAG, "open()");
+	Intent intent = new Intent(Intent.ACTION_SEARCH, SGFProvider.CONTENT_URI, this, ChooseSGF.class);
+	startActivity(intent);
+	finish();
     }
 
     public void newGame()
     {
-	Intent sgfIntent = new Intent(Intent.ACTION_EDIT, application.getNewGameUri());
+	Intent sgfIntent = new Intent(Intent.ACTION_INSERT, application.getNewGameUri());
 	startActivity(sgfIntent);
 	finish();
+    }
+
+    private void setGameTree(GameTree gameTree)
+    {
+	this.gameTree = gameTree;
+	application.setGameTree(gameTree);
+	gameTreeControls.setGameTree(gameTree);
+	getWindow().setTitle(gameTree.getGameName());
     }
 
     public void googleSync()

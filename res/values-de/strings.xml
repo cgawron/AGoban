@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">EditSGF</string>
+    <string name="AP">Anwendung</string>
+    <string name="PW">Weiß</string>
+    <string name="PB">Schwarz</string>
+    <string name="player">Spieler</string>
+    <string name="choose_file">Datei auswählen</string>
+    <string name="choose_variation">Variation auswählen</string>
+    <string name="open">Spiel öffnen</string>
+    <string name="save">Speichern</string>
+    <string name="about">Über AGoban</string>
+    <string name="quit">Beenden</string>
+    <string name="new_game">Neue Partie</string>
+    <string name="edit_preferences">Einstellungen</string>
+    <string name="google_sync">Google Sync</string>
+    <string name="game_info">Spielinformationen</string>
+</resources>

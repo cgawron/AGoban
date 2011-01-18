@@ -328,6 +328,5 @@ import de.cgawron.util.MiscEncodingReader;
       logger.severe(String.format("Illegal character: text=%s, line=%d, column %d, char=%d", 
 				  yytext(), yyline, getColumn(), yychar));
       return new Token(Symbols.error, yytext(), yyline, yychar, null);
-  //throw new ParseError("Illegal character <"+ yytext() + ">", this); 
    }
 

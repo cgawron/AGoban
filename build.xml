@@ -96,6 +96,7 @@
   <target name="cup">
     <cup srcfile="${source.absolute.dir}/de/cgawron/go/sgf/sgf.cup"
 	 destdir="${source.dir}/de/cgawron/go/sgf"
+	 package="de.cgawron.go.sgf"
 	 interface="true"
 	 parser="Parser"
 	 symbols="Symbols" />

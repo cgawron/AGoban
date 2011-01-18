@@ -7,4 +7,12 @@
     <string name="player">Player</string>
     <string name="choose_file">Choose file</string>
     <string name="choose_variation">Choose variation</string>
+    <string name="open">Open Game</string>
+    <string name="save">Save</string>
+    <string name="about">About</string>
+    <string name="quit">Quit</string>
+    <string name="new_game">New Game</string>
+    <string name="edit_preferences">Preferences</string>
+    <string name="google_sync">Google Sync</string>
+    <string name="game_info">Game Info</string>
 </resources>

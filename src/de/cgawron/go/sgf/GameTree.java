@@ -119,7 +119,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 	this.root = tree.root;
 
 	root.setGameTree(this);
-        root.setDefaultRootProperties();
+        //root.setDefaultRootProperties();
         setModified(false);
     }
 
@@ -132,22 +132,8 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 	    setRoot(new RootNode(root));
 
 	root.setGameTree(this);
-        root.setDefaultRootProperties();
+        //root.setDefaultRootProperties();
         setModified(false);
-
-	/*
-	if (root instanceof RootNode)
-	    init((RootNode) root);
-	else if (root instanceof CollectionRoot)
-	    init((CollectionRoot) root);
-	else if (root instanceof Sequence) {
-	    init((Sequence) root);
-	}
-	else {
-	    init(new RootNode(root));
-	    throw new RuntimeException("init: " + root);
-	}
-	*/
     }
 
     /**
