@@ -148,6 +148,7 @@ public class EditSGF extends Activity
 	if (intent.getData() == null || Intent.ACTION_INSERT.equals(intent.getAction())) {
 	    Log.d(TAG, "onStart: INSERT");
 	    setGameTree(new GameTree());
+	    application.initProperties(gameTree);
 	}
 	else
 	{

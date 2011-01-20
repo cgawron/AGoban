@@ -148,7 +148,7 @@ public class SGFApplication extends Application
      *   <li> FileFormat
      * </ul>
      */
-    protected void initProperties(GameTree gameTree)
+    public void initProperties(GameTree gameTree)
     {
 	Log.d(TAG, "initProperties");
 	Node root = gameTree.getRoot();

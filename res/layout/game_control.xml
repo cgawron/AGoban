@@ -3,41 +3,42 @@
     xmlns:android="http://schemas.android.com/apk/res/android"         
     xmlns:app="http://schemas.android.com/apk/res/de.cgawron.agoban"
     android:orientation="horizontal"
+    android:background="#f00"
     android:layout_width="fill_parent"
-    android:layout_height="40dip">
+    android:layout_height="wrap_content">
 
   <Button
-      android:id="@+id/prevNode"  
-      android:layout_height="match_parent"
-      android:layout_width="wrap_content"
-      android:text="prev"/>
-  <Button
       android:id="@+id/prevMarkup"  
-      android:layout_height="match_parent"
+      android:layout_height="wrap_content"
       android:layout_width="wrap_content"
-      android:text="prev"/>
+      android:background="@drawable/arrow_leftend"/>
+  <Button
+      android:id="@+id/prevNode"  
+      android:layout_height="wrap_content"
+      android:layout_width="wrap_content"
+      android:background="@drawable/arrow_left"/>
   <TextView
       android:id="@+id/moveNo"
-      android:layout_height="match_parent"
+      android:layout_height="wrap_content"
       android:layout_width="wrap_content"
       android:gravity="center"
       android:text=""/>
   <Spinner
       android:id="@+id/variations"
-      android:layout_height="match_parent"
+      android:layout_height="wrap_content"
       android:layout_width="wrap_content"
       android:prompt="@string/choose_variation"
       android:gravity="center" />
   <Button
-      android:id="@+id/nextMarkup"  
-      android:layout_height="match_parent"
-      android:layout_width="wrap_content"
-      android:text="next"/>
-  <Button
       android:id="@+id/nextNode"  
-      android:layout_height="match_parent"
+      android:layout_height="wrap_content"
       android:layout_width="wrap_content"
-      android:text="next"/>
+      android:background="@drawable/arrow_right"/>
+  <Button
+      android:id="@+id/nextMarkup"  
+      android:layout_height="wrap_content"
+      android:layout_width="wrap_content"
+      android:background="@drawable/arrow_rightend"/>
 
 </LinearLayout>
 
