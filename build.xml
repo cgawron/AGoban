@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="AGoban" default="help">
+<project name="AGoban" default="install">
 
   <!-- The local.properties file is created and updated by the 'android' tool.
   It contains the path to the SDK. It should *NOT* be checked in in Version
@@ -83,6 +83,10 @@
   <path id="tool.path">
     <pathelement path="tools/java-cup-11a.jar" />
     <pathelement path="tools/jflex/lib/JFlex.jar" />
+    <pathelement path="tools/RasterizerTask.jar" />
+    <fileset dir="tools/batik-1.7/lib">
+      <include name="*.jar"/>
+    </fileset>
   </path>
 
   <taskdef name="cup"
@@ -93,6 +97,10 @@
 	   classname="JFlex.anttask.JFlexTask"
 	   classpathref="tool.path" />
 
+  <taskdef name="rasterize" 
+	   classname="org.apache.tools.ant.taskdefs.optional.RasterizerTask"
+	   classpathref="tool.path" />
+  
   <target name="cup">
     <cup srcfile="${source.absolute.dir}/de/cgawron/go/sgf/sgf.cup"
 	 destdir="${source.dir}/de/cgawron/go/sgf"
@@ -106,6 +114,14 @@
     <jflex file="${source.absolute.dir}/de/cgawron/go/sgf/sgf.lex"
 	 destdir="${source.dir}"
 	 nobak="true" />
+  </target>
+
+  <target name="make-png">
+    <rasterize result="image/png" destdir="res/drawable-mdpi" classname="jaxp">
+      <fileset dir="svg/res">
+	<include name="*.svg"/>
+      </fileset>
+    </rasterize>
   </target>
 
 </project>
