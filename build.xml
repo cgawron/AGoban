@@ -89,31 +89,34 @@
     </fileset>
   </path>
 
-  <taskdef name="cup"
-	   classname="java_cup.anttask.CUPTask"
+  <taskdef name="jflex" 
+	   classname="JFlex.anttask.JFlexTask"
 	   classpathref="tool.path" />
 
-  <taskdef name="jflex"
-	   classname="JFlex.anttask.JFlexTask"
+  <taskdef name="cup" 
+	   classname="java_cup.anttask.CUPTask"
 	   classpathref="tool.path" />
 
   <taskdef name="rasterize" 
 	   classname="org.apache.tools.ant.taskdefs.optional.RasterizerTask"
 	   classpathref="tool.path" />
   
-  <target name="cup">
+  <target name="jflex" extensionOf="prepare">
+    <jflex file="${source.absolute.dir}/de/cgawron/go/sgf/sgf.lex"
+	 destdir="${source.dir}"
+	 nobak="true" />
+  </target>
+
+  <extension-point name="prepare"/>
+  <target name="-pre-compile" depends="prepare"/>
+
+  <target name="cup" extensionOf="prepare">
     <cup srcfile="${source.absolute.dir}/de/cgawron/go/sgf/sgf.cup"
 	 destdir="${source.dir}/de/cgawron/go/sgf"
 	 package="de.cgawron.go.sgf"
 	 interface="true"
 	 parser="Parser"
 	 symbols="Symbols" />
-  </target>
-
-  <target name="jflex">
-    <jflex file="${source.absolute.dir}/de/cgawron/go/sgf/sgf.lex"
-	 destdir="${source.dir}"
-	 nobak="true" />
   </target>
 
   <target name="make-png">
