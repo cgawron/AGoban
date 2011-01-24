@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
   <PreferenceScreen
-      android:key="first_preferencescreen"
+      android:key="general_preferencescreen"
+      android:title="General">
+    <EditTextPreference android:title="Your Name" android:key="name" android:defaultValue=""/>
+    <EditTextPreference android:title="Your Rank" android:key="rank" android:defaultValue="2d"/>
+  </PreferenceScreen>
+  <PreferenceScreen
+      android:key="appearance_preferencescreen"
       android:title="Appearance">
     <CheckBoxPreference android:title="Sort variations by tree depth" android:key="sortVariations" android:defaultValue="true"/>
   </PreferenceScreen>
   <PreferenceScreen
-      android:key="second_preferencescreen"
+      android:key="sync_preferencescreen"
       android:title="Sync settings">
     <CheckBoxPreference android:title="Enable Google sync" android:key="doSync" android:defaultValue="false"/>
     <de.cgawron.agoban.sync.AccountPreference android:title="Google Docs account" android:key="accountName" />

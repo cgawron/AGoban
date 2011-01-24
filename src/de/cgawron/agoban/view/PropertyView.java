@@ -33,8 +33,11 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
@@ -51,12 +54,12 @@ import de.cgawron.go.sgf.Value;
  * A {@link View} to be used for {@link de.cgawron.go.Goban} 
  *
  */
-public class PropertyView extends TableRow implements TextWatcher
+public class PropertyView extends EditText implements TextWatcher
 {
+    private static String TAG = "PropertyView";
+    private PropertyList properties;
     private GameInfo property;
 
-    private TextView label;
-    private TextView text;
     private String key;
     private String valueText = "";
 
@@ -71,31 +74,20 @@ public class PropertyView extends TableRow implements TextWatcher
     {
         super(context, attrs);
 	key = attrs.getAttributeValue("http://cgawron", "property");
+	addTextChangedListener(this);
+    }
 
+    @Override
+    protected void onAttachedToWindow()
+    {
+	super.onAttachedToWindow();
+	Context context = getContext();
 	SGFApplication application = (SGFApplication) context.getApplicationContext();
-	init(context);
 
 	//TODO: Rethink initialization
 	if (application.getGameTree() != null) {
 	    setPropertyList(application.getGameTree().getRoot());
 	}
-
-	String labelText = "";
-	int labelId = attrs.getAttributeResourceValue("http://cgawron", "label", 0);
-	if (labelId > 0)
-	    labelText = context.getResources().getString(labelId);
-	label.setText(labelText);
-    }
-
-    protected void init(Context context)
-    {
-	TableRow.LayoutParams params = new TableRow.LayoutParams(1);
-	label = new TextView(context);
-	text = new EditText(context);
-	label.setPadding(0, 0, 5, 0);
-	addView(label);
-	addView(text, params);
-	text.addTextChangedListener(this);
     }
 
     protected void initText() 
@@ -106,7 +98,7 @@ public class PropertyView extends TableRow implements TextWatcher
 		valueText = value.toString();
 	}
 	    
-	text.setText(valueText);
+	setText(valueText);
     }
 
     /**
@@ -114,27 +106,28 @@ public class PropertyView extends TableRow implements TextWatcher
      * @param text The text to display. This will be drawn as one line.
      */
     public void setPropertyList(PropertyList properties) {
+	this.properties = properties;
 	if (this.key != null) {
 	    Property.Key key = new Property.Key(this.key);
 	    property = (GameInfo) properties.get(key); 
-	    Log.d("PropertyView", "property: " + property); 
+	    Log.d(TAG, "property: " + property); 
 	    
 	    if (property == null) {
 		Property prop = Property.createProperty(key);
-		Log.d("PropertyView", "new property class for key " + this.key + ": " + prop.getClass()); 
+		Log.d(TAG, "new property for key " + this.key + ": " + prop.getClass()); 
 		property = (GameInfo) prop;
 		properties.add(property);
 	    }
 	}
 	
-	Log.d("PropertyView", "setPropertyList: " + properties); 
+	Log.d(TAG, "setPropertyList: " + properties); 
 	initText();
     }
 
     public void setValue(String value)
     {
 	valueText = value;
-	text.setText(valueText);
+	setText(valueText);
     }
 
     public void setValue(ContentValues values)
@@ -142,12 +135,12 @@ public class PropertyView extends TableRow implements TextWatcher
 	valueText = values.get(key).toString();
 	if (valueText == null)
 	    valueText= "";
-	text.setText(valueText);
+	setText(valueText);
     }
 
     public void setValue(Cursor cursor, int position)
     {
-	Log.d("PropertyView", String.format("setValue(%s, %d)", cursor, position));
+	Log.d(TAG, String.format("setValue(%s, %d)", cursor, position));
 	int oldPosition = cursor.getPosition();
 	cursor.moveToPosition(position);
 	valueText = cursor.getString(cursor.getColumnIndex(key));
@@ -155,16 +148,21 @@ public class PropertyView extends TableRow implements TextWatcher
 	
 	if (valueText == null)
 	    valueText= "";
-	text.setText(valueText);
+	setText(valueText);
     }
 
     public void afterTextChanged(android.text.Editable s)
     {
-	Log.d("PropertyView", "afterTextChanged: " + s);
+	Log.d(TAG, "afterTextChanged: " + s);
+	if (property == null) {
+	}
+
 	if (property != null) {
-	    Log.d("PropertyView", "setting property " + key + " to " + s);
+	    Log.d(TAG, "setting property " + key + " to " + s);
 	    property.setValue(s.toString());
 	}
+
+	Log.d(TAG, "after Text: " + properties);
     }
 
     public void beforeTextChanged(CharSequence s, int start, int count, int after)

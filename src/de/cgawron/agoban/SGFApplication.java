@@ -21,10 +21,13 @@ import android.app.Application;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.pm.PackageItemInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -42,6 +45,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.Calendar;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.UUID;
@@ -54,6 +58,13 @@ public class SGFApplication extends Application
 {
     private static final String TAG  = "SGFApplication";
     public  static final String PREF = "AGoban";
+    public static String KEY_DEFAULT = "default";
+
+    private GameTree gameTree;
+    private Uri data;
+    private boolean readOnly = true;
+    private Map<Uri, GameTree> gameMap = new WeakHashMap<Uri, GameTree>();
+    String gitId;
 
     public interface ExceptionHandler {
 	public void handleException(String message, Throwable t);
@@ -68,16 +79,25 @@ public class SGFApplication extends Application
 	}
     }
 
-    public static String KEY_DEFAULT = "default";
-
-    private GameTree gameTree;
-    private Uri data;
-    private boolean readOnly = true;
-    private Map<Uri, GameTree> gameMap = new WeakHashMap<Uri, GameTree>();
-
     public SGFApplication()
     {
 	super();
+    }
+
+    @Override
+    public void onCreate()
+    {
+	super.onCreate();
+	try {
+	    PackageItemInfo info = getPackageManager().getActivityInfo(new ComponentName(this, EditSGF.class), 
+								       PackageManager.GET_META_DATA);
+	    gitId = info.metaData.getString("git-id");
+	}
+	catch (Exception e)
+	{
+	    throw new RuntimeException("git-id", e);
+	}
+	Log.d(TAG, "git-id: " + gitId);
     }
 
     /**
@@ -130,10 +150,12 @@ public class SGFApplication extends Application
 		    loadedCB.run();
 	    }
 	}
+	/*
 	else {
 	    gameTree = new GameTree(); 
 	    initProperties(gameTree);
 	}
+	*/
     }
 
     /**
@@ -155,14 +177,14 @@ public class SGFApplication extends Application
 
 	root.setFileFormat(4);
 	root.setGame(1);
-	root.setProperty(Property.APPLICATION, "AGoban");
-	//setProperty(Property.APPLICATION, "GoDiagram:" + GoDiagram.getVersion());
+	root.setProperty(Property.APPLICATION, "AGoban:" + gitId);
 
 	Charset defaultCharset = Charset.defaultCharset();
 	if (defaultCharset == null)
 	    defaultCharset = Charset.forName("UTF-8");
 	root.setProperty(Property.CHARACTER_SET, defaultCharset.name());
 
+	root.setProperty(Property.DATE, String.format("%1$tY-%1$tm-%1$td", Calendar.getInstance()));
     }
 
     public GameTree getGameTree()
@@ -173,6 +195,7 @@ public class SGFApplication extends Application
     public void setGameTree(GameTree gameTree)
     {
 	this.gameTree = gameTree;
+	gameMap.put(data, gameTree);
     }
 
     public Uri getNewGameUri()
@@ -211,7 +234,7 @@ public class SGFApplication extends Application
     {
 	if (gameTree == null)
 	    return;
-	if (!gameTree.isModified()) {
+	if (false && !gameTree.isModified()) {
 	    Log.i(TAG, "not saving unmodified GameTree");
 	    return;
 	}

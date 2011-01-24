@@ -25,14 +25,11 @@ import java.util.HashMap;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageItemInfo;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
@@ -69,7 +66,8 @@ import de.cgawron.go.sgf.Value;
 public class EditSGF extends Activity 
     implements GobanEventListener, GameTreeNavigationListener, SGFApplication.ExceptionHandler
 {
-    private static String TAG = "EditSGF";
+    private static final String TAG = "EditSGF";
+    private static final String KEY_URI = "URI";
 
     public static Resources resources;
 
@@ -79,7 +77,6 @@ public class EditSGF extends Activity
     private GameTreeControls gameTreeControls;
     private Node currentNode;
     private Map<Point, Node> variations = new HashMap<Point, Node>();
-    private String gitId;
     private SGFApplication application;
     private SharedPreferences settings; 
 
@@ -88,43 +85,32 @@ public class EditSGF extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+	Log.d(TAG, "oncreate: " + savedInstanceState);
 	application = (SGFApplication) getApplication();
 	resources = getResources();
 	settings = getSharedPreferences(SGFApplication.PREF, 0);
-	try {
-	    PackageItemInfo info = getPackageManager().getActivityInfo(new ComponentName(this, EditSGF.class), 
-								       PackageManager.GET_META_DATA);
-	    gitId = info.metaData.getString("git-id");
-	}
-	catch (Exception e)
-	{
-	    throw new RuntimeException("git-id", e);
-	}
-	Log.d(TAG, "git-id: " + gitId);
-
 	setContentView(R.layout.main);
 
 	gobanView = (GobanView) findViewById(R.id.goban);
 	gobanView.addGobanEventListener(this);
 	registerForContextMenu(gobanView);
 
-	commentView = (TextView) findViewById(R.id.comment);
+	//commentView = (TextView) findViewById(R.id.comment);
 
 	gameTreeControls = (GameTreeControls) findViewById(R.id.controls);
 	gameTreeControls.addGameTreeNavigationListener(this);
 	
+	Uri savedUri = null;
+	if (savedInstanceState != null) {
+	    savedUri = savedInstanceState.getParcelable(KEY_URI);
+	}
+
 	Intent intent = getIntent();
+	if (intent.getData() == null)
+	    intent.setData(savedUri);
 	if (Intent.ACTION_EDIT.equals(intent.getAction()))
 	    application.setReadOnly(false);
 
-	Log.d(TAG, "Uri: " + intent.getData());
-	if (intent.getData() == null) {
-	    application.setData(application.getNewGameUri());
-	    application.setReadOnly(false);
-	}
-	else {
-	    application.setData(intent.getData());
-	}
 	gameTree = null;
     }
 
@@ -145,14 +131,19 @@ public class EditSGF extends Activity
 	Log.d(TAG, "OnStart");
 
 	Intent intent = getIntent();
+	Log.d(TAG, "Uri: " + intent.getData());
 	if (intent.getData() == null || Intent.ACTION_INSERT.equals(intent.getAction())) {
-	    Log.d(TAG, "onStart: INSERT");
+	    Uri data = application.getNewGameUri();
+	    application.setData(data);
+	    application.setReadOnly(false);
+	    intent.setData(data);
 	    setGameTree(new GameTree());
 	    application.initProperties(gameTree);
 	}
 	else
 	{
 	    Log.d(TAG, "onStart: EDIT");
+	    application.setData(intent.getData());
 	    final Runnable afterLoaded = new Runnable() {
 		    public void run() {
 			gameTree = application.getGameTree(); 
@@ -202,7 +193,7 @@ public class EditSGF extends Activity
 
 	case R.id.about:
 	    Context context = getApplicationContext();
-	    CharSequence text = String.format("AGoban, (c)2010 Christian Gawron\nGit-Id: %s", gitId);
+	    CharSequence text = String.format("AGoban, (c)2010 Christian Gawron\nGit-Id: %s", application.gitId);
 	    int duration = Toast.LENGTH_LONG;
 	    Toast toast = Toast.makeText(context, text, duration);
 	    toast.show();
@@ -262,6 +253,21 @@ public class EditSGF extends Activity
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) 
+    {
+	super.onSaveInstanceState(outState);
+	outState.putParcelable(KEY_URI, application.getData());
+	Log.d(TAG, "onSaveInstanceState: " + outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState (Bundle savedState)
+    {
+	Log.d(TAG, "onRestoreInstanceState: " + savedState);
+	super.onRestoreInstanceState(savedState);
+    }
+
+    @Override
     protected void onResume() {
        super.onResume();
        Log.i(TAG, "onResume");
@@ -313,7 +319,7 @@ public class EditSGF extends Activity
 		
 		doMarkup(gobanView, currentNode);
 		gobanView.setGoban(goban);
-		commentView.setText(currentNode.getComment());
+		//commentView.setText(currentNode.getComment());
 	    }
 	    gameTreeControls.setCurrentNode(node);
 	}

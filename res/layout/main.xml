@@ -29,6 +29,7 @@
 	android:layout_gravity="center_horizontal"/>
   </LinearLayout>
 
+  <!--
   <SlidingDrawer
       android:id="@+id/drawerComment"
       android:layout_width="match_parent"
@@ -128,6 +129,7 @@
       </LinearLayout>
     </TabHost>
   </SlidingDrawer>
-  
+  -->
+
 </RelativeLayout>
 

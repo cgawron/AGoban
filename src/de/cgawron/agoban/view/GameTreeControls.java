@@ -23,6 +23,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -67,6 +69,53 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
     {
 	public void setCurrentNode(Node node);
 
+    }
+
+    public class SavedState extends View.BaseSavedState
+    {
+	private int nodeId;
+	
+	private SavedState(Parcel in) 
+	{
+	    super(in);
+	    nodeId = in.readInt();
+	}
+
+	public SavedState(Parcelable superState, Node n) 
+	{
+	    super(superState);
+	    nodeId = n.getId();
+	}
+	
+	@Override
+	public void writeToParcel(Parcel out, int flags) 
+	{
+	    out.writeInt(nodeId);
+	}
+
+	@Override
+	public String toString()
+	{
+	    return "GameTreeControls.SavedState " + nodeId;
+	}
+
+	/*	
+	public static final Parcelable.Creator<SavedState> CREATOR
+	    = new Parcelable.Creator<SavedState>() {
+	    public SavedState createFromParcel(Parcel in) {
+		return new SavedState(in);
+	    }
+	    
+	    public SavedState[] newArray(int size) {
+		return new SavedState[size];
+	    }
+	};
+	*/
+
+	public Node getNode(GameTree gameTree)
+	{
+	    return gameTree.getNode(nodeId);
+	}
     }
 
     private class VariationAdapter extends BaseAdapter implements GameTreeNavigationListener 
@@ -249,5 +298,22 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
     public void prevMarkupNode() 
     {
 	throw new RuntimeException("Not yet implemented");
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState()
+    {
+	Parcelable state = super.onSaveInstanceState();
+	state = new SavedState(state, currentNode);
+	Log.d(TAG, "onSaveInstanceState: " + state);
+	return state;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state)
+    {
+	Node node = ((SavedState) state).getNode(gameTree);
+	Log.d(TAG, "onRestoreInstanceState: " + state + "->" + node);
+	setCurrentNode(node);
     }
 }

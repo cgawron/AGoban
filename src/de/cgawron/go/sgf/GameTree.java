@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2010 Christian Gawron
  *
@@ -53,6 +54,7 @@ import de.cgawron.go.Goban;
 import de.cgawron.go.SimpleGoban;
 import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Symmetry;
+import de.cgawron.go.sgf.TreeIterator.DepthFirstIterator;
 import de.cgawron.util.Memento;
 import de.cgawron.util.MementoOriginator;
 import de.cgawron.util.MiscEncodingReader;
@@ -603,6 +605,23 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 	    return getRoot();
 	else
 	    throw new Exception("node specification " + nodeSpec + " not recognized");
+    }
+
+    /**
+     * Get the node with the specified id.
+     * @param id The node id to search.
+     * @return the specified node or null if the id is not found
+     */
+    public Node getNode(int id)
+    {
+	Iterator<Node> it = new DepthFirstIterator<Node>(getRoot());
+	Node n;
+	while (it.hasNext()) {
+	    n = it.next();
+	    if (n.getId() == id)
+		return n;
+	}
+	return null;
     }
     
     public String getGameName()
