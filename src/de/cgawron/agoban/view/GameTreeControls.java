@@ -304,6 +304,8 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
     protected Parcelable onSaveInstanceState()
     {
 	Parcelable state = super.onSaveInstanceState();
+	Log.d(TAG, "onSaveInstanceState: superState class: " + state.getClass());
+	
 	state = new SavedState(state, currentNode);
 	Log.d(TAG, "onSaveInstanceState: " + state);
 	return state;
@@ -312,8 +314,10 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
     @Override
     protected void onRestoreInstanceState(Parcelable state)
     {
-	Node node = ((SavedState) state).getNode(gameTree);
-	Log.d(TAG, "onRestoreInstanceState: " + state + "->" + node);
+	Log.d(TAG, "onRestoreInstanceState: " + state + " " + state.getClass());
+	SavedState saved = (SavedState) state;
+	super.onRestoreInstanceState(saved.getSuperState());
+	Node node = saved.getNode(gameTree);
 	setCurrentNode(node);
     }
 }

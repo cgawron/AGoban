@@ -17,6 +17,7 @@
 package de.cgawron.agoban.view;
 
 import android.content.res.Resources;
+import android.graphics.PointF;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -28,7 +29,7 @@ import demo.MultiTouchController;
 
 public class GobanEventHandler extends MultiTouchController<Object> implements View.OnLongClickListener, View.OnTouchListener
 {
-    private static int MIN_STILL_TIME = 100;
+    private static int MIN_STILL_TIME = 10;
 
     private GobanView gobanView;
     private long time;
@@ -49,6 +50,8 @@ public class GobanEventHandler extends MultiTouchController<Object> implements V
 
 	    switch (event.getAction()) {
 	    case MotionEvent.ACTION_UP: 
+		gobanView.setBlowup(gobanEvent);
+		gobanView.setCursorPosition(null);
 		if (armed && event.getEventTime() - time > MIN_STILL_TIME) {
 		    gobanView.fireGobanEvent(gobanEvent);
 		}
@@ -57,12 +60,15 @@ public class GobanEventHandler extends MultiTouchController<Object> implements V
 	    case MotionEvent.ACTION_DOWN: 
 		time = event.getEventTime();
 		armed = true;
-		gobanView.setSelection(gobanEvent.getPoint());
+		gobanView.setBlowup(gobanEvent);
+		gobanView.setCursorPosition(gobanEvent.getPointF());
 		return true;
 
+	    case MotionEvent.ACTION_MOVE: 
+		gobanView.setBlowup(gobanEvent);
 	    default:
 		time = event.getEventTime();
-		gobanView.setSelection(gobanEvent.getPoint());
+		gobanView.setCursorPosition(gobanEvent.getPointF());
 		break;
 	    }
 	    return true;
@@ -73,11 +79,16 @@ public class GobanEventHandler extends MultiTouchController<Object> implements V
     public boolean onTrackballEvent(MotionEvent event) 
     {
 	Log.d("GobanEventHandler", "onTrackballEvent: " + event);
-	Point p = gobanView.getSelection();
-	if (p == null) p = new Point(9, 9);
+	PointF pF = gobanView.getCursorPosition();
+	Point p;
+	if (pF == null) 
+	    p = new Point(9, 9);
+	else 
+	    p = new Point((int) pF.x, (int) pF.y);
 	
 	switch (event.getAction()) {
 	case MotionEvent.ACTION_UP: 
+	    gobanView.setCursorPosition(null);
 	    if (event.getEventTime() - time > MIN_STILL_TIME) {
 		GobanEvent gobanEvent = new GobanEvent(gobanView, p);
 		Log.d("GobanEventHandler", "gobanEvent: " + gobanEvent);
@@ -105,7 +116,7 @@ public class GobanEventHandler extends MultiTouchController<Object> implements V
 	    time = event.getEventTime();
 	    GobanEvent gobanEvent = new GobanEvent(gobanView, p);
 	    Log.d("GobanEventHandler", "gobanEvent: " + gobanEvent);
-	    gobanView.setSelection(gobanEvent.getPoint());
+	    gobanView.setCursorPosition(gobanEvent.getPointF());
 	    break;
 	}
 

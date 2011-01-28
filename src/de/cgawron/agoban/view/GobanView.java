@@ -22,9 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PointF;
 import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -34,6 +39,7 @@ import android.view.View;
 import de.cgawron.agoban.GobanEvent;
 import de.cgawron.agoban.GobanEventListener;
 import de.cgawron.agoban.R;
+import de.cgawron.agoban.SGFApplication;
 import de.cgawron.go.Goban;
 import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
@@ -55,25 +61,44 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
     private Goban goban;
     private GobanRenderer renderer;
     private final List<GobanEventListener> listeners = new ArrayList<GobanEventListener>();
+    private SharedPreferences settings; 
     private GobanEventHandler gobanEventHandler ;
-    private Point selection;
+    private PointF cursorPosition;
+    private Tool tool;
     private List<GobanRenderer.Markup> markupList = new ArrayList<GobanRenderer.Markup>();
 
     private final float xOff = 0.0f, yOff = 0.0f, relativeScale = 1.0f;
+    private RectF blowup;
+    private float blowupScale;
+    private float blowupWidth;
+    
+    /**
+     * This interface represents an abstract "tool" for a Goban which can implement
+     * functions like moving, adding a stone, etc.
+     */
+    public interface Tool
+    {
+	/** 
+	 * Get a {@code Drawable} for the cursor. 
+	 * 
+	 */
+	Drawable getCursor();
+	void onGobanEvent(GobanEvent event);
+    }
 
     public class GobanContextMenuInfo implements ContextMenuInfo
     {
-	public Point point;
+	public PointF pointF;
  
-	GobanContextMenuInfo(Point point)
+	GobanContextMenuInfo(PointF pointF)
 	{
-	    this.point = point;
+	    this.pointF = pointF;
 	}
 	
 	@Override
 	public String toString() 
 	{
-	    return String.format("GobanContextMenuInfo(%s)", point);
+	    return String.format("GobanContextMenuInfo(%s)", pointF);
 	}
     }
     
@@ -84,6 +109,7 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
      */
     public GobanView(Context context) {
         super(context);
+	settings = context.getSharedPreferences(SGFApplication.PREF, 0);
 	//mOrientationListener = new MyOrientationEventListener(context);
         initGobanView();
     }
@@ -98,6 +124,7 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
     public GobanView(Context context, AttributeSet attrs) 
     {
         super(context, attrs);
+	settings = context.getSharedPreferences(SGFApplication.PREF, 0);
         initGobanView();
 
         TypedArray a = context.obtainStyledAttributes(attrs,
@@ -108,6 +135,20 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
         //setTextColor(a.getColor(R.styleable.GobanView_textColor, 0xFF000000));
 
         a.recycle();
+    }
+
+    private final void initGobanView() 
+    {
+	blowupScale = settings.getFloat("blowupScale", 4f);
+	blowupWidth = settings.getFloat("blowupWidth", 8.5f);
+
+	// Create Event handler
+	gobanEventHandler = new GobanEventHandler(this, getResources());
+	setOnTouchListener(gobanEventHandler);
+	//setOnClickListener(gobanEventHandler);
+	setOnLongClickListener(gobanEventHandler);
+
+	renderer = new GobanRenderer(this);
     }
 
     public void addMarkup(Goban goban, Markup property)
@@ -158,17 +199,6 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
 	return markupList;
     }
 
-    private final void initGobanView() 
-    {
-	// Create Event handler
-	gobanEventHandler = new GobanEventHandler(this, getResources());
-	setOnTouchListener(gobanEventHandler);
-	//setOnClickListener(gobanEventHandler);
-	setOnLongClickListener(gobanEventHandler);
-
-	renderer = new GobanRenderer(this);
-    }
-
     /**
      * Sets the text to display in this label
      * @param text The text to display. This will be drawn as one line.
@@ -195,7 +225,6 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
 
     /**
      * Render the Goban
-     * 
      * @see android.view.View#onDraw(android.graphics.Canvas)
      */
     @Override
@@ -207,15 +236,80 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
 	Log.d("Goban", "onDraw, clip=" + clip);
 
 	if (goban == null) return;
-	int size = goban.getBoardSize();
+	float size = goban.getBoardSize();
 	int width = getWidth();
 	int height = getHeight();
 	float min = width < height ? width : height;
 	Log.d("Goban", "onDraw " + min);
 
 	canvas.scale(min / size, min / size);
-	canvas.translate(-0.5f, -0.5f);
+	canvas.translate(0.5f, 0.5f);
 	renderer.render(goban, canvas);
+	
+	Drawable cursor = null;
+	if (tool != null) {
+	    cursor = tool.getCursor();
+	    cursor.setBounds(-2, -2, 2, 2);
+	}
+
+	// draw blowup
+	if (blowup != null) {
+	    float xm = blowup.left + blowupWidth;
+	    float ym = blowup.top + blowupWidth;
+	    canvas.saveLayerAlpha(blowup, 240, Canvas.ALL_SAVE_FLAG);
+	    canvas.translate(-(blowupScale-1)*xm, -(blowupScale-1)*ym);
+	    canvas.scale(blowupScale, blowupScale);
+	    renderer.render(goban, canvas);
+	    if (cursorPosition != null && cursor != null) {
+		canvas.save();
+		canvas.translate(cursorPosition.x-0.5f, cursorPosition.y-0.5f);
+		cursor.draw(canvas);
+		canvas.restore();
+	    }
+	    canvas.restore();
+
+	    Paint paint = new Paint();
+	    paint.setARGB(200, 255, 0, 0);
+	    paint.setStyle(Paint.Style.STROKE);
+	    canvas.drawRect(blowup, paint);
+	}
+	else if (cursorPosition != null && cursor != null) {
+	    canvas.save();
+	    canvas.translate(cursorPosition.x - 1f, cursorPosition.y - 1f);
+	    cursor.draw(canvas);
+	    canvas.restore();
+	}
+    }
+
+    public void setBlowup(GobanEvent event)
+    {
+	Log.d(TAG, "setBlowup: " + event);
+	MotionEvent me = event.getBaseEvent();
+	switch (me.getAction()) {
+	case MotionEvent.ACTION_UP:
+	    blowup = null;
+	    invalidate();
+	    break;
+	case MotionEvent.ACTION_MOVE:
+	case MotionEvent.ACTION_DOWN:
+	    float width = getWidth();
+	    float height = getHeight();
+	    float min = width < height ? width : height;
+	    float size = getBoardSize();
+	
+	    float bx = size*me.getX()/width - 0.5f;
+	    float by = size*me.getY()/height - 0.5f;
+	    if (bx > size-0.5f) bx = size-0.5f;
+	    else if (bx < -0.5f) bx = -0.5f;
+	    if (by > size-0.5f) by = size-0.5f;
+	    else if (by < -0.5) by = -0.5f;
+	    
+	    //float xm = bx * (size - 10) / size; 
+	    //float ym = by * (size - 10) / size; 
+	    blowup = new RectF(bx - blowupWidth, by - blowupWidth, 
+			       bx + blowupWidth, by + blowupWidth);
+	    invalidate();
+	}
     }
 
     @Override
@@ -244,13 +338,14 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
 	int width = getWidth();
 	int height = getHeight();
 	int size = goban.getBoardSize();
-	Log.d("Goban", String.format("selectObject: %f(%d), %f(%d) obj=%s", pt.getX(), width, pt.getY(), height, (obj == null ? "null" : obj.toString())));
+	Log.d("Goban", String.format("selectObject: %f(%d), %f(%d) obj=%s", pt.getX(), width, pt.getY(), 
+				     height, (obj == null ? "null" : obj.toString())));
 	
-	int bx = (int) (size*pt.getX()/width);
-	int by = (int) (size*pt.getY()/height);
-	Log.d("Goban", String.format("selectObject: (%d, %d)", bx, by));
+	float bx = size*pt.getX()/width;
+	float by = size*pt.getY()/height;
+	Log.d("Goban", String.format("selectObject: (%f, %f)", bx, by));
 	
-	setSelection(new Point(bx, by));
+	setCursorPosition(new PointF(bx, by));
 	//invalidate(bx, by, bx+1, by+1);
 	invalidate();
     }
@@ -275,34 +370,30 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
 
     public void fireGobanEvent(GobanEvent gobanEvent) 
     {
+	if (tool != null)
+	    tool.onGobanEvent(gobanEvent);
 	for (GobanEventListener listener : listeners) {
 	    listener.onGobanEvent(gobanEvent);
 	}
     }
-
-    public boolean isSelected(int i, int j)
-    {
-	if (selection == null)
-	    return false;
-	else
-	    return selection.equals(i, j);
-    }
-
-    public Point getSelection()
-    {
-	return selection;
-    }
-
-    public void setSelection(Point point)
-    {
-	Log.d("Goban", "setSelection: " + point);
-	selection = point;
-	invalidate();
-    }
     
+    public void setCursorPosition(PointF point)
+    {
+	cursorPosition = point;
+    }
+
+    public PointF getCursorPosition()
+    {
+	return cursorPosition;
+    }
+
     public ContextMenuInfo getContextMenuInfo()
     {
-	return new GobanContextMenuInfo(selection);
+	return new GobanContextMenuInfo(cursorPosition);
     }
 
+    public void setTool(Tool tool)
+    {
+	this.tool = tool;
+    }
 }

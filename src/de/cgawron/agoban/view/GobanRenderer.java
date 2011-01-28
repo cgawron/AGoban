@@ -80,7 +80,7 @@ public class GobanRenderer
 	    paint.setStrokeWidth(SELECTION_STROKEWIDTH);
 	    paint.setColor(VARIATION_COLOR);
 	    paint.setStyle(Paint.Style.FILL);
-	    canvas.drawCircle(x+1f, y+1f, STONE_RADIUS, paint);
+	    canvas.drawCircle(x, y, STONE_RADIUS, paint);
 	}
     }
 
@@ -108,11 +108,11 @@ public class GobanRenderer
 	    switch (stone) {
 	    case BLACK:
 		paint.setARGB(255, 255, 255, 255);
-		canvas.drawCircle(x+1f, y+1f, HIGHLIGHT_RADIUS, paint);
+		canvas.drawCircle(x, y, HIGHLIGHT_RADIUS, paint);
 		break;
 	    case WHITE:
 		paint.setARGB(255, 0, 0, 0);
-		canvas.drawCircle(x+1f, y+1f, HIGHLIGHT_RADIUS, paint);
+		canvas.drawCircle(x, y, HIGHLIGHT_RADIUS, paint);
 		break;
 	    default:
 		break;
@@ -161,43 +161,43 @@ public class GobanRenderer
 	    case TRIANGLE:
 		Log.d(TAG, String.format("SGFMarkup: draw %s@%s", type, point));
 		path = new Path();
-		path.moveTo(x + 1f, y + 1f - MARKUP_RADIUS);
-		path.lineTo(x + 1f + MARKUP_RADIUS*COS30, y + 1f + MARKUP_RADIUS*SIN30);
-		path.lineTo(x + 1f - MARKUP_RADIUS*COS30, y + 1f + MARKUP_RADIUS*SIN30);
+		path.moveTo(x, y - MARKUP_RADIUS);
+		path.lineTo(x + MARKUP_RADIUS*COS30, y + MARKUP_RADIUS*SIN30);
+		path.lineTo(x - MARKUP_RADIUS*COS30, y + MARKUP_RADIUS*SIN30);
 		path.close();
 		break;
 	    case SQUARE:
 		Log.d(TAG, String.format("SGFMarkup: draw %s@%s", type, point));
 		path = new Path();
-		path.moveTo(x + 1f + d, y + 1f + d);
-		path.lineTo(x + 1f + d, y + 1f - d);
-		path.lineTo(x + 1f - d, y + 1f - d);
-		path.lineTo(x + 1f - d, y + 1f + d);
+		path.moveTo(x + d, y + d);
+		path.lineTo(x + d, y - d);
+		path.lineTo(x - d, y - d);
+		path.lineTo(x - d, y + d);
 		path.close();
 		break;
 	    case MARK:
 		Log.d(TAG, String.format("SGFMarkup: draw %s@%s", type, point));
 		path = new Path();
-		path.moveTo(x + 1f + d, y + 1f + d);
-		path.lineTo(x + 1f - d, y + 1f - d);
-		path.moveTo(x + 1f + d, y + 1f - d);
-		path.lineTo(x + 1f - d, y + 1f + d);
+		path.moveTo(x + d, y + d);
+		path.lineTo(x - d, y - d);
+		path.moveTo(x + d, y - d);
+		path.lineTo(x - d, y + d);
 		path.close();
 		break;
 	    case CIRCLE:
 		Log.d(TAG, String.format("SGFMarkup: draw %s@%s", type, point));
 		path = new Path();
-		path.addCircle(x + 1f, y + 1f, 0.25f, Path.Direction.CW);
+		path.addCircle(x , y, 0.25f, Path.Direction.CW);
 		break;
 	    case TERRITORY_BLACK:
 		paint.setARGB(196, 0, 0, 0);
 		paint.setStyle(Paint.Style.FILL_AND_STROKE);
-		canvas.drawCircle(x+1f, y+1f, 0.25f, paint);
+		canvas.drawCircle(x, y, 0.25f, paint);
 		break;
 	    case TERRITORY_WHITE:
 		paint.setARGB(196, 255, 255, 255);
 		paint.setStyle(Paint.Style.FILL_AND_STROKE);
-		canvas.drawCircle(x+1f, y+1f, 0.25f, paint);
+		canvas.drawCircle(x, y, 0.25f, paint);
 		break;
 	    default:
 		Log.e(TAG, String.format("SGFMarkup: draw %s@%s (not implemented)", type, point));
@@ -251,13 +251,13 @@ public class GobanRenderer
 		
 	    case EMPTY:
 		paint.setARGB(255, 255, 255, 10);
-		canvas.drawCircle(x+1f, y+1f, 0.5f, paint);
+		canvas.drawCircle(x, y, 0.5f, paint);
 		// fall through
 	    case WHITE:
 		paint.setARGB(255, 0, 0, 0);
 		break;
 	    }
-	    canvas.drawText(text, x+1f, y+1.25f, paint);
+	    canvas.drawText(text, x, y+1.25f, paint);
 	}
     }
 
@@ -272,13 +272,13 @@ public class GobanRenderer
 	int size = goban.getBoardSize();
 
 	paint.setARGB(255, 255, 255, 10);
-	canvas.drawRect(0.5f, 0.5f, size+0.5f, size+0.5f, paint);
+	canvas.drawRect(-0.5f, -0.5f, size-0.5f, size-0.5f, paint);
 	paint.setARGB(255, 0, 0, 0);
 	paint.setStrokeWidth(BOARD_STROKEWIDTH);
 	paint.setStyle(Paint.Style.STROKE);
-	for (int i=1; i<=size; i++) {
-	    canvas.drawLine(1, i, size, i, paint);
-	    canvas.drawLine(i, 1, i, size, paint);
+	for (int i=0; i<size; i++) {
+	    canvas.drawLine(0, i, size-1, i, paint);
+	    canvas.drawLine(i, 0, i, size-1, paint);
 	}
 
 	drawHoshi(size, canvas, paint);
@@ -299,16 +299,6 @@ public class GobanRenderer
 		    case EMPTY:
 			break;
 		    }
-		    /*
-		    if (markup != null) {
-			Log.d(TAG, String.format("markup: (%d, %d) -> %s (%s)", i, j, markup.toString(), markup.getClass().getName()));
-			if (markup instanceof MarkupModel.Text) {
-			    drawText(i, j, stone, markup.toString(), canvas);
-			}
-		    }
-		    */
-		    if (view.isSelected(i, j))
-			drawSelection(i, j, canvas);
 		}
 	    }
 	    for (Markup markup : view.getMarkup()) {
@@ -328,15 +318,15 @@ public class GobanRenderer
 	case BLACK:
 	    paint.setARGB(255, 0, 0, 0);
 	    paint.setStyle(Paint.Style.FILL_AND_STROKE);
-	    canvas.drawCircle(i+1f, j+1f, STONE_RADIUS, paint);
+	    canvas.drawCircle(i, j, STONE_RADIUS, paint);
 	    break;
 	case WHITE:
 	    paint.setARGB(255, 255, 255, 255);
 	    paint.setStyle(Paint.Style.FILL);
-	    canvas.drawCircle(i+1f, j+1f, STONE_RADIUS, paint);
+	    canvas.drawCircle(i, j, STONE_RADIUS, paint);
 	    paint.setARGB(255, 0, 0, 0);
 	    paint.setStyle(Paint.Style.STROKE);
-	    canvas.drawCircle(i+1f, j+1f, STONE_RADIUS, paint);
+	    canvas.drawCircle(i, j, STONE_RADIUS, paint);
 	    break;
 	default:
 	    break;
@@ -352,28 +342,26 @@ public class GobanRenderer
 	paint.setARGB(230, 0, 0, 0);
 	paint.setStyle(Paint.Style.FILL_AND_STROKE);
 
-	if (boardSize % 2 != 0)
-	    {
-		canvas.drawCircle(m+1, m+1, HOSHI_RADIUS, paint);
+	if (boardSize % 2 != 0) {
+	    canvas.drawCircle(m, m, HOSHI_RADIUS, paint);
 
-		if (boardSize > 9)
-		    {
-			canvas.drawCircle(h+1, m+1, HOSHI_RADIUS, paint);
-			canvas.drawCircle(boardSize-h, m+1, HOSHI_RADIUS, paint);
-			canvas.drawCircle(m+1, h+1, HOSHI_RADIUS, paint);
-			canvas.drawCircle(m+1, boardSize-h, HOSHI_RADIUS, paint);
-		    }
+	    if (boardSize > 9) {
+		canvas.drawCircle(h, m, HOSHI_RADIUS, paint);
+		canvas.drawCircle(boardSize-h-1, m, HOSHI_RADIUS, paint);
+		canvas.drawCircle(m, h, HOSHI_RADIUS, paint);
+		canvas.drawCircle(m, boardSize-h-1, HOSHI_RADIUS, paint);
 	    }
-
-	if (boardSize > 7)
-	    {
-		canvas.drawCircle(h+1, h+1, HOSHI_RADIUS, paint);
-		canvas.drawCircle(h+1, boardSize-h, HOSHI_RADIUS, paint);
-		canvas.drawCircle(boardSize-h, h+1, HOSHI_RADIUS, paint);
-		canvas.drawCircle(boardSize-h, boardSize-h, HOSHI_RADIUS, paint);
-	    }
+	}
+	
+	if (boardSize > 7) {
+	    canvas.drawCircle(h, h, HOSHI_RADIUS, paint);
+	    canvas.drawCircle(h, boardSize-h-1, HOSHI_RADIUS, paint);
+	    canvas.drawCircle(boardSize-h-1, h, HOSHI_RADIUS, paint);
+	    canvas.drawCircle(boardSize-h-1, boardSize-h-1, HOSHI_RADIUS, paint);
+	}
     }
 
+    /*
     void drawSelection(int x, int y, Canvas canvas)
     {
 	Log.d("GobanRenderer", String.format("drawSelection(%d, %d)", x, y));
@@ -383,7 +371,7 @@ public class GobanRenderer
 	paint.setStrokeWidth(SELECTION_STROKEWIDTH);
 	paint.setColor(SELECTION_COLOR);
 	paint.setStyle(Paint.Style.STROKE);
-	canvas.drawRect(x+0.5f, y+0.5f, x+1.5f, y+1.5f, paint);
+	canvas.drawRect(x-0.5f, y-0.5f, x+0.5f, y+0.5f, paint);
     }
-
+    */
 }

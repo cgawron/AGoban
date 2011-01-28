@@ -9,6 +9,12 @@
   <PreferenceScreen
       android:key="appearance_preferencescreen"
       android:title="Appearance">
+<!--
+    <ListPreference android:title="Blowup magnification" 
+		    android:key="blowupScale" android:defaultValue="5"
+		    android:entries="@array/magnification_keys"
+		    android:entryValues="@array/magnification_vals"/>
+-->
     <CheckBoxPreference android:title="Sort variations by tree depth" android:key="sortVariations" android:defaultValue="true"/>
   </PreferenceScreen>
   <PreferenceScreen

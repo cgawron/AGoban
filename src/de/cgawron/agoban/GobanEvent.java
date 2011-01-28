@@ -19,10 +19,7 @@ package de.cgawron.agoban;
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
 import android.content.Context;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
-import android.graphics.Canvas;
-import android.graphics.Paint;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -39,11 +36,14 @@ import de.cgawron.agoban.view.GobanView;
 public class GobanEvent
 {
     private GobanView gobanView;
+    private PointF pointF;
     private Point point;
+    private MotionEvent motionEvent;
 
     public GobanEvent(GobanView gobanView, MotionEvent motionEvent) 
     {
 	this.gobanView = gobanView;
+	this.motionEvent = motionEvent;
 	initialize(motionEvent);
     }
 
@@ -57,12 +57,20 @@ public class GobanEvent
     {
 	int width = gobanView.getWidth();
 	int height = gobanView.getHeight();
-	int size = gobanView.getBoardSize();
+	float size = gobanView.getBoardSize();
 	
-	int bx = (int) (size*motionEvent.getX()/width);
-	int by = (int) (size*motionEvent.getY()/height);
-	point = new Point(bx, by);
-	Log.d("GobanEvent", String.format("initialize: (%d, %d)", bx, by));
+	float bx = size*motionEvent.getX()/width;
+	float by = size*motionEvent.getY()/height;
+	if (bx >= size || bx < 0 ||
+	    by >= size ||by < 0) {
+	    point = null;
+	    pointF = null;
+	}
+	else {
+	    point = new Point((int) bx, (int) by);
+	    pointF = new PointF(bx, by);
+	}
+	Log.d("GobanEvent", String.format("initialize: (%f, %f)", bx, by));
     }
 
     public void initialize(Point point) 
@@ -76,7 +84,16 @@ public class GobanEvent
 	return "GobanEvent p=" + point;
     }
 
+    public MotionEvent getBaseEvent()
+    {
+	return motionEvent;
+    }
+
     public Point getPoint() {
 	return point;
+    }
+
+    public PointF getPointF() {
+	return pointF;
     }
 }

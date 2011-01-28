@@ -31,6 +31,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.Shape;
+import android.graphics.drawable.shapes.OvalShape;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -46,6 +50,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import de.cgawron.agoban.R;
 import de.cgawron.agoban.view.GameTreeControls;
 import de.cgawron.agoban.view.GameTreeControls.GameTreeNavigationListener;
 import de.cgawron.agoban.view.GobanView;
@@ -67,7 +72,7 @@ public class EditSGF extends Activity
     implements GobanEventListener, GameTreeNavigationListener, SGFApplication.ExceptionHandler
 {
     private static final String TAG = "EditSGF";
-    private static final String KEY_URI = "URI";
+    private static final String KEY_URI = "de.cgawron.agoban:URI";
 
     public static Resources resources;
 
@@ -79,6 +84,72 @@ public class EditSGF extends Activity
     private Map<Point, Node> variations = new HashMap<Point, Node>();
     private SGFApplication application;
     private SharedPreferences settings; 
+
+    private class MoveTool implements GobanView.Tool 
+    {
+	private Drawable whiteCursor;
+	private Drawable blackCursor;
+
+	private MoveTool() 
+	{
+	    Shape oval = new OvalShape();
+	    //oval.resize(1.0f, 1.0f);
+	    blackCursor = new ShapeDrawable(oval);
+	    whiteCursor = new ShapeDrawable(oval);
+	    //blackCursor = resources.getDrawable(R.drawable.black_stone_cursor);
+	    //whiteCursor = resources.getDrawable(R.drawable.white_stone_cursor);
+	}
+
+	@Override
+	public Drawable getCursor()
+	{
+	    if (currentNode != null) {
+		BoardType color = currentNode.getColor();
+
+		if (color == BoardType.BLACK) {
+		    return whiteCursor;
+		}
+		else return blackCursor;
+	    }
+	    else return blackCursor;
+	}
+	
+	@Override
+	public void onGobanEvent(GobanEvent gobanEvent) 
+	{
+	    if (currentNode != null) {
+		Point point = gobanEvent.getPoint();
+		if (point == null) return;
+		Log.d(TAG, "onGobanEvent: variations: " + variations.keySet());
+		// click on a variation - select it
+		if (variations.containsKey(point)) {
+		    setCurrentNode(variations.get(point));
+		}
+		// click on an existing stone - go to node
+		else if (currentNode.getGoban().getStone(point) != BoardType.EMPTY) {
+		    Node node = currentNode;
+		    while (node.getParent() != null && !point.equals(node.getGoban().getLastMove())) {
+			node = node.getParent();
+		    }
+		    setCurrentNode(node);
+		}
+		// click on an empty intersection - move
+		else if (application.checkNotReadOnly(EditSGF.this)) {
+		    Node node = new Node(gameTree);
+		    try {
+			node.setGoban(currentNode.getGoban().clone());
+		    }
+		    catch (CloneNotSupportedException ex) {
+			Log.e(TAG, "onGobanEvent", ex);
+		    }
+		    currentNode.add(node);
+		    Log.d(TAG, "addMove: " + node + ", " + currentNode);
+		    node.move(point);	
+		    setCurrentNode(node);
+		}
+	    }
+	}
+    }
 
     /** Called when the activity is first created. */
     @Override
@@ -94,7 +165,9 @@ public class EditSGF extends Activity
 	gobanView = (GobanView) findViewById(R.id.goban);
 	gobanView.addGobanEventListener(this);
 	registerForContextMenu(gobanView);
-
+	
+	GobanView.Tool tool = new MoveTool();
+	gobanView.setTool(tool);
 	//commentView = (TextView) findViewById(R.id.comment);
 
 	gameTreeControls = (GameTreeControls) findViewById(R.id.controls);
@@ -205,36 +278,7 @@ public class EditSGF extends Activity
     public void onGobanEvent(GobanEvent gobanEvent) 
     {
 	Log.d(TAG, "onGobanEvent: " + gobanEvent);
-	if (currentNode != null) {
-	    Point point = gobanEvent.getPoint();
-	    Log.d(TAG, "onGobanEvent: variations: " + variations.keySet());
-	    // click on a variation - select it
-	    if (variations.containsKey(point)) {
-		setCurrentNode(variations.get(point));
-	    }
-	    // click on an existing stone - go to node
-	    else if (currentNode.getGoban().getStone(point) != BoardType.EMPTY) {
-		Node node = currentNode;
-		while (node.getParent() != null && !point.equals(node.getGoban().getLastMove())) {
-		    node = node.getParent();
-		}
-		setCurrentNode(node);
-	    }
-	    // click on an empty intersection - move
-	    else if (application.checkNotReadOnly(this)) {
-		Node node = new Node(gameTree);
-		try {
-		    node.setGoban(currentNode.getGoban().clone());
-		}
-		catch (CloneNotSupportedException ex) {
-		    Log.e(TAG, "onGobanEvent", ex);
-		}
-		currentNode.add(node);
-		Log.d(TAG, "addMove: " + node + ", " + currentNode);
-		node.move(point);	
-		setCurrentNode(node);
-	    }
-	}
+
     }
 
     @Override
