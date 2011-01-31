@@ -23,7 +23,11 @@ import java.io.OutputStream;
 import java.util.Map;
 import java.util.HashMap;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Canvas;
@@ -133,19 +137,63 @@ public class MoveTool extends Drawable implements GobanView.Tool
 	    }
 	    // click on an empty intersection - move
 	    else if (editor.checkNotReadOnly()) {
-		Node node = new Node(editor.getGameTree());
-		try {
-		    node.setGoban(currentNode.getGoban().clone());
+		if (currentNode.getChildCount() == 1 && currentNode.getDepth() <= 1) {
+		    askReplaceMove(currentNode, point);
 		}
-		catch (CloneNotSupportedException ex) {
-		    Log.e(TAG, "onGobanEvent", ex);
-		}
-		currentNode.add(node);
-		Log.d(TAG, "addMove: " + node + ", " + currentNode);
-		node.move(point);	
-		editor.setCurrentNode(node);
+		else 
+		    move(currentNode, point, false);
 	    }
 	}
+    }
+
+    private void move(Node parent, Point point, boolean replaceChild)
+    {
+	if (replaceChild) {
+	    Log.i(TAG, "Removing old child node");
+	    parent.getChildren().remove(0);
+	}
+	
+	Node newNode;
+	newNode = new Node(editor.getGameTree());
+	Log.d(TAG, "Adding new node " + newNode);
+	try {
+	    newNode.setGoban(parent.getGoban().clone());
+	}
+	catch (CloneNotSupportedException ex) {
+	    Log.e(TAG, "onGobanEvent", ex);
+	}
+	parent.add(newNode);
+
+	newNode.move(point);	
+	Log.d(TAG, "addMove: " + newNode + ", " + parent);
+	editor.setCurrentNode(newNode);
+    }
+
+
+    boolean replace;
+    public boolean askReplaceMove(final Node currentNode, final Point point)
+    {
+	Context context = editor;
+	Dialog dialog;
+	replace  = true;
+	OnClickListener listener = new OnClickListener() {
+		public void onClick(DialogInterface dialog, int which) {
+		    if (which == DialogInterface.BUTTON_POSITIVE) 
+			move(currentNode, point, false);
+		    else
+			move(currentNode, point, true);
+		    
+		    dialog.dismiss();
+		}
+	    };
+	AlertDialog.Builder builder = new AlertDialog.Builder(context);
+	builder.setTitle("Add Variation?");
+	builder.setMessage("Do you want to replace the last move or to add a variaton?");
+	builder.setPositiveButton("Add", listener);
+	builder.setNegativeButton("Replace", listener);
+	dialog = builder.show();
+	
+	return replace;
     }
 
     @Override

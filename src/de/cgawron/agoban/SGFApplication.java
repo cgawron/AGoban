@@ -257,6 +257,8 @@ public class SGFApplication extends Application
 		}
 	    };
 	
+
+	// TODO: Reimplement that without recursion and the extra thread
 	Thread thread = new Thread(Thread.currentThread().getThreadGroup(), runnable, "saveSGF", 64*1024);
 	thread.start();
 	while (!async && thread.isAlive()) {
@@ -292,6 +294,8 @@ public class SGFApplication extends Application
 	    builder.setPositiveButton("Yes", listener);
 	    builder.setNegativeButton("No", listener);
 	    dialog = builder.show();
+
+	    // TODO: This probably does not work!
 	    
 	    return !readOnly;
 	}
