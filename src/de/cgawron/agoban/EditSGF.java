@@ -31,6 +31,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.Shape;
@@ -55,6 +58,7 @@ import de.cgawron.agoban.view.GameTreeControls;
 import de.cgawron.agoban.view.GameTreeControls.GameTreeNavigationListener;
 import de.cgawron.agoban.view.GobanView;
 import de.cgawron.agoban.view.GobanView.GobanContextMenuInfo;
+import de.cgawron.agoban.view.tool.MoveTool;
 import de.cgawron.agoban.provider.SGFProvider;
 import de.cgawron.agoban.sync.GoogleSync;
 import de.cgawron.go.Goban;
@@ -85,72 +89,6 @@ public class EditSGF extends Activity
     private SGFApplication application;
     private SharedPreferences settings; 
 
-    private class MoveTool implements GobanView.Tool 
-    {
-	private Drawable whiteCursor;
-	private Drawable blackCursor;
-
-	private MoveTool() 
-	{
-	    Shape oval = new OvalShape();
-	    //oval.resize(1.0f, 1.0f);
-	    blackCursor = new ShapeDrawable(oval);
-	    whiteCursor = new ShapeDrawable(oval);
-	    //blackCursor = resources.getDrawable(R.drawable.black_stone_cursor);
-	    //whiteCursor = resources.getDrawable(R.drawable.white_stone_cursor);
-	}
-
-	@Override
-	public Drawable getCursor()
-	{
-	    if (currentNode != null) {
-		BoardType color = currentNode.getColor();
-
-		if (color == BoardType.BLACK) {
-		    return whiteCursor;
-		}
-		else return blackCursor;
-	    }
-	    else return blackCursor;
-	}
-	
-	@Override
-	public void onGobanEvent(GobanEvent gobanEvent) 
-	{
-	    if (currentNode != null) {
-		Point point = gobanEvent.getPoint();
-		if (point == null) return;
-		Log.d(TAG, "onGobanEvent: variations: " + variations.keySet());
-		// click on a variation - select it
-		if (variations.containsKey(point)) {
-		    setCurrentNode(variations.get(point));
-		}
-		// click on an existing stone - go to node
-		else if (currentNode.getGoban().getStone(point) != BoardType.EMPTY) {
-		    Node node = currentNode;
-		    while (node.getParent() != null && !point.equals(node.getGoban().getLastMove())) {
-			node = node.getParent();
-		    }
-		    setCurrentNode(node);
-		}
-		// click on an empty intersection - move
-		else if (application.checkNotReadOnly(EditSGF.this)) {
-		    Node node = new Node(gameTree);
-		    try {
-			node.setGoban(currentNode.getGoban().clone());
-		    }
-		    catch (CloneNotSupportedException ex) {
-			Log.e(TAG, "onGobanEvent", ex);
-		    }
-		    currentNode.add(node);
-		    Log.d(TAG, "addMove: " + node + ", " + currentNode);
-		    node.move(point);	
-		    setCurrentNode(node);
-		}
-	    }
-	}
-    }
-
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -166,7 +104,7 @@ public class EditSGF extends Activity
 	gobanView.addGobanEventListener(this);
 	registerForContextMenu(gobanView);
 	
-	GobanView.Tool tool = new MoveTool();
+	GobanView.Tool tool = new MoveTool(this);
 	gobanView.setTool(tool);
 	//commentView = (TextView) findViewById(R.id.comment);
 
@@ -341,6 +279,11 @@ public class EditSGF extends Activity
 	   save();
     }
 
+    public Node getCurrentNode()
+    {
+	return currentNode;
+    } 
+
     public void setCurrentNode(Node node) 
     {
 	if (!node.equals(currentNode)) {
@@ -395,6 +338,16 @@ public class EditSGF extends Activity
 	}
     }
 
+    public Map<Point, Node> getVariations() 
+    {
+	return variations;
+    }
+
+    public boolean checkNotReadOnly()
+    {
+	return application.checkNotReadOnly(this);
+    }
+
     public void save() 
     {
 	application.save();
@@ -420,6 +373,11 @@ public class EditSGF extends Activity
 	Intent sgfIntent = new Intent(Intent.ACTION_INSERT, application.getNewGameUri());
 	startActivity(sgfIntent);
 	finish();
+    }
+
+    public GameTree getGameTree()
+    {
+	return gameTree;
     }
 
     private void setGameTree(GameTree gameTree)

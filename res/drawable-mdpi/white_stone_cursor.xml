@@ -24,11 +24,11 @@
       android:dashWidth="integer"
       android:dashGap="integer" />
   -->
-  <size android:width="10pt" android:height="10pt" />
+  <size android:width="100px" android:height="100px" />
   <solid
       android:color="#fff" />
   <stroke
-      android:width="0.1pt"
+      android:width="1px"
       android:color="#000" />
 </shape>
 

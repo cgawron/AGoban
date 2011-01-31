@@ -83,6 +83,7 @@ public class GobanView extends View implements demo.MultiTouchController.MultiTo
 	 * 
 	 */
 	Drawable getCursor();
+
 	void onGobanEvent(GobanEvent event);
     }
 
