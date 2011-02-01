@@ -8,7 +8,7 @@
     android:layout_height="wrap_content">
 
   <Button
-      android:id="@+id/prevMarkup"  
+      android:id="@+id/firstNode"  
       android:layout_height="wrap_content"
       android:layout_width="wrap_content"
       android:background="@drawable/arrow_leftend"/>
@@ -35,7 +35,7 @@
       android:layout_width="wrap_content"
       android:background="@drawable/arrow_right"/>
   <Button
-      android:id="@+id/nextMarkup"  
+      android:id="@+id/lastNode"  
       android:layout_height="wrap_content"
       android:layout_width="wrap_content"
       android:background="@drawable/arrow_rightend"/>

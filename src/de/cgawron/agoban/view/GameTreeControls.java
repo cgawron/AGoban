@@ -55,8 +55,8 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
     private SharedPreferences settings; 
     private final Button buttonNext;
     private final Button buttonPrev;
-    private final Button buttonNextMarkup;
-    private final Button buttonPrevMarkup;
+    private final Button buttonLast;
+    private final Button buttonFirst;
     private final TextView moveNoView;
     private final Spinner variations;
 
@@ -179,8 +179,8 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 	
 	buttonNext = (Button) findViewById(R.id.nextNode);
 	buttonPrev = (Button) findViewById(R.id.prevNode);
-	buttonNextMarkup = (Button) findViewById(R.id.nextMarkup);
-	buttonPrevMarkup = (Button) findViewById(R.id.prevMarkup);
+	buttonLast = (Button) findViewById(R.id.lastNode);
+	buttonFirst = (Button) findViewById(R.id.firstNode);
 	moveNoView = (TextView) findViewById(R.id.moveNo);
 	variations = (Spinner) findViewById(R.id.variations);
 
@@ -197,8 +197,8 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
     private void initView(Context context)
     {
 	buttonPrev.setOnClickListener(this);
-	buttonPrevMarkup.setOnClickListener(this);
-	buttonNextMarkup.setOnClickListener(this);
+	buttonFirst.setOnClickListener(this);
+	buttonLast.setOnClickListener(this);
 	buttonNext.setOnClickListener(this);
 	variations.setOnItemSelectedListener(this);
     }
@@ -219,17 +219,17 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 	    Log.d(TAG, "button pressed: prev");
 	    prevNode();
 	}
-	else if (buttonPrevMarkup.equals(v)) {
+	else if (buttonFirst.equals(v)) {
 	    Log.d(TAG, "button pressed: prevMarkup");
-	    prevMarkupNode();
+	    firstNode();
 	}
 	else if (buttonNext.equals(v)) {
 	    Log.d(TAG, "button pressed: next");
 	    nextNode();
 	}
-	else if (buttonNextMarkup.equals(v)) {
+	else if (buttonLast.equals(v)) {
 	    Log.d(TAG, "button pressed: nextMarkup");
-	    nextMarkupNode();
+	    lastNode();
 	}
     }
 
@@ -287,17 +287,20 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 	}
     }
 
-    public void nextMarkupNode() 
+    public void lastNode() 
     {
-	while (currentNode != null && currentNode.getChildCount() > 0 /* && !currentNode.isMarkup()*/) {
+	while (currentNode != null && currentNode.getChildCount() > 0) {
 	    currentNode = currentNode.getChildAt(0);
 	}
-	throw new RuntimeException("Not yet implemented");
+	setCurrentNode(currentNode);
     }
 
-    public void prevMarkupNode() 
+    public void firstNode() 
     {
-	throw new RuntimeException("Not yet implemented");
+       while (currentNode != null && currentNode.getParent() != null) {
+	    currentNode = currentNode.getParent();
+	}
+	setCurrentNode(currentNode);
     }
 
     @Override

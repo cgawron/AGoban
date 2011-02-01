@@ -71,6 +71,7 @@ public class MoveTool extends Drawable implements GobanView.Tool
 	oval.resize(1.0f, 1.0f);
 	blackCursor = new ShapeDrawable(oval);
 	whiteCursor = new ShapeDrawable(oval);
+	((ShapeDrawable) whiteCursor).getPaint().setARGB(255, 255, 255, 255);
 	
 	//blackCursor = resources.getDrawable(R.drawable.black_stone_cursor);
 	//whiteCursor = resources.getDrawable(R.drawable.white_stone_cursor);
