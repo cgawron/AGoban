@@ -17,26 +17,6 @@
    inkscape:version="0.48.0 r9654"
    sodipodi:docname="arrow_left.svg"
    version="1.0">
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1103"
-     inkscape:window-height="769"
-     id="namedview28"
-     showgrid="false"
-     inkscape:zoom="6.575"
-     inkscape:cx="-6.0076043"
-     inkscape:cy="20"
-     inkscape:window-x="280"
-     inkscape:window-y="206"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="layer1" />
   <defs
      id="defs">
     <linearGradient
@@ -147,7 +127,7 @@
            height="130.17355"
            width="131.24196"
            id="rect1942"
-           style="fill:#8b8b8b;fill-opacity:1;fill-rule:evenodd;stroke:none" />
+           style="fill:#c0c0c0;fill-opacity:1;fill-rule:evenodd;stroke:none" />
       </g>
       <path
          style="fill:url(#gradient1);fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter2)"

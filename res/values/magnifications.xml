@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <array name="magnification_keys">
+    <item>2</item>
+    <item>4</item>
+    <item>6</item>
+  </array>
+  <integer-array name="magnification_vals">
+    <item>2</item>
+    <item>4</item>
+    <item>6</item>
+  </integer-array>
+</resources>
+

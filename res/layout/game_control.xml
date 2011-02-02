@@ -11,12 +11,12 @@
       android:id="@+id/firstNode"  
       android:layout_height="wrap_content"
       android:layout_width="wrap_content"
-      android:background="@drawable/arrow_leftend"/>
+      android:background="@drawable/arrow_leftend_sl"/>
   <Button
       android:id="@+id/prevNode"  
       android:layout_height="wrap_content"
       android:layout_width="wrap_content"
-      android:background="@drawable/arrow_left"/>
+      android:background="@drawable/arrow_left_sl"/>
   <TextView
       android:id="@+id/moveNo"
       android:layout_height="wrap_content"
@@ -33,12 +33,12 @@
       android:id="@+id/nextNode"  
       android:layout_height="wrap_content"
       android:layout_width="wrap_content"
-      android:background="@drawable/arrow_right"/>
+      android:background="@drawable/arrow_right_sl"/>
   <Button
       android:id="@+id/lastNode"  
       android:layout_height="wrap_content"
       android:layout_width="wrap_content"
-      android:background="@drawable/arrow_rightend"/>
+      android:background="@drawable/arrow_rightend_sl"/>
 
 </LinearLayout>
 

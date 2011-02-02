@@ -17,26 +17,6 @@
    inkscape:version="0.48.0 r9654"
    sodipodi:docname="arrow_left.svg"
    version="1.0">
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1103"
-     inkscape:window-height="769"
-     id="namedview28"
-     showgrid="false"
-     inkscape:zoom="6.575"
-     inkscape:cx="-6.0076043"
-     inkscape:cy="20"
-     inkscape:window-x="280"
-     inkscape:window-y="206"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="layer1" />
   <defs
      id="defs">
     <linearGradient
@@ -88,7 +68,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
         <dc:creator>
           <cc:Agent>
             <dc:title>Christian Gawron</dc:title>
@@ -147,7 +127,7 @@
            height="130.17355"
            width="131.24196"
            id="rect1942"
-           style="fill:#8b8b8b;fill-opacity:1;fill-rule:evenodd;stroke:none" />
+           style="fill:#C0c0c0;fill-opacity:1;fill-rule:evenodd;stroke:none" />
       </g>
       <path
          style="fill:url(#gradient1);fill-opacity:1;fill-rule:evenodd;stroke:none;filter:url(#filter2)"
@@ -158,15 +138,15 @@
     <path
        id="shadow"
        d="M 462.93058,424.60931 423.6579,384.51935 462.93058,344.4294"
-       style="fill:none;stroke:#595959;stroke-width:12.41169453;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter1)"
-       transform="matrix(-0.30616288,0,0,0.30616288,529.49578,326.03812)"
+       style="fill:none;stroke:#595959;stroke-width:12.41169453000000000;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter1)"
+       transform="matrix(0.30616288,0,0,0.30616288,258.0553,326.03812)"
        inkscape:connector-curvature="0" />
     <path
-       style="fill:none;stroke:#ffffff;stroke-width:13.09999943;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter2)"
+       style="fill:none;stroke:#ffffff;stroke-width:13.09999936000000000;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter2)"
        d="M 462.93058,424.60931 423.6579,384.51935 462.93058,344.4294"
        id="arrow"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccc"
-       transform="matrix(-0.29007635,0,0,0.29007635,522.26647,331.56109)" />
+       transform="matrix(0.29007635,0,0,0.29007635,265.08812,331.56109)" />
   </g>
 </svg>
