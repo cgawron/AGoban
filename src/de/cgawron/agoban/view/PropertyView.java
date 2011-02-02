@@ -51,7 +51,7 @@ import de.cgawron.go.sgf.PropertyList;
 import de.cgawron.go.sgf.Value;
 
 /**
- * A {@link View} to be used for {@link de.cgawron.go.Goban} 
+ * A {@link View} to be used for SGF properties
  *
  */
 public class PropertyView extends EditText implements TextWatcher

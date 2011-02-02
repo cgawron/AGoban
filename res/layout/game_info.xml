@@ -39,7 +39,7 @@
 	      android:id="@+id/PW"
 	      android:focusable="true"
 	      android:layout_weight="10" /> 
-	  <de.cgawron.agoban.view.PropertyView
+	  <de.cgawron.agoban.view.GradeView
 	      cgawron:property="WR"
 	      android:id="@+id/WR"
 	      android:focusable="true"
@@ -64,7 +64,7 @@
 	      android:focusable="true"
 	      android:layout_width="fill_parent" 
 	      android:layout_weight="10" /> 
-	  <de.cgawron.agoban.view.PropertyView
+	  <de.cgawron.agoban.view.GradeView
 	      cgawron:property="BR"
 	      android:id="@+id/BR"
 	      android:focusable="true"
