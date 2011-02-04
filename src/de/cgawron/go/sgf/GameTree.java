@@ -54,7 +54,7 @@ import de.cgawron.go.Goban;
 import de.cgawron.go.SimpleGoban;
 import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Symmetry;
-import de.cgawron.go.sgf.TreeIterator.DepthFirstIterator;
+import de.cgawron.go.sgf.TreeIterator.PreorderIterator;
 import de.cgawron.util.Memento;
 import de.cgawron.util.MementoOriginator;
 import de.cgawron.util.MiscEncodingReader;
@@ -108,9 +108,9 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
         public abstract boolean predicate(Node n);
 
         @Override
-	public void visitNode(Object o)
+	public void visitNode(Node n)
         {
-            if (predicate((Node)o))
+            if (predicate(n))
                 count++;
         }
     }
@@ -352,9 +352,35 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 	if (root.get(Property.CHARACTER_SET) != null)
 	    (root.get(Property.CHARACTER_SET)).getValue().getString();
 	if (charset == null) charset = "utf8";
-        PrintWriter out = new PrintWriter(new OutputStreamWriter(new BufferedOutputStream(stream), charset));
-        root.write(out);
-        out.close();
+        final PrintWriter out = new PrintWriter(new OutputStreamWriter(new BufferedOutputStream(stream), charset));
+
+        TreeIterator<Node> iterator = new PreorderIterator<Node> (root) {
+	    @Override
+	    public void endNode(Node parent)
+	    {
+		if (parent == null || parent.getChildren().size() > 1) { 
+		    out.write(")");
+		}
+	    }
+
+	};
+
+	while (iterator.hasNext()) {
+	    Node node = iterator.next();
+	    Node parent = node.getParent();
+
+	    if (parent == null)
+		out.write("(");
+	    else if (parent.getChildren().size() > 1) { 
+		if (!node.isFirstChild()) 
+		    out.write(")");
+		out.write("(");
+	    }
+
+	    node.write(out);
+	}
+
+	out.close();
         setModified(false);
     }
 
@@ -528,9 +554,8 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 		new TreeVisitor<GameTree, Node>(this) 
 		{
 		    @Override
-		    protected void visitNode(Object o)
+		    protected void visitNode(Node n)
 		    {
-			Node n = (Node) o;
 			Goban goban = null;
 			
 			if (logger.isLoggable(Level.FINE))
@@ -614,7 +639,7 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
      */
     public Node getNode(int id)
     {
-	Iterator<Node> it = new DepthFirstIterator<Node>(getRoot());
+	Iterator<Node> it = new PreorderIterator<Node>(getRoot());
 	Node n;
 	while (it.hasNext()) {
 	    n = it.next();
@@ -726,11 +751,8 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 	    new TreeVisitor<GameTree, Node>(this)
 	    {
 		@Override
-		protected void visitNode(Object o)
+		protected void visitNode(Node node)
 		{
-		    if (logger.isLoggable(Level.FINE))
-			logger.fine("getLeafs: visiting " + o);
-		    Node node = (Node) o;
 		    if (node.isLeaf())
 			leafs.add(node);
 		}
@@ -988,9 +1010,8 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
 	    new TreeVisitor<GameTree, Node>(this) 
 	    {
 		@Override
-		protected void visitNode(Object o)
+		protected void visitNode(Node n)
 		{
-		    Node n = (Node) o;
 		    Iterator it = n.entrySet().iterator();
 		    while (it.hasNext()) {
 			Map.Entry entry = (Map.Entry) it.next();

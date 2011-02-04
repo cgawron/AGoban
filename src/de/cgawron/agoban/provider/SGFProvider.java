@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2010 Christian Gawron
  *
@@ -46,11 +45,13 @@ import de.cgawron.go.sgf.Property.Key;
 
 public class SGFProvider extends ContentProvider
 {
+    private static String TAG = "SGFProvider";
     final public static Uri CONTENT_URI = new Uri.Builder().scheme("content").authority("de.cgawron.agoban").build();
     final public static String SGF_TYPE = "application/x-go-sgf";
 
     final static String QUERY_STRING = "_id=?";
     final static String[] COLUMNS_FILENAME_ONLY = { GameInfo.KEY_FILENAME };
+    final static String[] COLUMNS_ID_FILENAME = { KEY_ID, KEY_FILENAME };
     final static File SGF_DIRECTORY;
     static 
     {
@@ -87,13 +88,20 @@ public class SGFProvider extends ContentProvider
 
     private Cursor queryDB(String[] projection, String query, String[] args)
     {
-	Log.d("SGFProvider", String.format("queryDB(%s, %s, %s)", projection, query, args));
+	Log.d(TAG, String.format("queryDB(%s, %s, %s)", projection, query, args));
 	
 	SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 	qb.setTables(SGFDBOpenHelper.SGF_TABLE_NAME);
 	Cursor cursor = qb.query(db, projection, query, args, null, null, null);
 	
 	return cursor;
+    }
+
+    private void deleteDB(String id)
+    {
+	Log.i(TAG, "deleting " + id);
+	String[] args = { id };
+	db.delete(SGFDBOpenHelper.SGF_TABLE_NAME, QUERY_STRING, args);
     }
 
     Thread updateThread = null;
@@ -115,13 +123,13 @@ public class SGFProvider extends ContentProvider
 
     public void doUpdateDatabase()
     {
-	Log.d("SGFProvider", "updateDatabase");
+	Log.d(TAG, "updateDatabase");
 	//Debug.startMethodTracing("updateDatabase");
 	
 	//fileMap = new HashMap<Integer, GameInfo>();
 	String state = Environment.getExternalStorageState();
 	if (Environment.MEDIA_MOUNTED.equals(state)) {
-	    Log.d("SGFProvider", "reading directory " + SGF_DIRECTORY);
+	    Log.d(TAG, "reading directory " + SGF_DIRECTORY);
 	    File[] files = SGF_DIRECTORY.listFiles(new FilenameFilter() {
 		    public boolean accept(File dir, String fileName) 
 		    {
@@ -139,32 +147,31 @@ public class SGFProvider extends ContentProvider
 
 		    String[] args = new String[1];
 		    args[0] = Integer.toString(id);
-		    Log.d("SGFProvider", "checking if information for " + file + " is available");
+		    Log.d(TAG, "checking if information for " + file + " is available");
 		    cursor = queryDB(getColumns(), QUERY_STRING, args);
 		    cursor.moveToFirst();
-		    Log.d("SGFProvider", "getCount(): " + cursor.getCount());
+		    Log.d(TAG, "getCount(): " + cursor.getCount());
 		    
 		    if (cursor.getCount() > 0 && cursor.getLong(cursor.getColumnIndex(KEY_MODIFIED_DATE)) == lastModified) {
-			Log.d("SGFProvider", "found entry");
+			Log.d(TAG, "found entry");
 		    }
 		    else {
-			Log.d("SGFProvider", "parsing " + file);
+			Log.d(TAG, "parsing " + file);
 			GameInfo gameInfo;
 			try {
 			    gameInfo = new GameInfo(file);
 			}
 			catch (Exception ex) {
-			    Log.e("SGFProvider", "parse error: " + ex);
+			    Log.e(TAG, "parse error: " + ex);
 			    ex.printStackTrace();
 			    continue;
 			}
-			// needs version 8 of the API
 			long _id = db.insertWithOnConflict(SGFDBOpenHelper.SGF_TABLE_NAME, "", 
 							   gameInfo.getContentValues(), SQLiteDatabase.CONFLICT_REPLACE);
 		    }
 		}
 		catch (Exception ex) {
-		    Log.d("SGFProvider", "caught " + ex);
+		    Log.d(TAG, "caught " + ex);
 		    throw new RuntimeException(ex);
 		}
 		finally {
@@ -172,6 +179,17 @@ public class SGFProvider extends ContentProvider
 			cursor.close();
 		}
 	    }
+
+	    Cursor cursor = queryDB(COLUMNS_ID_FILENAME, null, null);
+	    while (cursor.moveToNext()) {
+		File file = new File(SGF_DIRECTORY, cursor.getString(1));
+		Log.d(TAG, "updateDatabase: checking " + file);
+		if (!file.exists()) {
+		    Log.i(TAG, "updateDatabase: deleting stale entry for " + file);
+		    deleteDB(cursor.getString(0));
+		}
+	    }
+	    cursor.close();
 	}
 	lastChecked = System.currentTimeMillis();
 	updateThread = null;
@@ -180,35 +198,35 @@ public class SGFProvider extends ContentProvider
 
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder)
     {
-	Log.d("SGFProvider", String.format("query(uri=%s, projection=%s, selection=%s)", uri, projection, selection));
+	Log.d(TAG, String.format("query(uri=%s, projection=%s, selection=%s)", uri, projection, selection));
 	updateDatabase();
 
 	String path = uri.getPath();
-	Log.d("SGFProvider", String.format("path=%s", path));
+	Log.d(TAG, String.format("path=%s", path));
 
 	Cursor cursor = queryDB(projection, selection, selectionArgs);
-	Log.d("SGFProvider", String.format("query: returning cursor with %d rows", cursor.getCount()));
+	Log.d(TAG, String.format("query: returning cursor with %d rows", cursor.getCount()));
 	return cursor;
     }
 	
     public Uri insert(Uri uri, ContentValues values) 
     {
-	Log.d("SGFProvider", String.format("insert(uri=%s, values=%s)", uri, values));
+	Log.d(TAG, String.format("insert(uri=%s, values=%s)", uri, values));
 	String path = uri.getPath();
-	Log.d("SGFProvider", String.format("path=%s", path));
+	Log.d(TAG, String.format("path=%s", path));
 	if (path.equals("")) {
 	    path = UUID.randomUUID().toString() + ".sgf";
 	}
 
 	uri = new Uri.Builder().scheme("content").authority("de.cgawron.agoban").path(path).build();
-	Log.d("SGFProvider", String.format("insert: returning %s", uri));
+	Log.d(TAG, String.format("insert: returning %s", uri));
 	
 	return uri;
     }
 
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs)
     {
-	Log.d("SGFProvider", String.format("update(uri=%s, values=%s, selection=%s)", uri, values, selection));
+	Log.d(TAG, String.format("update(uri=%s, values=%s, selection=%s)", uri, values, selection));
 	return 0;
     }
 
@@ -224,7 +242,7 @@ public class SGFProvider extends ContentProvider
 
     public boolean onCreate()
     {
-	Log.d("SGFProvider", "onCreate");
+	Log.d(TAG, "onCreate");
 	dbHelper = new SGFDBOpenHelper(getContext());
 	db = dbHelper.getWritableDatabase();
 	db.setLockingEnabled(true);
@@ -241,7 +259,7 @@ public class SGFProvider extends ContentProvider
 
     public ParcelFileDescriptor openFile(Uri uri, String mode) throws java.io.FileNotFoundException
     {
-	Log.d("SGFProvider", String.format("openFile(uri=%s, mode=%s)", uri, mode));
+	Log.d(TAG, String.format("openFile(uri=%s, mode=%s)", uri, mode));
 	File file;
 	String query = uri.getQuery();
 	if (query != null && query.length() > 0) {
@@ -254,26 +272,26 @@ public class SGFProvider extends ContentProvider
 	    Cursor cursor = queryDB(COLUMNS_FILENAME_ONLY, QUERY_STRING, args);
 	    cursor.moveToFirst();
 	    String fileName = cursor.getString(0);
-	    Log.d("SGFProvider", "openFile: filename=" + fileName);
+	    Log.d(TAG, "openFile: filename=" + fileName);
 	    cursor.close();
 	    file = new File(SGF_DIRECTORY, fileName);
 	}
 	else {
 	    file = new File(SGF_DIRECTORY, uri.getPath());
 	}
-	Log.d("SGFProvider", String.format("openFile: file=%s, read=%b write=%b", file, file.canRead(), file.canWrite()));
+	Log.d(TAG, String.format("openFile: file=%s, read=%b write=%b", file, file.canRead(), file.canWrite()));
 	int _mode = ParcelFileDescriptor.MODE_CREATE;
 	if (mode.contains("w")) _mode |= ParcelFileDescriptor.MODE_READ_WRITE;
 	else _mode |= ParcelFileDescriptor.MODE_READ_ONLY;
 	if (mode.contains("t")) _mode |= ParcelFileDescriptor.MODE_TRUNCATE;
 	if (mode.contains("a")) _mode |= ParcelFileDescriptor.MODE_APPEND;
-	Log.d("SGFProvider", String.format("openFile: file=%s, mode=%s", file, _mode));
+	Log.d(TAG, String.format("openFile: file=%s, mode=%s", file, _mode));
 	return ParcelFileDescriptor.open(file, _mode);
     }
 
     public static GameInfo getGameInfo(long id)
     {
-	Log.d("SGFProvider", String.format("getGameInfo(%d)=%s", id, sgfMap.get(id)));
+	Log.d(TAG, String.format("getGameInfo(%d)=%s", id, sgfMap.get(id)));
 	return sgfMap.get(id);
     }
 

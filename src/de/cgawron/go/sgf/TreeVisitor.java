@@ -68,14 +68,14 @@ public abstract class TreeVisitor<T extends TreeModel, N extends TreeNode>
 
     protected TreeIterator<N> getIterator()
     {
-        return new TreeIterator.DepthFirstIterator<N>((N) model.getRoot());
+        return new TreeIterator.PreorderIterator<N>((N) model.getRoot());
     }
 
     /**
      * This method is called for every node visited.
      * @param o - current node visited.
      */
-    protected abstract void visitNode(Object o) throws Exception;
+    protected abstract void visitNode(N o) throws Exception;
 
     protected void initialize()
     {

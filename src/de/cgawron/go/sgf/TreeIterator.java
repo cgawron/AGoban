@@ -33,7 +33,7 @@ public class TreeIterator<N extends TreeNode> implements Iterator<N>
 
     public TreeIterator(N node)
     {
-        iterator = new DepthFirstIterator<N>(node);
+        iterator = new PreorderIterator<N>(node);
     }
 
     public TreeIterator(TreeModel model)
@@ -105,150 +105,84 @@ public class TreeIterator<N extends TreeNode> implements Iterator<N>
         {
             throw new UnsupportedOperationException();
         }
-
-        // A simple queue with a linked list data structure.
-	/*
-        final class Queue
-        {
-            QNode head; // null if empty
-            QNode tail;
-
-            final class QNode
-            {
-                public Object object;
-                public QNode next; // null if end
-
-                public QNode(Object object, QNode next)
-                {
-                    this.object = object;
-                    this.next = next;
-                }
-            }
-
-
-            public void enqueue(Object anObject)
-            {
-                if (head == null)
-                {
-                    head = tail = new QNode(anObject, null);
-                }
-                else
-                {
-                    tail.next = new QNode(anObject, null);
-                    tail = tail.next;
-                }
-            }
-
-            public Object dequeue()
-            {
-                if (head == null)
-                {
-                    throw new NoSuchElementException("No more elements");
-                }
-
-                Object retval = head.object;
-                QNode oldHead = head;
-                head = head.next;
-                if (head == null)
-                {
-                    tail = null;
-                }
-                else
-                {
-                    oldHead.next = null;
-                }
-                return retval;
-            }
-
-            public Object firstObject()
-            {
-                if (head == null)
-                {
-                    throw new NoSuchElementException("No more elements");
-                }
-
-                return head.object;
-            }
-
-            public boolean isEmpty()
-            {
-                return head == null;
-            }
-
-        }
-	*/
     }
 
-    public static class MyOrderIterator<N extends TreeNode> extends TreeIterator<N>
+    
+    /**
+     * A PreorderIterator iterates the nodes in the following order:
+     * <ul>
+     * <li> Visit the root.
+     * <li> Visit the subtrees rooted at each children in order.
+     * </ul>
+     * The method {@link #endNode(N node)} is called after the last child of a node has been visited.  
+     */
+    public static class PreorderIterator<N extends TreeNode> extends TreeIterator<N>
     {
-        protected Stack<N> stack;
-
-        public MyOrderIterator(N node)
-        {
-            stack = new Stack<N>();
-            /* queue.enqueue(new EnumIterator(node.children()));*/
-            stack.push(node);
-        }
-
-        public boolean hasNext()
-        {
-            return !stack.empty();
-        }
-
-        public N next()
-        {
-            N node = stack.pop();
-	    Enumeration<TreeNode> enumeration = node.children();
+	private class Pair<N>
+	{
+	    N node;
+	    Iterator<N> iterator;
 	    
-	    while (enumeration.hasMoreElements())
-		stack.push((N) enumeration.nextElement());
+	    public Pair(N node, Iterator<N> iterator)
+	    {
+		this.node = node;
+		this.iterator = iterator;
+	    }
 
-            return node;
-        }
+	}
+	
+        protected Stack<Pair<N>> stack;
 
-        public void remove()
+        public PreorderIterator(N node)
         {
-            throw new UnsupportedOperationException();
-        }
-
-    }
-
-
-    public static class DepthFirstIterator<N extends TreeNode> extends TreeIterator<N>
-    {
-        protected Stack<Iterator<N>> stack;
-
-        public DepthFirstIterator(N node)
-        {
-            stack = new Stack<Iterator<N>>();
+            stack = new Stack<Pair<N>>();
 	    Collection<N> c = new ArrayList<N>();
 	    if (node != null)
 		c.add(node);
-            stack.push(c.iterator());
+	    Pair<N> pair = new Pair(null, c.iterator());
+            stack.push(pair);
         }
 
         public boolean hasNext()
         {
-            return !stack.empty() && stack.peek().hasNext();
+	    if (stack.empty())
+		return false;
+
+            Iterator<N> it = stack.peek().iterator;
+            while (!it.hasNext())
+            {
+		N current = stack.peek().node;
+		endNode(current);
+		stack.pop();
+		if (stack.empty())
+		    return false;
+		current = stack.peek().node;
+		it = stack.peek().iterator;
+            }
+	    return true;
         }
 
         public N next()
         {
-            Iterator<N> it = stack.peek();
+	    N current = stack.peek().node;
+            Iterator<N> it = stack.peek().iterator;
             N node = it.next();
+
 	    if (logger.isLoggable(Level.FINE))
-		logger.fine("DepthFirstIterator " + this + ": node " + node);
-            Iterator<TreeNode> children = new EnumIterator<TreeNode>(node.children());
-            if (!it.hasNext())
-            {
-                stack.pop();
-            }
+		logger.fine("PreorderIterator " + this + ": node " + node);
+            Iterator<N> children = new EnumIterator(node.children());
             if (children.hasNext())
             {
-                stack.push((Iterator<N>) children);
+		Pair pair = new Pair(node, children);
+                stack.push(pair);
             }
+
             return node;
         }
+
+	public void endNode(N parent)
+	{
+	}
 
         public void remove()
         {
@@ -256,6 +190,7 @@ public class TreeIterator<N extends TreeNode> implements Iterator<N>
         }
     }
 
+    
 
     public static class PostorderIterator<N extends TreeNode> extends TreeIterator<N>
     {

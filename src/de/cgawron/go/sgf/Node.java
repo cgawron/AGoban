@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.SortedMap;
+import java.util.Stack;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -443,9 +444,17 @@ public class Node
      */
     public GameTree getGameTree()
     {
-	if (gameTree == null) {
-	    gameTree = parent.getGameTree();
+	Node node = this;
+	while (node.gameTree == null) {
+	    if (node instanceof Sequence) {
+		node = ((Sequence) node).getFirst().getParent();
+	    }
+	    else
+		node = node.getParent();
 	}
+	if (node != this)
+	    gameTree = node.gameTree;
+	
 	return gameTree;
     }
 
@@ -533,17 +542,33 @@ public class Node
 
     public int getSiblingCount()
     {
-	if (logger.isLoggable(Level.FINE))
-	    logger.fine("getSiblingCount()");
 	if (parent != null) {
-	    if (logger.isLoggable(Level.FINE)) {
-		logger.fine("childCount: " + parent.getChildCount());
-		logger.fine("index: " + parent.getIndex(this));
-	    }
 	    return parent.children.size() - 1;
 	}
 	else 
 	    return 0;
+    }
+
+    public boolean isFirstChild()
+    {
+	if (parent == null)
+	    return false;
+
+	if (parent.children.get(0) == this)
+	    return true;
+	else
+	    return false;
+    }
+
+    public boolean isLastChild()
+    {
+	if (parent == null)
+	    return false;
+
+	if (parent.children.get(parent.children.size() - 1) == this)
+	    return true;
+	else
+	    return false;
     }
 
     /*
@@ -613,10 +638,8 @@ public class Node
 		    new TreeVisitor<GameTree, Node>(getRoot().getGameTree(), this) 
 		    {
 			@Override
-			protected void visitNode(Object o)
+			protected void visitNode(Node n)
 			{
-			    Node n = (Node) o;
-			    
 			    Node p = n.getParent();
 			    Goban goban;
 			    if (p == null)  {
@@ -718,7 +741,15 @@ public class Node
     public Goban getGoban()
     {
 	if (goban == null) {
-	    initGoban();
+	    Node node = this;
+	    Stack<Node> nodes = new Stack<Node>();
+	    while (node != null && node.goban == null) {
+		nodes.push(node);
+		node = node.parent;
+	    }
+	    while (!nodes.empty()) {
+		nodes.pop().initGoban();
+	    }
 	}
 	return goban;
     }
@@ -1247,6 +1278,7 @@ public class Node
     public void write(PrintWriter out)
     {
 	super.write(out);
+	/*
 	if (getChildCount() > 1) {
 	    Iterator it = getChildren().iterator();
 	    while (it.hasNext()) {
@@ -1260,6 +1292,7 @@ public class Node
 	    Node node = (Node)getChildAt(0);
 	    node.write(out);
 	}
+	*/
     }
 
     public void setProperty(Property.Key key, Object newValue)

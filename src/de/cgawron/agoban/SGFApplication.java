@@ -223,15 +223,6 @@ public class SGFApplication extends Application
     }
 
     public void save() {
-	save(false);
-    }
-
-    /**
-     * Save the GameTree.
-     * Due to the small default stack size, this has to be done in a worker thread.
-     */
-    public void save(boolean async) 
-    {
 	if (gameTree == null)
 	    return;
 	if (false && !gameTree.isModified()) {
@@ -242,31 +233,14 @@ public class SGFApplication extends Application
 	if (data == null) {
 	    setData(null);
 	}
-
-	Runnable runnable = new Runnable() {
-		public void run() {
-		    Log.d(TAG, "saving " + data);
-		    try {
-			OutputStream os = getContentResolver().openOutputStream(data, "rwt");
-			gameTree.save(os);
-			os.close();
-		    }
-		    catch (Exception ex) {
-			Log.e(TAG, "Exception while saving SGF", ex);
-		    }
-		}
-	    };
 	
-
-	// TODO: Reimplement that without recursion and the extra thread
-	Thread thread = new Thread(Thread.currentThread().getThreadGroup(), runnable, "saveSGF", 64*1024);
-	thread.start();
-	while (!async && thread.isAlive()) {
-	    try {
-		thread.join();
-	    }
-	    catch (InterruptedException ex) {
-	    }
+	try {
+	    OutputStream os = getContentResolver().openOutputStream(data, "rwt");
+	    gameTree.save(os);
+	    os.close();
+	}
+	catch (java.io.IOException ex) {
+	    throw new RuntimeException("save failed", ex);
 	}
     }
 

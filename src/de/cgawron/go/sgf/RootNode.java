@@ -20,7 +20,6 @@ package de.cgawron.go.sgf;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,14 +48,6 @@ public class RootNode extends Node implements PropertyChangeListener
 	while (it.hasNext())
 	    add((Node) it.next());
     }
-
-    public void write(PrintWriter out)
-    {
-	out.println("(");
-	super.write(out);
-	out.println(")");
-    }
-
 
     /**
      * This method is called when a property in some child node changes. 
