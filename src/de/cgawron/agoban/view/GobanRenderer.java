@@ -190,14 +190,24 @@ public class GobanRenderer
 		path.addCircle(x , y, 0.25f, Path.Direction.CW);
 		break;
 	    case TERRITORY_BLACK:
-		paint.setARGB(196, 0, 0, 0);
+		paint.setARGB(210, 0, 0, 0);
 		paint.setStyle(Paint.Style.FILL_AND_STROKE);
-		canvas.drawCircle(x, y, 0.25f, paint);
+		path = new Path();
+		path.moveTo(x + d, y + d);
+		path.lineTo(x + d, y - d);
+		path.lineTo(x - d, y - d);
+		path.lineTo(x - d, y + d);
+		path.close();
 		break;
 	    case TERRITORY_WHITE:
-		paint.setARGB(196, 255, 255, 255);
+		paint.setARGB(210, 255, 255, 255);
 		paint.setStyle(Paint.Style.FILL_AND_STROKE);
-		canvas.drawCircle(x, y, 0.25f, paint);
+		path = new Path();
+		path.moveTo(x + d, y + d);
+		path.lineTo(x + d, y - d);
+		path.lineTo(x - d, y - d);
+		path.lineTo(x - d, y + d);
+		path.close();
 		break;
 	    default:
 		Log.e(TAG, String.format("SGFMarkup: draw %s@%s (not implemented)", type, point));
@@ -257,7 +267,7 @@ public class GobanRenderer
 		paint.setARGB(255, 0, 0, 0);
 		break;
 	    }
-	    canvas.drawText(text, x, y+1.25f, paint);
+	    canvas.drawText(text, x, y+0.25f, paint);
 	}
     }
 

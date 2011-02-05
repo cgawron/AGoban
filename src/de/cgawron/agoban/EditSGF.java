@@ -50,6 +50,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -81,6 +82,7 @@ public class EditSGF extends Activity
     public static Resources resources;
 
     private GobanView gobanView;
+    private TextView titleView;
     private TextView commentView;
     private GameTree gameTree;
     private GameTreeControls gameTreeControls;
@@ -98,7 +100,9 @@ public class EditSGF extends Activity
 	application = (SGFApplication) getApplication();
 	resources = getResources();
 	settings = getSharedPreferences(SGFApplication.PREF, 0);
+	requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 	setContentView(R.layout.main);
+	getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.custom_title);
 
 	gobanView = (GobanView) findViewById(R.id.goban);
 	gobanView.addGobanEventListener(this);
@@ -106,6 +110,7 @@ public class EditSGF extends Activity
 	
 	GobanView.Tool tool = new MoveTool(this);
 	gobanView.setTool(tool);
+	titleView = (TextView) findViewById(R.id.title);
 	//commentView = (TextView) findViewById(R.id.comment);
 
 	gameTreeControls = (GameTreeControls) findViewById(R.id.controls);
@@ -387,7 +392,7 @@ public class EditSGF extends Activity
 	this.gameTree = gameTree;
 	application.setGameTree(gameTree);
 	gameTreeControls.setGameTree(gameTree);
-	getWindow().setTitle(gameTree.getGameName());
+	titleView.setText(gameTree.getGameName());
     }
 
     public void googleSync()
