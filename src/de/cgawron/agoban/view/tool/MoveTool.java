@@ -141,8 +141,9 @@ public class MoveTool extends Drawable implements GobanView.Tool
 		if (currentNode.getChildCount() == 1 && currentNode.getDepth() <= 1) {
 		    askReplaceMove(currentNode, point);
 		}
-		else 
+		else {
 		    move(currentNode, point, false);
+		}
 	    }
 	}
     }

@@ -144,12 +144,14 @@ public class EditSGF extends Activity
 	Intent intent = getIntent();
 	Log.d(TAG, "Uri: " + intent.getData());
 	if (intent.getData() == null || Intent.ACTION_INSERT.equals(intent.getAction())) {
+	    Log.d(TAG, "onStart: new file");
 	    Uri data = application.getNewGameUri();
 	    application.setData(data);
 	    application.setReadOnly(false);
 	    intent.setData(data);
 	    setGameTree(new GameTree());
 	    application.initProperties(gameTree);
+	    gameTree.setModified(false);
 	}
 	else
 	{
@@ -216,7 +218,6 @@ public class EditSGF extends Activity
     public void onGobanEvent(GobanEvent gobanEvent) 
     {
 	Log.d(TAG, "onGobanEvent: " + gobanEvent);
-
     }
 
     @Override
@@ -286,6 +287,7 @@ public class EditSGF extends Activity
 
     public void setCurrentNode(Node node) 
     {
+	Log.d(TAG, "setCurrentNode: new=" + node + ", old=" + currentNode);
 	if (!node.equals(currentNode)) {
 	    currentNode = node;
 	    variations.clear();

@@ -31,6 +31,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsSpinner;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -118,7 +119,7 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 	}
     }
 
-    private class VariationAdapter extends BaseAdapter implements GameTreeNavigationListener 
+    private class VariationAdapter extends BaseAdapter 
     {
 	Node currentNode = null;
 
@@ -163,9 +164,19 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 	    return convertView;
 	}
 	
-	public void setCurrentNode(Node node)
+	public int getPosition(Node node)
 	{
+	    if (currentNode.getParent() != null)
+		return currentNode.getParent().getChildren().indexOf(node);
+	    else
+		return 0;
+	}
+
+	public void setCurrentNode(Node node, AbsSpinner spinner)
+	{
+	    Log.d(TAG, "VariationTreeAdapter.setCurrentNode: " + node);
 	    currentNode = node;
+	    spinner.setSelection(getPosition(node));
 	    notifyDataSetChanged();
 	}
     }
@@ -186,7 +197,6 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
 
 	variationAdapter = new VariationAdapter();
 	variations.setAdapter(variationAdapter);
-	addGameTreeNavigationListener((GameTreeNavigationListener) variationAdapter);
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.GobanView);
 
@@ -206,6 +216,7 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) 
     {
 	Node node = (Node) variationAdapter.getItem(position);
+	Log.d(TAG, "onItemSelected: " + node);
 	setCurrentNode(node);
     }
 
@@ -248,6 +259,7 @@ public class GameTreeControls extends LinearLayout implements View.OnClickListen
     public void setCurrentNode(Node node) {
 	Log.d(TAG, "setCurrentNode: " + node);
 	this.currentNode = node;
+	variationAdapter.setCurrentNode(node, variations);
 	moveNoView.setText(Integer.toString(node.getMoveNo()));
 	for (GameTreeNavigationListener listener : listeners) {
 	    listener.setCurrentNode(node);
