@@ -100,9 +100,9 @@ public class EditSGF extends Activity
 	application = (SGFApplication) getApplication();
 	resources = getResources();
 	settings = getSharedPreferences(SGFApplication.PREF, 0);
-	requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+	requestWindowFeature(Window.FEATURE_NO_TITLE);
 	setContentView(R.layout.main);
-	getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.custom_title);
+	//getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.custom_title);
 
 	gobanView = (GobanView) findViewById(R.id.goban);
 	gobanView.addGobanEventListener(this);
@@ -367,7 +367,12 @@ public class EditSGF extends Activity
 	startActivity(intent);
     }
 
-    public void open() 
+    public void open(View view)
+    {
+	open();
+    } 
+
+    public void open()
     {
 	Log.d(TAG, "open()");
 	Intent intent = new Intent(Intent.ACTION_SEARCH, SGFProvider.CONTENT_URI, this, ChooseSGF.class);
@@ -393,6 +398,14 @@ public class EditSGF extends Activity
 	application.setGameTree(gameTree);
 	gameTreeControls.setGameTree(gameTree);
 	titleView.setText(gameTree.getGameName());
+
+	if (gameTree.getRoot() instanceof de.cgawron.go.sgf.CollectionRoot) {
+	    Toast toast = Toast.makeText(getApplicationContext(), 
+					 String.format("CollectionRoot: %s, %d children", gameTree.getRoot(), gameTree.getRoot().getChildren().size()), 
+					 Toast.LENGTH_LONG);
+	    toast.show();
+	}
+
     }
 
     public void googleSync()
@@ -402,6 +415,11 @@ public class EditSGF extends Activity
 	send.putExtra(Intent.EXTRA_STREAM, application.getData());
 	startActivity(send);
 	finish();
+    }
+
+    public void showGameInfo(View view)
+    {
+	showGameInfo();
     }
 
     public void showGameInfo() 

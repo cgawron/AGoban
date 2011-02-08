@@ -18,8 +18,10 @@
 
 package de.cgawron.go.sgf;
 
-import java.util.Iterator;
 import java.io.PrintWriter;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.cgawron.go.Goban;
 import de.cgawron.go.Goban.BoardType;
@@ -31,17 +33,19 @@ import de.cgawron.go.Point;
  */
 public class CollectionRoot extends RootNode
 {
+    private static Logger logger = Logger.getLogger(CollectionRoot.class.getName());
+
     public CollectionRoot(GameTree gameTree)
     {
         super(gameTree);
+	add(gameTree.getRoot());
     }
 
     public void write(PrintWriter out)
     {
-	Iterator it = getChildren().iterator();
-	while (it.hasNext())
-	{
-	    Node node = (Node)it.next();
+	logger.info("CollectionRoot.write: " + this);
+	for (Node node : getChildren()) {
+	    logger.info("CollectionRoot.write:" + node);
 	    node.write(out);
 	}
     }

@@ -197,35 +197,19 @@ public class GameTree implements TreeModel, PropertyChangeListener, MementoOrigi
      */
     public GameTree(Reader reader) throws Exception
     {
-	root = new CollectionRoot(this);
         name = "<unknown input>";
         listeners = new HashSet<EventListener>();
 	Yylex lexer = new Yylex(reader);
         Parser parser = new Parser(lexer);
 	logger.info("parsing " + reader + " ...");
-        List roots = (List) parser.debug_parse().value;
-	logger.info("parsing done");
-        if (roots.size() > 1) {
-	    init(new CollectionRoot(this));
-	    Iterator it = roots.iterator();
-	    while (it.hasNext()) {
-		GameTree tree = (GameTree)it.next();
-		Node n = tree.getRoot();
-		logger.info("GameTree(stream): " + root + ", " + n);
-		if (n != null) {
-		    root.add(n);
-		    n.setGameTree(this);
-		}
-	    }
+        Object obj = parser.debug_parse().value;
+	logger.info("parsing done: " + obj.getClass());
+        if (obj instanceof CollectionRoot) {
+	    init((CollectionRoot) obj);
 	    collection = true;
 	}
         else {
-	    GameTree tree = (GameTree) roots.get(0);
-	    init(tree);
-	    //Node node = tree.getRoot();
-	    //node.setRoot((Node)getRoot());
-	    //node.setRoot(node);
-	    //init(node);
+	    init((GameTree) obj);
 	}
         reader.close();
         setModified(false);

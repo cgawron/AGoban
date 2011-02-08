@@ -58,6 +58,13 @@ parser code
 
 :};
 
+action code 
+{:
+    private static Logger logger = Logger.getLogger(Parser.class.getName());
+:};
+
+
+
 //init with {: scanner.init();              :};
 //scan with {: return scanner.next_token(); :};
 
@@ -72,16 +79,25 @@ non terminal            Collection, GameTree, GameTreeList, Sequence, Node, Prop
 /* The grammar */
 Collection   ::= GameTree:gt
                  {:
-	            Collection c = new LinkedList();
-	            c.add(new GameTree((Node) gt));
-	            RESULT = c;
+		    GameTree tree = new GameTree((Node) gt);
+		    logger.info("Collection: " + gt.getClass());
+	            RESULT = tree;
                  :}
 
 	       | Collection:c GameTree:gt
                  {:
-	            RESULT = c;
+                    CollectionRoot root;
+		    if (c instanceof GameTree) {
+		       root = new CollectionRoot((GameTree) c);
+                    } 
+		    else {
+                       root = (CollectionRoot) c;
+                    }
 	            GameTree gameTree = new GameTree((Node) gt);
-	            ((Collection) c).add(gameTree);
+	            root.add(gameTree.getRoot());
+		    logger.info("Collection: " + c.getClass() + ", " + gt.getClass());
+		    logger.info("Collection: " + root.getChildren().size());
+	            RESULT = root;
                  :}
 ;
 
