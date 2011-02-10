@@ -392,7 +392,8 @@ public abstract class AbstractValue implements Value
 
         public PointList(String text)
         {
-	    logger.fine("PointList(" + text + ")");
+	    if (logger.isLoggable(Level.FINE))
+		logger.fine("PointList(" + text + ")");
             if (text.length() == 0)
 	    {
 		// PointList is empty

@@ -53,6 +53,20 @@ public class Property implements Cloneable
 	int priority() default 1000;
     }
     
+
+    static Class[] argt = new Class[1];
+    
+    static
+    {
+	try {
+	    argt[0] = Class.forName("de.cgawron.go.sgf.Property$Key");
+	}
+	catch (ClassNotFoundException ex) {
+	    //logger.severe("Class Key missing, installation is corrupt: " + ex.getMessage());
+	    throw new RuntimeException("Class Key missing, installation is corrupt", ex);
+	}
+    }
+
     public interface Joinable
     {
 	public void join(Property p);
@@ -149,13 +163,21 @@ public class Property implements Cloneable
 
     static class PropertyDescriptor
     {
+
         Class myClass;
+	Constructor myConstructor;
         int priority = 0;
 	String userFriendlyName;
 
         PropertyDescriptor(SGFProperty annotation)
 	{
 	    myClass = annotation.propertyClass();
+	    try {
+		myConstructor = myClass.getConstructor(argt);
+	    }
+	    catch (Exception ex) {
+		myConstructor = null;
+	    }
 	    priority = annotation.priority();
 	    userFriendlyName = annotation.name();
 	}
@@ -169,11 +191,12 @@ public class Property implements Cloneable
             try
             {
                 myClass = Class.forName(name);
+		if (myClass != null)
+		    myConstructor = myClass.getConstructor(argt);
             }
             catch (Throwable e)
             {
-                throw new MissingResourceException("Exception while loading " + name + ": " + e.getMessage(), 
-						   getClass().getName(), name);
+		myConstructor = null;
             }
             priority = Integer.parseInt(tokens.nextToken());
 	    if (tokens.hasMoreElements())
@@ -196,12 +219,18 @@ public class Property implements Cloneable
         {
             return myClass;
         }
+
+        Constructor getConstructor()
+        {
+            return myConstructor;
+        }
     }
 
 
     private static class Factory
     {
 	private static HashMap<String, PropertyDescriptor> propertyMap = null;
+	Map<Key, Constructor> constructorMap = new HashMap<Key, Constructor>();
 
         Factory()
         {
@@ -264,7 +293,8 @@ public class Property implements Cloneable
             {
                 argv[0] = key;
                 propertyClass = getDescriptor(key).getPropertyClass();
-                Constructor c = propertyClass.getConstructor(argt);
+		Constructor c = getDescriptor(key).getConstructor();
+		if (c == null) return new Property(key);
                 return (Property)c.newInstance(argv);
             }
             catch (Exception e)
@@ -278,7 +308,7 @@ public class Property implements Cloneable
                 else
                     logger.warning("No class known for " + key);
 
-                return new Property(key);
+		return new Property(key);
             }
         }
 

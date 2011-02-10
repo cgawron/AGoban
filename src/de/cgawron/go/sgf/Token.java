@@ -42,7 +42,6 @@ class Token extends Symbol
         m_line = line;
         m_charBegin = charBegin;
         value = o;
-	logger.fine("Token created: " + this);
     }
 
     public String toString()
