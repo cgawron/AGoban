@@ -23,38 +23,33 @@ import de.cgawron.util.Memento;
 import java.util.*;
 import java.util.logging.Logger;
 
-class GameTreeMemento implements Memento
-{
-    private static Logger logger = Logger.getLogger(NodeMemento.class.getName());
-    private Map<Node, Memento> nodeMementos = new HashMap<Node, Memento>(); 
-    
-    public GameTreeMemento(GameTree gameTree)
-    {
-	Iterator it = new TreeIterator(gameTree);
-	while (it.hasNext())
-	{
-	    Node n = (Node) it.next();
-	    nodeMementos.put(n, n.createMemento());
-	}
-    }
+class GameTreeMemento implements Memento {
+	private static Logger logger = Logger
+			.getLogger(NodeMemento.class.getName());
+	private Map<Node, Memento> nodeMementos = new HashMap<Node, Memento>();
 
-    void setMemento(Node n)
-    {
-	logger.info("GameTreeMement: setMemento: " + n);
-	Memento m = (Memento) nodeMementos.get(n);
-	if (m != null)
-	    n.setMemento(m);
-	else
-	    logger.severe("No Memento stored for Node " + n);
-	Iterator it = n.getChildren().iterator();
-	while (it.hasNext())
-	{
-	    setMemento((Node) it.next());
+	public GameTreeMemento(GameTree gameTree) {
+		Iterator it = new TreeIterator(gameTree);
+		while (it.hasNext()) {
+			Node n = (Node) it.next();
+			nodeMementos.put(n, n.createMemento());
+		}
 	}
-    }
-    
-    public String toString()
-    {
-	return "[GameTreeMemento nodeMementos=" + nodeMementos + "]";
-    }
+
+	void setMemento(Node n) {
+		logger.info("GameTreeMement: setMemento: " + n);
+		Memento m = (Memento) nodeMementos.get(n);
+		if (m != null)
+			n.setMemento(m);
+		else
+			logger.severe("No Memento stored for Node " + n);
+		Iterator it = n.getChildren().iterator();
+		while (it.hasNext()) {
+			setMemento((Node) it.next());
+		}
+	}
+
+	public String toString() {
+		return "[GameTreeMemento nodeMementos=" + nodeMementos + "]";
+	}
 }

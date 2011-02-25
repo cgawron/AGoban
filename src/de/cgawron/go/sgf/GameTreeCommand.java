@@ -19,20 +19,20 @@
 package de.cgawron.go.sgf;
 
 /**
- * A command to be run on a GameTree.
- * Instances of this interface may be {@link #run} on a {@link GameTree}. 
+ * A command to be run on a GameTree. Instances of this interface may be
+ * {@link #run} on a {@link GameTree}.
  */
-public interface GameTreeCommand
-{
-    /**
-     * Runs the command on a {@link GameTree}.
-     */
-    public void run(GameTree gameTree) throws Exception;
-    
-    /**
-     * Returns the name of the command. 
-     * The name should be used to describe the functionality this command implements.
-     * @return the name of the command.
-     */
-    public String getName();
+public interface GameTreeCommand {
+	/**
+	 * Runs the command on a {@link GameTree}.
+	 */
+	public void run(GameTree gameTree) throws Exception;
+
+	/**
+	 * Returns the name of the command. The name should be used to describe the
+	 * functionality this command implements.
+	 * 
+	 * @return the name of the command.
+	 */
+	public String getName();
 }

@@ -18,10 +18,10 @@
 
 package de.cgawron.go.sgf;
 
-public interface InputPosition 
-{
-    int getLine();
-    int getColumn();
+public interface InputPosition {
+	int getLine();
 
-    String getCurrentLine();
+	int getColumn();
+
+	String getCurrentLine();
 }

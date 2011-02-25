@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2010 Christian Gawron
  *
@@ -53,83 +52,80 @@ import de.cgawron.go.sgf.Value;
 
 /**
  * A {@link View} to be used for grade properties (i.e. BR[] and WR[])
- *
+ * 
  */
-public class GradeView extends PropertyView 
-{
-    private static String TAG = "GradeView";
-    
-    private DanKyuFilter[] filters = { new DanKyuFilter() };
-   
-    private class DanKyuFilter implements InputFilter
-    {
-	public CharSequence filter (CharSequence source, int start, int end, Spanned dest, int dstart, int dend)
-	{
-	    StringBuilder builder = new StringBuilder();
-	    if (dest != null) {
-		builder.append(dest, 0, dstart);
-		builder.append(source.subSequence(start, end));
-		if (dend < dest.length())
-		    builder.append(dest, dend, dest.length());
-	    }
-	    Log.d(TAG, String.format("filter: %s->%s, %d, %d: %s", 
-				     source.subSequence(start, end), dest, dstart, dend, builder));
+public class GradeView extends PropertyView {
+	private static String TAG = "GradeView";
 
-	    int grade = 0;
-	    int i;
-	    for (i=0; i<builder.length() && Character.isDigit(builder.charAt(i)); i++) {
-		grade = 10*grade + Character.digit(builder.charAt(i), 10);
-	    }
-	    if (grade == 0) return "";
+	private DanKyuFilter[] filters = { new DanKyuFilter() };
 
-	    switch (builder.length()-i) {
-	    case 0:
-		return null;
-	    case 1:
-		if (isGrade(builder.charAt(builder.length()-1)))
-		    return null;
-		else
-		    return "";
-	    default:
-		return "";
-	    }
+	private class DanKyuFilter implements InputFilter {
+		public CharSequence filter(CharSequence source, int start, int end,
+				Spanned dest, int dstart, int dend) {
+			StringBuilder builder = new StringBuilder();
+			if (dest != null) {
+				builder.append(dest, 0, dstart);
+				builder.append(source.subSequence(start, end));
+				if (dend < dest.length())
+					builder.append(dest, dend, dest.length());
+			}
+			Log.d(TAG,
+					String.format("filter: %s->%s, %d, %d: %s",
+							source.subSequence(start, end), dest, dstart, dend,
+							builder));
+
+			int grade = 0;
+			int i;
+			for (i = 0; i < builder.length()
+					&& Character.isDigit(builder.charAt(i)); i++) {
+				grade = 10 * grade + Character.digit(builder.charAt(i), 10);
+			}
+			if (grade == 0)
+				return "";
+
+			switch (builder.length() - i) {
+			case 0:
+				return null;
+			case 1:
+				if (isGrade(builder.charAt(builder.length() - 1)))
+					return null;
+				else
+					return "";
+			default:
+				return "";
+			}
+		}
+
+		public boolean isGrade(char c) {
+			switch (c) {
+			case 'k':
+			case 'd':
+			case 'p':
+				return true;
+
+			default:
+				return false;
+			}
+		}
 	}
 
-	public boolean isGrade(char c)
-	{
-	    switch (c) {
-	    case 'k':
-	    case 'd':
-	    case 'p':
-		return true;
-
-	    default:
-		return false;
-	    }
+	/**
+	 * Construct object, initializing with any attributes we understand from a
+	 * layout file. These attributes are defined in
+	 * SDK/assets/res/any/classes.xml.
+	 * 
+	 * @see android.view.View#View(android.content.Context,
+	 *      android.util.AttributeSet)
+	 */
+	public GradeView(Context context, AttributeSet attrs) {
+		super(context, attrs);
 	}
-    }
 
-    /**
-     * Construct object, initializing with any attributes we understand from a
-     * layout file. These attributes are defined in
-     * SDK/assets/res/any/classes.xml.
-     * 
-     * @see android.view.View#View(android.content.Context, android.util.AttributeSet)
-     */
-    public GradeView(Context context, AttributeSet attrs) 
-    {
-        super(context, attrs);
-    }
+	@Override
+	protected void onAttachedToWindow() {
+		super.onAttachedToWindow();
 
-    @Override
-    protected void onAttachedToWindow()
-    {
-	super.onAttachedToWindow();
-	
-	getText().setFilters(filters);
-    }
+		getText().setFilters(filters);
+	}
 
 }
-
-
-

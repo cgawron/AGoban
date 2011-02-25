@@ -29,25 +29,24 @@ import de.cgawron.go.Point;
 
 /**
  * An instance of this class represents a node in a sgf game tree.
+ * 
  * @author Christian Gawron
  */
-public class CollectionRoot extends RootNode
-{
-    private static Logger logger = Logger.getLogger(CollectionRoot.class.getName());
+public class CollectionRoot extends RootNode {
+	private static Logger logger = Logger.getLogger(CollectionRoot.class
+			.getName());
 
-    public CollectionRoot(GameTree gameTree)
-    {
-        super(gameTree);
-	add(gameTree.getRoot());
-    }
-
-    public void write(PrintWriter out)
-    {
-	logger.info("CollectionRoot.write: " + this);
-	for (Node node : getChildren()) {
-	    logger.info("CollectionRoot.write:" + node);
-	    node.write(out);
+	public CollectionRoot(GameTree gameTree) {
+		super(gameTree);
+		add(gameTree.getRoot());
 	}
-    }
+
+	public void write(PrintWriter out) {
+		logger.info("CollectionRoot.write: " + this);
+		for (Node node : getChildren()) {
+			logger.info("CollectionRoot.write:" + node);
+			node.write(out);
+		}
+	}
 
 }

@@ -23,50 +23,45 @@ import de.cgawron.util.Memento;
 import java.util.*;
 import java.util.logging.Logger;
 
-class NodeMemento implements Memento
-{
-    private static Logger logger = Logger.getLogger(NodeMemento.class.getName());
-    private Map<Property.Key, Property> properties;
-    private Node parent;
-    private List<Node> children;
-    
-    public NodeMemento(Node node)
-    {
-	if (node != null)
-	{
-	    this.parent = (Node) node.getParent();
-	    this.children = null;
-	    if (node.getChildren() != null)
-		this.children = new LinkedList<Node>(node.getChildren());
-	    properties = new TreeMap<Property.Key, Property>();
-	    Iterator it = node.keySet().iterator();
-	    while (it.hasNext()) {
-		Property.Key key = (Property.Key) it.next();
-		Property prop = (Property) node.get(key);
-		properties.put(key, (Property) prop.clone());
-	    }
-	    logger.info("NodeMemento: Setting properties to " + properties);
+class NodeMemento implements Memento {
+	private static Logger logger = Logger
+			.getLogger(NodeMemento.class.getName());
+	private Map<Property.Key, Property> properties;
+	private Node parent;
+	private List<Node> children;
+
+	public NodeMemento(Node node) {
+		if (node != null) {
+			this.parent = (Node) node.getParent();
+			this.children = null;
+			if (node.getChildren() != null)
+				this.children = new LinkedList<Node>(node.getChildren());
+			properties = new TreeMap<Property.Key, Property>();
+			Iterator it = node.keySet().iterator();
+			while (it.hasNext()) {
+				Property.Key key = (Property.Key) it.next();
+				Property prop = (Property) node.get(key);
+				properties.put(key, (Property) prop.clone());
+			}
+			logger.info("NodeMemento: Setting properties to " + properties);
+		}
 	}
-    }
-    
-    public Map<Property.Key, Property> getProperties()
-    {
-	return Collections.unmodifiableMap(properties);
-    }
 
-    public Node getParent()
-    {
-	return parent;
-    }
+	public Map<Property.Key, Property> getProperties() {
+		return Collections.unmodifiableMap(properties);
+	}
 
-    public List<Node> getChildren()
-    {
-	return children;
-    }
-    
-    public String toString()
-    {
-	return "NodeMemento: properies=" + properties.toString() + " " + super.toString() + 
-	       ", children=" + children + ", parent=" + parent;
-    }
+	public Node getParent() {
+		return parent;
+	}
+
+	public List<Node> getChildren() {
+		return children;
+	}
+
+	public String toString() {
+		return "NodeMemento: properies=" + properties.toString() + " "
+				+ super.toString() + ", children=" + children + ", parent="
+				+ parent;
+	}
 }

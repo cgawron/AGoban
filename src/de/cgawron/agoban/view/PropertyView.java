@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2010 Christian Gawron
  *
@@ -52,126 +51,121 @@ import de.cgawron.go.sgf.Value;
 
 /**
  * A {@link View} to be used for SGF properties
- *
+ * 
  */
-public class PropertyView extends EditText implements TextWatcher
-{
-    private static String TAG = "PropertyView";
-    private PropertyList properties;
-    private GameInfo property;
+public class PropertyView extends EditText implements TextWatcher {
+	private static String TAG = "PropertyView";
+	private PropertyList properties;
+	private GameInfo property;
 
-    private String key;
-    private String valueText = "";
+	private String key;
+	private String valueText = "";
 
-    /**
-     * Construct object, initializing with any attributes we understand from a
-     * layout file. These attributes are defined in
-     * SDK/assets/res/any/classes.xml.
-     * 
-     * @see android.view.View#View(android.content.Context, android.util.AttributeSet)
-     */
-    public PropertyView(Context context, AttributeSet attrs) 
-    {
-        super(context, attrs);
-	key = attrs.getAttributeValue("http://cgawron", "property");
-	addTextChangedListener(this);
-    }
-
-    @Override
-    protected void onAttachedToWindow()
-    {
-	super.onAttachedToWindow();
-	Context context = getContext();
-	SGFApplication application = (SGFApplication) context.getApplicationContext();
-
-	//TODO: Rethink initialization
-	if (application.getGameTree() != null) {
-	    setPropertyList(application.getGameTree().getRoot());
-	}
-    }
-
-    protected void initText() 
-    {
-	if (property != null) {
-	    Value value = property.getValue();
-	    if (value != null)
-		valueText = value.toString();
-	}
-	    
-	setText(valueText);
-    }
-
-    /**
-     * Sets the text to display in this label
-     * @param text The text to display. This will be drawn as one line.
-     */
-    public void setPropertyList(PropertyList properties) {
-	this.properties = properties;
-	if (this.key != null) {
-	    Property.Key key = new Property.Key(this.key);
-	    property = (GameInfo) properties.get(key); 
-	    Log.d(TAG, "property: " + property); 
-	    
-	    if (property == null) {
-		Property prop = Property.createProperty(key);
-		Log.d(TAG, "new property for key " + this.key + ": " + prop.getClass()); 
-		property = (GameInfo) prop;
-		properties.add(property);
-	    }
-	}
-	
-	Log.d(TAG, "setPropertyList: " + properties); 
-	initText();
-    }
-
-    public void setValue(String value)
-    {
-	valueText = value;
-	setText(valueText);
-    }
-
-    public void setValue(ContentValues values)
-    {
-	valueText = values.get(key).toString();
-	if (valueText == null)
-	    valueText= "";
-	setText(valueText);
-    }
-
-    public void setValue(Cursor cursor, int position)
-    {
-	Log.d(TAG, String.format("setValue(%s, %d)", cursor, position));
-	int oldPosition = cursor.getPosition();
-	cursor.moveToPosition(position);
-	valueText = cursor.getString(cursor.getColumnIndex(key));
-	cursor.moveToPosition(oldPosition);
-	
-	if (valueText == null)
-	    valueText= "";
-	setText(valueText);
-    }
-
-    public void afterTextChanged(android.text.Editable s)
-    {
-	Log.d(TAG, "afterTextChanged: " + s);
-	if (property == null) {
+	/**
+	 * Construct object, initializing with any attributes we understand from a
+	 * layout file. These attributes are defined in
+	 * SDK/assets/res/any/classes.xml.
+	 * 
+	 * @see android.view.View#View(android.content.Context,
+	 *      android.util.AttributeSet)
+	 */
+	public PropertyView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		key = attrs.getAttributeValue("http://cgawron", "property");
+		addTextChangedListener(this);
 	}
 
-	if (property != null) {
-	    Log.d(TAG, "setting property " + key + " to " + s);
-	    property.setValue(s.toString());
+	@Override
+	protected void onAttachedToWindow() {
+		super.onAttachedToWindow();
+		Context context = getContext();
+		SGFApplication application = (SGFApplication) context
+				.getApplicationContext();
+
+		// TODO: Rethink initialization
+		if (application.getGameTree() != null) {
+			setPropertyList(application.getGameTree().getRoot());
+		}
 	}
 
-	Log.d(TAG, "after Text: " + properties);
-    }
+	protected void initText() {
+		if (property != null) {
+			Value value = property.getValue();
+			if (value != null)
+				valueText = value.toString();
+		}
 
-    public void beforeTextChanged(CharSequence s, int start, int count, int after)
-    {
-    }
+		setText(valueText);
+	}
 
-    public void onTextChanged(CharSequence s, int start, int count, int after)
-    {
-    }
+	/**
+	 * Sets the text to display in this label
+	 * 
+	 * @param text
+	 *            The text to display. This will be drawn as one line.
+	 */
+	public void setPropertyList(PropertyList properties) {
+		this.properties = properties;
+		if (this.key != null) {
+			Property.Key key = new Property.Key(this.key);
+			property = (GameInfo) properties.get(key);
+			Log.d(TAG, "property: " + property);
+
+			if (property == null) {
+				Property prop = Property.createProperty(key);
+				Log.d(TAG,
+						"new property for key " + this.key + ": "
+								+ prop.getClass());
+				property = (GameInfo) prop;
+				properties.add(property);
+			}
+		}
+
+		Log.d(TAG, "setPropertyList: " + properties);
+		initText();
+	}
+
+	public void setValue(String value) {
+		valueText = value;
+		setText(valueText);
+	}
+
+	public void setValue(ContentValues values) {
+		valueText = values.get(key).toString();
+		if (valueText == null)
+			valueText = "";
+		setText(valueText);
+	}
+
+	public void setValue(Cursor cursor, int position) {
+		Log.d(TAG, String.format("setValue(%s, %d)", cursor, position));
+		int oldPosition = cursor.getPosition();
+		cursor.moveToPosition(position);
+		valueText = cursor.getString(cursor.getColumnIndex(key));
+		cursor.moveToPosition(oldPosition);
+
+		if (valueText == null)
+			valueText = "";
+		setText(valueText);
+	}
+
+	public void afterTextChanged(android.text.Editable s) {
+		Log.d(TAG, "afterTextChanged: " + s);
+		if (property == null) {
+		}
+
+		if (property != null) {
+			Log.d(TAG, "setting property " + key + " to " + s);
+			property.setValue(s.toString());
+		}
+
+		Log.d(TAG, "after Text: " + properties);
+	}
+
+	public void beforeTextChanged(CharSequence s, int start, int count,
+			int after) {
+	}
+
+	public void onTextChanged(CharSequence s, int start, int count, int after) {
+	}
 }
-
-

@@ -1,6 +1,6 @@
 /*
  *
- * $Id$
+ * $Id: NeighborhoodEnumeration.java 15 2003-03-15 23:25:52Z cgawron $
  *
  * (c) 2010 Christian Gawron. All rights reserved.
  *
@@ -20,63 +20,60 @@ package de.cgawron.go;
 import de.cgawron.go.Point;
 import java.util.Enumeration;
 
-public class NeighborhoodEnumeration implements Enumeration<Point>
-{
-    protected int direction;
-    protected int size;
-    protected Point point;
-    private Point nextPoint;
+public class NeighborhoodEnumeration implements Enumeration<Point> {
+	protected int direction;
+	protected int size;
+	protected Point point;
+	private Point nextPoint;
 
-    /** NeighborhoodEnumeration constructor comment. */
-    public NeighborhoodEnumeration(Goban goban, Point p)
-    {
-        super();
-        point = p;
-        size = (int) goban.getBoardSize();
-        direction = 0;
-        calcNext();
-    }
+	/** NeighborhoodEnumeration constructor comment. */
+	public NeighborhoodEnumeration(Goban goban, Point p) {
+		super();
+		point = p;
+		size = (int) goban.getBoardSize();
+		direction = 0;
+		calcNext();
+	}
 
-    /** Insert the method's description here. Creation date: (03/25/00 19:05:28) */
-    private void calcNext()
-    {
-        nextPoint = null;
-        while (nextPoint == null && direction < 4)
-        {
-            switch (direction)
-            {
-                case 0:
-                    if (point.getX() + 1 < size)
-                        nextPoint = new Point((short)(point.getX() + 1), point.getY());
-                    break;
-                case 1:
-                    if (point.getY() + 1 < size)
-                        nextPoint = new Point(point.getX(), (short)(point.getY() + 1));
-                    break;
-                case 2:
-                    if (point.getX() > 0)
-                        nextPoint = new Point((short)(point.getX() - 1), point.getY());
-                    break;
-                case 3:
-                    if (point.getY() > 0)
-                        nextPoint = new Point(point.getX(), (short)(point.getY() - 1));
-                    break;
-            }
-            direction++;
-        }
-    }
+	/** Insert the method's description here. Creation date: (03/25/00 19:05:28) */
+	private void calcNext() {
+		nextPoint = null;
+		while (nextPoint == null && direction < 4) {
+			switch (direction) {
+			case 0:
+				if (point.getX() + 1 < size)
+					nextPoint = new Point((short) (point.getX() + 1),
+							point.getY());
+				break;
+			case 1:
+				if (point.getY() + 1 < size)
+					nextPoint = new Point(point.getX(),
+							(short) (point.getY() + 1));
+				break;
+			case 2:
+				if (point.getX() > 0)
+					nextPoint = new Point((short) (point.getX() - 1),
+							point.getY());
+				break;
+			case 3:
+				if (point.getY() > 0)
+					nextPoint = new Point(point.getX(),
+							(short) (point.getY() - 1));
+				break;
+			}
+			direction++;
+		}
+	}
 
-    /** hasMoreElements method comment. */
-    public boolean hasMoreElements()
-    {
-        return nextPoint != null;
-    }
+	/** hasMoreElements method comment. */
+	public boolean hasMoreElements() {
+		return nextPoint != null;
+	}
 
-    /** nextElement method comment. */
-    public Point nextElement()
-    {
-        Point p = nextPoint;
-        calcNext();
-        return p;
-    }
+	/** nextElement method comment. */
+	public Point nextElement() {
+		Point p = nextPoint;
+		calcNext();
+		return p;
+	}
 }

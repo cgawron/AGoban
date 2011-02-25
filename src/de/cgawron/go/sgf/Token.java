@@ -20,32 +20,28 @@ import java_cup.runtime.Symbol;
 
 import java.util.logging.Logger;
 
-class Token extends Symbol
-{
-    private static Logger logger = Logger.getLogger(Token.class.getName());
+class Token extends Symbol {
+	private static Logger logger = Logger.getLogger(Token.class.getName());
 
-    public int m_index;
-    public String m_text;
-    public int m_line;
-    public int m_charBegin;
+	public int m_index;
+	public String m_text;
+	public int m_line;
+	public int m_charBegin;
 
-    Token(int index, String text, int line, int charBegin)
-    {
-        this(index, text, line, charBegin, null);
-    }
+	Token(int index, String text, int line, int charBegin) {
+		this(index, text, line, charBegin, null);
+	}
 
-    Token(int index, String text, int line, int charBegin, Object o)
-    {
-        super(index, charBegin, charBegin + text.length(), null);
-        m_index = index;
-        m_text = new String(text);
-        m_line = line;
-        m_charBegin = charBegin;
-        value = o;
-    }
+	Token(int index, String text, int line, int charBegin, Object o) {
+		super(index, charBegin, charBegin + text.length(), null);
+		m_index = index;
+		m_text = new String(text);
+		m_line = line;
+		m_charBegin = charBegin;
+		value = o;
+	}
 
-    public String toString()
-    {
-        return "Token #" + m_index + ": " + m_text + " (line " + m_line + ")";
-    }
+	public String toString() {
+		return "Token #" + m_index + ": " + m_text + " (line " + m_line + ")";
+	}
 }

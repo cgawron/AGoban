@@ -18,40 +18,36 @@
 
 package de.cgawron.go.sgf;
 
-public class ParseError extends RuntimeException 
-{
-    int line;
-    int column;
-    String text;
-    String message;
+public class ParseError extends RuntimeException {
+	int line;
+	int column;
+	String text;
+	String message;
 
-    public ParseError(String message, Object info)
-    {
-	super(message + " at " + info);
-	this.message = message + " at " + info;
-    }
+	public ParseError(String message, Object info) {
+		super(message + " at " + info);
+		this.message = message + " at " + info;
+	}
 
-    public ParseError(String message, InputPosition position, Object info)
-    {
-	super(message + " at " + info);
-	this.message = message + " at " + info;
-	text = position.getCurrentLine();
-	line = position.getLine();
-	column = position.getColumn();
-    }
+	public ParseError(String message, InputPosition position, Object info) {
+		super(message + " at " + info);
+		this.message = message + " at " + info;
+		text = position.getCurrentLine();
+		line = position.getLine();
+		column = position.getColumn();
+	}
 
-    public String getMessage()
-    {
-	int i;
-	StringBuffer buffer = new StringBuffer();
-	
-	buffer.append(message).append(" at line ").append(line);
-	buffer.append(", column").append(column).append(":\n");
-	buffer.append(text).append("\n");
-	for (i=1; i<column; i++)
-	    buffer.append(' ');
-	buffer.append('^');
-	
-	return buffer.toString();
-    }
+	public String getMessage() {
+		int i;
+		StringBuffer buffer = new StringBuffer();
+
+		buffer.append(message).append(" at line ").append(line);
+		buffer.append(", column").append(column).append(":\n");
+		buffer.append(text).append("\n");
+		for (i = 1; i < column; i++)
+			buffer.append(' ');
+		buffer.append('^');
+
+		return buffer.toString();
+	}
 }

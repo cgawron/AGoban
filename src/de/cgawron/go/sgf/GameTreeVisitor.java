@@ -18,11 +18,12 @@
 
 package de.cgawron.go.sgf;
 
-/** 
- * A GameTreeVisitor calls {@link #visitNode} for all nodes of a {@link GameTree}.
+/**
+ * A GameTreeVisitor calls {@link #visitNode} for all nodes of a
+ * {@link GameTree}.
+ * 
  * @author Christian Gawron
  */
-public interface GameTreeVisitor 
-{
-    void visitNode(Object o) throws Exception;
+public interface GameTreeVisitor {
+	void visitNode(Object o) throws Exception;
 }

@@ -24,51 +24,49 @@ import java.io.PrintWriter;
 /**
  * A value of a {@link Property}
  */
-public interface Value extends Cloneable
-{
-    void write(PrintWriter out);
-    
-    String getString();
+public interface Value extends Cloneable {
+	void write(PrintWriter out);
 
-    public interface Transformable
-    {
-	void transform(Symmetry symmetry);
-    }
+	String getString();
 
-    public interface Void extends Value 
-    {
-    }
+	public interface Transformable {
+		void transform(Symmetry symmetry);
+	}
 
-    public interface Point extends Value, Transformable 
-    {
-	de.cgawron.go.Point getPoint();
-    }
+	public interface Void extends Value {
+	}
 
-    public interface PointList extends Value, Transformable, java.util.Collection<de.cgawron.go.Point> 
-    {
-	short getMinX();
-	short getMinY();
-	short getMaxX();
-	short getMaxY();
-    }
+	public interface Point extends Value, Transformable {
+		de.cgawron.go.Point getPoint();
+	}
 
-    public interface Label extends Value, Transformable 
-    {
-	de.cgawron.go.Point getPoint();
-    }
+	public interface PointList extends Value, Transformable,
+			java.util.Collection<de.cgawron.go.Point> {
+		short getMinX();
 
-    public interface Text extends Value {}
+		short getMinY();
 
-    public interface Result extends Value {}
+		short getMaxX();
 
-    public interface Number extends Value 
-    {
-	int intValue();
-    }
+		short getMaxY();
+	}
 
-    public interface ValueList extends Value, java.util.List<Value> 
-    {
-    }
+	public interface Label extends Value, Transformable {
+		de.cgawron.go.Point getPoint();
+	}
 
-    public Value clone();
+	public interface Text extends Value {
+	}
+
+	public interface Result extends Value {
+	}
+
+	public interface Number extends Value {
+		int intValue();
+	}
+
+	public interface ValueList extends Value, java.util.List<Value> {
+	}
+
+	public Value clone();
 }

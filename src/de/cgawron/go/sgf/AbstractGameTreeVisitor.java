@@ -19,43 +19,48 @@
 package de.cgawron.go.sgf;
 
 /**
- * This class provides an abstract base class for the {@link GameTreeVisitor} interface.
- * A child class only has to implement the {@link #visitNode} method. 
+ * This class provides an abstract base class for the {@link GameTreeVisitor}
+ * interface. A child class only has to implement the {@link #visitNode} method.
  */
-public abstract class AbstractGameTreeVisitor 
-    extends TreeVisitor<GameTree, Node> 
-    implements GameTreeVisitor, GameTreeCommand 
-{
-    /**
-     * Constructs a AbstractGameTreeVisitor without an underlying {@link GameTree}.
-     */
-    public AbstractGameTreeVisitor()
-    {
-    }
-    
-    /**
-     * Constructs a AbstractGameTreeVisitor and sets the underlying {@link GameTree}.
-     * @param gameTree - the {@link GameTree} to set.
-     */
-    public AbstractGameTreeVisitor(GameTree gameTree)
-    {
-	setModel(gameTree);
-    }
+public abstract class AbstractGameTreeVisitor extends
+		TreeVisitor<GameTree, Node> implements GameTreeVisitor, GameTreeCommand {
+	/**
+	 * Constructs a AbstractGameTreeVisitor without an underlying
+	 * {@link GameTree}.
+	 */
+	public AbstractGameTreeVisitor() {
+	}
 
-    /**
-     * Runs the {@link visit} on the gameTree.
-     * @param gameTree - {@link GameTree} to vist.
-     * @throws Exception - if any {@link visitNode} throws an exception, it will be reported here.
-     */
-    public void run(GameTree gameTree) throws Exception
-    {
-	setModel(gameTree);
-	visit();
-    }
+	/**
+	 * Constructs a AbstractGameTreeVisitor and sets the underlying
+	 * {@link GameTree}.
+	 * 
+	 * @param gameTree
+	 *            - the {@link GameTree} to set.
+	 */
+	public AbstractGameTreeVisitor(GameTree gameTree) {
+		setModel(gameTree);
+	}
 
-    /**
-     * {@inheritDoc}.
-     * @throws Exception - an implementing method may throw any exception. 
-     */
-    public abstract void visitNode(Object o) throws Exception;
+	/**
+	 * Runs the {@link visit} on the gameTree.
+	 * 
+	 * @param gameTree
+	 *            - {@link GameTree} to vist.
+	 * @throws Exception
+	 *             - if any {@link visitNode} throws an exception, it will be
+	 *             reported here.
+	 */
+	public void run(GameTree gameTree) throws Exception {
+		setModel(gameTree);
+		visit();
+	}
+
+	/**
+	 * {@inheritDoc}.
+	 * 
+	 * @throws Exception
+	 *             - an implementing method may throw any exception.
+	 */
+	public abstract void visitNode(Object o) throws Exception;
 }

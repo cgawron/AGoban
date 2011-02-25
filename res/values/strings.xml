@@ -4,6 +4,9 @@
     <string name="AP">Application</string>
     <string name="PW">White</string>
     <string name="PB">Black</string>
+    <string name="DT">Date</string>
+    <string name="EV">Event</string>
+    <string name="PC">Place</string>
     <string name="me">me</string>
     <string name="player">Player</string>
     <string name="choose_file">Choose file</string>

@@ -24,30 +24,26 @@ import android.content.Context;
 import android.preference.ListPreference;
 import android.util.AttributeSet;
 
-public class AccountPreference extends ListPreference
-{
-    public AccountPreference(Context context, AttributeSet attrs)
-    {
-	super(context, attrs);
-    }
-
-    public AccountPreference(Context context)
-    {
-	super(context);
-    }
-    
-    protected void onPrepareDialogBuilder(AlertDialog.Builder builder)
-    {
-	final AccountManager manager = AccountManager.get(getContext());
-	final Account[] accounts = manager.getAccountsByType("com.google");
-	final int size = accounts.length;
-	String[] names = new String[size];
-	for (int i = 0; i < size; i++) {
-	    names[i] = accounts[i].name;
+public class AccountPreference extends ListPreference {
+	public AccountPreference(Context context, AttributeSet attrs) {
+		super(context, attrs);
 	}
-	setEntries(names);
-	setEntryValues(names);
 
-	super.onPrepareDialogBuilder(builder);
-    }
+	public AccountPreference(Context context) {
+		super(context);
+	}
+
+	protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
+		final AccountManager manager = AccountManager.get(getContext());
+		final Account[] accounts = manager.getAccountsByType("com.google");
+		final int size = accounts.length;
+		String[] names = new String[size];
+		for (int i = 0; i < size; i++) {
+			names[i] = accounts[i].name;
+		}
+		setEntries(names);
+		setEntryValues(names);
+
+		super.onPrepareDialogBuilder(builder);
+	}
 }

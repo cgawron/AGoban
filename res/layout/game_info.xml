@@ -32,6 +32,7 @@
 	    android:layout_height="wrap_content"
 	    android:padding="1dp">
 	  <TextView
+	      style="@style/PropertyLabel"
 	      android:text="@string/PW"
 	      android:layout_column="1"/>
 	  <de.cgawron.agoban.view.PropertyView
@@ -56,6 +57,7 @@
 	    android:layout_height="wrap_content"
 	    android:padding="1dp">
 	  <TextView
+	      style="@style/PropertyLabel"
 	      android:text="@string/PB"
 	      android:layout_column="1"/>
 	  <de.cgawron.agoban.view.PropertyView
@@ -74,6 +76,54 @@
 	      android:text="@string/me"
 	      android:layout_width="wrap_content" 
 	      android:layout_height="wrap_content"/>
+	</TableRow>
+	<TableRow
+	    android:orientation="horizontal"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:padding="1dp">
+	  <TextView
+	      style="@style/PropertyLabel"
+	      android:text="@string/DT"
+	      android:layout_column="1"/>
+	  <de.cgawron.agoban.view.PropertyView
+	      cgawron:property="DT"
+	      android:id="@+id/DT"
+	      android:focusable="true"
+	      android:layout_width="fill_parent" 
+	      android:layout_weight="10" /> 
+	</TableRow>
+	<TableRow
+	    android:orientation="horizontal"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:padding="1dp">
+	  <TextView
+	      style="@style/PropertyLabel"
+	      android:text="@string/EV"
+	      android:layout_column="1"/>
+	  <de.cgawron.agoban.view.PropertyView
+	      cgawron:property="EV"
+	      android:id="@+id/EV"
+	      android:focusable="true"
+	      android:layout_width="fill_parent" 
+	      android:layout_weight="10" /> 
+	</TableRow>
+	<TableRow
+	    android:orientation="horizontal"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:padding="1dp">
+	  <TextView
+	      style="@style/PropertyLabel"
+	      android:text="@string/PC"
+	      android:layout_column="1"/>
+	  <de.cgawron.agoban.view.PropertyView
+	      cgawron:property="PC"
+	      android:id="@+id/PC"
+	      android:focusable="true"
+	      android:layout_width="fill_parent" 
+	      android:layout_weight="10" /> 
 	</TableRow>
       </TableLayout>
 

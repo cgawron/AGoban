@@ -18,7 +18,6 @@
 
 package de.cgawron.go.sgf;
 
-public interface Visitor
-{
+public interface Visitor {
 	public void visit(Node n);
 }

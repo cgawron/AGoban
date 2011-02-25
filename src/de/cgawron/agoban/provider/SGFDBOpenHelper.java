@@ -23,50 +23,46 @@ import android.util.Log;
 
 import java.lang.reflect.Field;
 
-class SGFDBOpenHelper extends SQLiteOpenHelper 
-{
-    private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "AGoban";
-    static final String SGF_TABLE_NAME = "sgf";
-    
-    SGFDBOpenHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-	String cs = getCreateStatement();
-    }
+class SGFDBOpenHelper extends SQLiteOpenHelper {
+	private static final int DATABASE_VERSION = 1;
+	private static final String DATABASE_NAME = "AGoban";
+	static final String SGF_TABLE_NAME = "sgf";
 
-    @Override
-    public void onCreate(SQLiteDatabase db) 
-    {
-	Log.d("SGFDBOpenHelper", "onCreate");
-        db.execSQL(getCreateStatement());
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) 
-    {
-    }
-
-    public String getCreateStatement() 
-    {
-	StringBuilder sb = new StringBuilder();
-	sb.append("CREATE TABLE ").append(SGF_TABLE_NAME).append(" (").append(GameInfo.KEY_ID).append(" INTEGER PRIMARY KEY, ");
-	Field[] fields = GameInfo.class.getFields();
-	for (Field field : fields) {
-	    if (field.getAnnotation(GameInfo.Column.class) != null) {
-		try {
-		    Log.d("SGFDBOpenHelper", "Key: " + field.getName() + " " + field.get(null));
-		    sb.append(field.get(null)).append(" TEXT, ");
-		}
-		catch (IllegalAccessException ex) {
-		    throw new RuntimeException(ex);
-		}
-	    }
+	SGFDBOpenHelper(Context context) {
+		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		String cs = getCreateStatement();
 	}
-	sb.append(GameInfo.KEY_MODIFIED_DATE).append(" INTEGER);");
-	Log.d("SGFDBOpenHelper", "SQL: " + sb.toString());
 
-	return sb.toString();
-    }
+	@Override
+	public void onCreate(SQLiteDatabase db) {
+		Log.d("SGFDBOpenHelper", "onCreate");
+		db.execSQL(getCreateStatement());
+	}
+
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+	}
+
+	public String getCreateStatement() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("CREATE TABLE ").append(SGF_TABLE_NAME).append(" (")
+				.append(GameInfo.KEY_ID).append(" INTEGER PRIMARY KEY, ");
+		Field[] fields = GameInfo.class.getFields();
+		for (Field field : fields) {
+			if (field.getAnnotation(GameInfo.Column.class) != null) {
+				try {
+					Log.d("SGFDBOpenHelper", "Key: " + field.getName() + " "
+							+ field.get(null));
+					sb.append(field.get(null)).append(" TEXT, ");
+				} catch (IllegalAccessException ex) {
+					throw new RuntimeException(ex);
+				}
+			}
+		}
+		sb.append(GameInfo.KEY_MODIFIED_DATE).append(" INTEGER);");
+		Log.d("SGFDBOpenHelper", "SQL: " + sb.toString());
+
+		return sb.toString();
+	}
 
 }
-
