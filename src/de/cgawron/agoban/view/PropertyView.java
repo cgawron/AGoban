@@ -18,34 +18,16 @@ package de.cgawron.agoban.view;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
-import java.util.ArrayList;
-import java.util.List;
-
-import android.content.Context;
 import android.content.ContentValues;
-import android.content.res.TypedArray;
+import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Canvas;
-import android.graphics.Rect;
-import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
-
 import de.cgawron.agoban.SGFApplication;
-import de.cgawron.agoban.R;
-
-import de.cgawron.go.sgf.GameTree;
-import de.cgawron.go.sgf.Property.GameInfo;
 import de.cgawron.go.sgf.Property;
+import de.cgawron.go.sgf.Property.GameInfo;
 import de.cgawron.go.sgf.PropertyList;
 import de.cgawron.go.sgf.Value;
 
@@ -53,7 +35,7 @@ import de.cgawron.go.sgf.Value;
  * A {@link View} to be used for SGF properties
  * 
  */
-public class PropertyView extends EditText implements TextWatcher {
+public class PropertyView extends EditText {
 	private static String TAG = "PropertyView";
 	private PropertyList properties;
 	private GameInfo property;
@@ -69,18 +51,30 @@ public class PropertyView extends EditText implements TextWatcher {
 	 * @see android.view.View#View(android.content.Context,
 	 *      android.util.AttributeSet)
 	 */
+	public PropertyView(Context context) {
+		super(context);
+	}
+
+	/**
+	 * Construct object, initializing with any attributes we understand from a
+	 * layout file. These attributes are defined in
+	 * SDK/assets/res/any/classes.xml.
+	 * 
+	 * @see android.view.View#View(android.content.Context,
+	 *      android.util.AttributeSet)
+	 */
 	public PropertyView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		key = attrs.getAttributeValue("http://cgawron", "property");
-		addTextChangedListener(this);
 	}
 
 	@Override
 	protected void onAttachedToWindow() {
 		super.onAttachedToWindow();
 		Context context = getContext();
-		SGFApplication application = (SGFApplication) context
-				.getApplicationContext();
+		if (isInEditMode()) return;
+		
+		SGFApplication application = (SGFApplication) context.getApplicationContext();
 
 		// TODO: Rethink initialization
 		if (application.getGameTree() != null) {
@@ -149,8 +143,9 @@ public class PropertyView extends EditText implements TextWatcher {
 		setText(valueText);
 	}
 
-	public void afterTextChanged(android.text.Editable s) {
-		Log.d(TAG, "afterTextChanged: " + s);
+	@Override
+	public void onTextChanged(CharSequence s, int start, int count, int after) {
+		Log.d(TAG, "onTextChanged: " + s);
 		if (property == null) {
 		}
 
@@ -160,12 +155,6 @@ public class PropertyView extends EditText implements TextWatcher {
 		}
 
 		Log.d(TAG, "after Text: " + properties);
-	}
 
-	public void beforeTextChanged(CharSequence s, int start, int count,
-			int after) {
-	}
-
-	public void onTextChanged(CharSequence s, int start, int count, int after) {
 	}
 }
