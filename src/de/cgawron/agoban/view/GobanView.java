@@ -32,7 +32,6 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MotionEvent;
 import android.view.View;
@@ -41,12 +40,10 @@ import de.cgawron.agoban.GobanEventListener;
 import de.cgawron.agoban.R;
 import de.cgawron.agoban.SGFApplication;
 import de.cgawron.go.Goban;
-import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
 import de.cgawron.go.sgf.Property;
 import de.cgawron.go.sgf.Property.Markup;
 import de.cgawron.go.sgf.Value;
-
 import demo.MultiTouchController.PointInfo;
 import demo.MultiTouchController.PositionAndScale;
 
@@ -61,11 +58,11 @@ public class GobanView extends View implements
 	private Goban goban;
 	private GobanRenderer renderer;
 	private final List<GobanEventListener> listeners = new ArrayList<GobanEventListener>();
-	private SharedPreferences settings;
+	private final SharedPreferences settings;
 	private GobanEventHandler gobanEventHandler;
 	private PointF cursorPosition;
 	private Tool tool;
-	private List<GobanRenderer.Markup> markupList = new ArrayList<GobanRenderer.Markup>();
+	private final List<GobanRenderer.Markup> markupList = new ArrayList<GobanRenderer.Markup>();
 
 	private final float xOff = 0.0f, yOff = 0.0f, relativeScale = 1.0f;
 	private RectF blowup;
@@ -286,7 +283,6 @@ public class GobanView extends View implements
 		case MotionEvent.ACTION_DOWN:
 			float width = getWidth();
 			float height = getHeight();
-			float min = width < height ? width : height;
 			float size = getBoardSize();
 
 			float bx = size * me.getX() / width - 0.5f;
@@ -378,6 +374,7 @@ public class GobanView extends View implements
 		return cursorPosition;
 	}
 
+	@Override
 	public ContextMenuInfo getContextMenuInfo() {
 		return new GobanContextMenuInfo(cursorPosition);
 	}

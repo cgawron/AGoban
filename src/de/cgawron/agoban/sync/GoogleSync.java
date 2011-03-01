@@ -17,14 +17,15 @@
 package de.cgawron.agoban.sync;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -36,18 +37,15 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
+import android.widget.Toast;
 
 import com.google.api.client.apache.ApacheHttpTransport;
 import com.google.api.client.googleapis.GoogleHeaders;
@@ -65,12 +63,7 @@ import com.google.api.client.xml.XmlNamespaceDictionary;
 import com.google.api.client.xml.atom.AtomContent;
 import com.google.api.client.xml.atom.AtomParser;
 
-import de.cgawron.agoban.SGFApplication;
-import static de.cgawron.agoban.SGFApplication.PREF;
 import de.cgawron.agoban.provider.GameInfo;
-import static de.cgawron.agoban.provider.GameInfo.KEY_ID;
-import static de.cgawron.agoban.provider.GameInfo.KEY_FILENAME;
-import static de.cgawron.agoban.provider.GameInfo.KEY_MODIFIED_DATE;
 import de.cgawron.agoban.provider.SGFProvider;
 
 /**
@@ -80,28 +73,24 @@ import de.cgawron.agoban.provider.SGFProvider;
  * @author Christian Gawron
  */
 public final class GoogleSync extends Activity {
+
 	/** The token type for authentication */
 	private static final String AUTH_TOKEN_TYPE = "writely";
-
+	private static final String PREFS = "SyncPrefs";
 	private static final String TAG = "GoogleSync";
-
-	private static final int MENU_ADD = 0;
-
-	private static final int MENU_ACCOUNTS = 1;
-
-	private static final int CONTEXT_EDIT = 0;
-
-	private static final int CONTEXT_DELETE = 1;
-
-	private static final int CONTEXT_LOGGING = 2;
-
+	private static final String FOLDER_SGF = "SGF";
+	private static final String CATEGORY_KIND = "http://schemas.google.com/g/2005#kind";
+	private static final String CATEGORY_DOCUMENT = "http://schemas.google.com/docs/2007#document";
+	private static final String LINK_PARENT = "http://schemas.google.com/docs/2007#parent";
 	private static final int REQUEST_AUTHENTICATE = 0;
-
 	private static final int DIALOG_ACCOUNTS = 0;
 
 	private static HttpTransport transport;
 	private String authToken;
-	private SGFApplication application;
+	private String sgfFolder;
+
+	private static final String[] PROJECTION = new String[] { GameInfo.KEY_ID,
+			GameInfo.KEY_FILENAME, GameInfo.KEY_MODIFIED_DATE };
 
 	public static final XmlNamespaceDictionary DICTIONARY = new XmlNamespaceDictionary();
 
@@ -130,6 +119,9 @@ public final class GoogleSync extends Activity {
 	}
 
 	public static class GDocEntry {
+		@Key("@gd:etag")
+		public String etag;
+
 		@Key
 		public String title;
 
@@ -142,6 +134,9 @@ public final class GoogleSync extends Activity {
 		@Key
 		public ContentLink content;
 
+		@Key
+		public boolean convert;
+
 		@Key("category")
 		public List<Category> categories;
 
@@ -149,13 +144,31 @@ public final class GoogleSync extends Activity {
 			return new Date(updated.value);
 		}
 
-		private String getDownloadLink() {
+		public GenericUrl getUpdateUrl() {
+			for (Link link : links) {
+				if (link.rel.equals("edit-media"))
+					return new GenericUrl(link.href);
+			}
+			return null;
+		}
+
+		public String getDownloadLink() {
 			return content.src;
 		}
 
-		private InputStream getStream() throws IOException {
+		public String getDownloadLink(String type) {
+			return content.src + "&exportFormat=" + type;
+		}
+
+		public InputStream getStream() throws IOException {
 			HttpRequest request = transport.buildGetRequest();
 			request.setUrl(getDownloadLink());
+			return request.execute().getContent();
+		}
+
+		public InputStream getStream(String type) throws IOException {
+			HttpRequest request = transport.buildGetRequest();
+			request.setUrl(getDownloadLink(type));
 			return request.execute().getContent();
 		}
 	}
@@ -170,6 +183,16 @@ public final class GoogleSync extends Activity {
 		@Key("@label")
 		public String label;
 
+		public Category() {
+		}
+
+		public Category(String scheme, String term, String label) {
+			this.scheme = scheme;
+			this.term = term;
+			this.label = label;
+		}
+
+		@Override
 		public String toString() {
 			return "category: " + scheme + "->" + term + ", label=" + label;
 		}
@@ -181,12 +204,19 @@ public final class GoogleSync extends Activity {
 
 		@Key("@src")
 		public String src;
+
+		@Override
+		public String toString() {
+			return "contentLink: " + type + ": " + src;
+		}
 	}
 
 	public static class Link {
-
 		@Key("@href")
 		public String href;
+
+		@Key("@title")
+		public String title;
 
 		@Key("@rel")
 		public String rel;
@@ -202,21 +232,60 @@ public final class GoogleSync extends Activity {
 			return null;
 		}
 
+		@Override
 		public String toString() {
 			return "link: " + rel + "->" + href;
 		}
 	}
 
+	static class SendData {
+		String fileName;
+		String contentType;
+		long contentLength;
+
+		SendData(Cursor cursor) {
+			Log.d(TAG, "SendData: " + cursor.getString(1));
+			this.fileName = cursor.getString(cursor
+					.getColumnIndexOrThrow(GameInfo.KEY_FILENAME));
+		}
+
+		public InputStream getInputStream() throws FileNotFoundException {
+			return new FileInputStream(fileName);
+		}
+		/*
+		 * SendData(Intent intent, ContentResolver contentResolver) { Bundle
+		 * extras = intent.getExtras(); Log.d(TAG, "SendData: " + intent + ", "
+		 * + extras); if (extras.containsKey(Intent.EXTRA_STREAM)) { Uri uri =
+		 * this.uri = (Uri) extras .getParcelable(Intent.EXTRA_STREAM); String
+		 * scheme = uri.getScheme(); Log.d(TAG, "SendData: uri=" + this.uri);
+		 * this.contentType = SGFProvider.SGF_TYPE; if
+		 * (scheme.equals("content")) { Cursor cursor =
+		 * contentResolver.query(uri, null, null, null, null);
+		 * cursor.moveToFirst(); this.fileName = cursor.getString(cursor
+		 * .getColumnIndexOrThrow(GameInfo.KEY_FILENAME)); this.contentLength =
+		 * 100; cursor.close(); } } }
+		 */
+	}
+
 	private GenericUrl getDocUrl() {
-		return new GenericUrl(
+		GenericUrl url = new GenericUrl(
 				"https://docs.google.com/feeds/default/private/full");
+
+		return url;
+	}
+
+	private GenericUrl getFolderUrl() {
+		GenericUrl url = new GenericUrl(sgfFolder);
+		url.appendRawPath("/contents");
+
+		return url;
 	}
 
 	public GoogleSync() {
 		HttpTransport.setLowLevelHttpTransport(ApacheHttpTransport.INSTANCE);
 		transport = GoogleTransport.create();
 		GoogleHeaders headers = (GoogleHeaders) transport.defaultHeaders;
-		headers.setApplicationName("AGoban");
+		headers.setApplicationName("NotePad");
 		headers.gdataVersion = "3";
 		AtomParser parser = new AtomParser();
 		parser.namespaceDictionary = DICTIONARY;
@@ -226,16 +295,8 @@ public final class GoogleSync extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		application = (SGFApplication) getApplication();
-		SharedPreferences settings = getSharedPreferences(PREF, 0);
+		getSharedPreferences(PREFS, 0);
 		setLogging(true);
-		Intent intent = getIntent();
-		if (Intent.ACTION_SEND.equals(intent.getAction())) {
-			sendData = new SendData(intent, getContentResolver());
-		} else if (Intent.ACTION_MAIN.equals(getIntent().getAction())) {
-			sendData = null;
-		}
-
 		gotAccount(true);
 	}
 
@@ -264,7 +325,7 @@ public final class GoogleSync extends Activity {
 
 	private void gotAccount(boolean tokenExpired) {
 		Log.d(TAG, "gotAccount: " + tokenExpired);
-		SharedPreferences settings = getSharedPreferences(PREF, 0);
+		SharedPreferences settings = getSharedPreferences(PREFS, 0);
 		String accountName = settings.getString("accountName", null);
 		if (accountName != null) {
 			Log.d(TAG, "gotAccount: looking for " + accountName);
@@ -289,7 +350,7 @@ public final class GoogleSync extends Activity {
 
 	private void gotAccount(final AccountManager manager, final Account account) {
 		Log.d(TAG, "gotAccount: " + manager + ", " + account);
-		SharedPreferences settings = getSharedPreferences(PREF, 0);
+		SharedPreferences settings = getSharedPreferences(PREFS, 0);
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString("accountName", account.name);
 		editor.commit();
@@ -351,47 +412,19 @@ public final class GoogleSync extends Activity {
 		this.authToken = authToken;
 		Log.d(TAG, "authToken: " + authToken);
 		((GoogleHeaders) transport.defaultHeaders).setGoogleLogin(authToken);
-		authenticated();
-	}
-
-	static class SendData {
-		String fileName;
-		Uri uri;
-		String contentType;
-		long contentLength;
-
-		SendData(Intent intent, ContentResolver contentResolver) {
-			Bundle extras = intent.getExtras();
-			Log.d(TAG, "SendData: " + intent + ", " + extras);
-			if (extras.containsKey(Intent.EXTRA_STREAM)) {
-				Uri uri = this.uri = (Uri) extras
-						.getParcelable(Intent.EXTRA_STREAM);
-				String scheme = uri.getScheme();
-				Log.d(TAG, "SendData: uri=" + this.uri);
-				this.contentType = SGFProvider.SGF_TYPE;
-				if (scheme.equals("content")) {
-					Cursor cursor = contentResolver.query(uri, null, null,
-							null, null);
-					cursor.moveToFirst();
-					this.fileName = cursor.getString(cursor
-							.getColumnIndexOrThrow(GameInfo.KEY_FILENAME));
-					this.contentLength = 100;
-					cursor.close();
-				}
-			}
+		try {
+			authenticated();
+		} catch (Exception ex) {
+			handleException(ex);
 		}
+		finish();
 	}
-
-	static SendData sendData;
 
 	private void authenticated() {
 		Log.d(TAG, "authenticated");
 
-		retrieveDocuments();
-
-		if (sendData != null)
-			createDoc();
-
+		Map<String, GDocEntry> docMap = retrieveDocuments();
+		sendDocuments(docMap);
 	}
 
 	private List<GDocEntry> getDocumentList() {
@@ -411,28 +444,35 @@ public final class GoogleSync extends Activity {
 		return entries;
 	}
 
-	private void retrieveDocuments() {
-		String projection[] = { KEY_FILENAME, KEY_MODIFIED_DATE };
+	private Map<String, GDocEntry> retrieveDocuments() {
+		Map<String, GDocEntry> docMap = new HashMap<String, GDocEntry>();
 		ContentResolver resolver = getContentResolver();
 		List<GDocEntry> entries = getDocumentList();
 		for (GDocEntry entry : entries) {
-			Log.d(TAG, "doc: " + entry.title);
-			boolean isSgf = false;
-			for (Category category : entry.categories) {
-				if (category.scheme
-						.equals("http://schemas.google.com/g/2005#kind")
-						&& category.term
-								.equals("http://schemas.google.com/docs/2007#file")
-						&& category.label.equals("application/x-go-sgf"))
-					isSgf = true;
+			String parent = null;
+			String parentFolder = null;
+			for (Link link : entry.links) {
+				if (link.rel.equals(LINK_PARENT)) {
+					parent = link.title;
+					parentFolder = link.href;
+					Log.d(TAG, "parent: " + parent);
+				}
 			}
-			if (!isSgf)
+			if (parent == null || !parent.equals(FOLDER_SGF))
 				continue;
+			sgfFolder = parentFolder;
+
+			Log.d(TAG, "doc: '" + entry.title + "'");
+			Log.d(TAG, "content: " + entry.content);
+			for (Category category : entry.categories) {
+				Log.d(TAG, "category: " + category);
+			}
 
 			Log.d(TAG, String.format("file %s updated on %s", entry.title,
 					entry.getUpdated().toString()));
-			Cursor cursor = resolver.query(SGFProvider.CONTENT_URI, projection,
-					String.format("%s = '%s'", KEY_FILENAME, entry.title),
+			docMap.put(entry.title, entry);
+			Cursor cursor = resolver.query(SGFProvider.CONTENT_URI, PROJECTION,
+					String.format("%s = '%s'", GameInfo.KEY_ID, entry.title),
 					null, null);
 
 			if (cursor.getCount() > 0) {
@@ -443,19 +483,22 @@ public final class GoogleSync extends Activity {
 				Log.d(TAG, "remote modification: " + remoteModification);
 
 				if (localModification.before(remoteModification)) {
-					retrieve(entry);
+					retrieve(entry, false);
 				} else {
 					Log.d(TAG, "not retrieving " + entry.title);
 				}
-				cursor.close();
 			} else {
-				retrieve(entry);
+				Log.d(TAG, entry.title + " not found locally");
+				retrieve(entry, true);
 			}
+			cursor.close();
 		}
+		return docMap;
 	}
 
-	private void retrieve(GDocEntry entry) {
+	private void retrieve(GDocEntry entry, boolean create) {
 		Log.d(TAG, "retrieving " + entry.title);
+
 		try {
 			InputStream is = entry.getStream();
 			File file = new File(SGFProvider.getSGFDirectory(), entry.title);
@@ -474,30 +517,61 @@ public final class GoogleSync extends Activity {
 		}
 	}
 
-	private void createDoc() {
-		Logger.getLogger("com.google.api.client").setLevel(Level.ALL);
-		Log.d(TAG, "createDoc");
+	private void sendDocuments(Map<String, GDocEntry> docMap) {
+		// Perform a managed query. The Activity will handle closing and
+		// requerying the cursor
+		// when needed.
+		setLogging(true);
+		Cursor cursor = managedQuery(SGFProvider.CONTENT_URI, PROJECTION, null,
+				null, null);
+
+		while (cursor.moveToNext()) {
+			String title = cursor.getString(1);
+			Date localModification = new Date(cursor.getLong(4));
+			Log.d(TAG, "sendDocuments: '" + title + "'");
+			Log.d(TAG, "local date: " + localModification);
+
+			GDocEntry entry = docMap.get(title);
+			SendData data = new SendData(cursor);
+			Date newModification = null;
+			if (entry == null) {
+				newModification = createGoogleDoc(getFolderUrl(), data);
+			} else if (entry.getUpdated().before(localModification)) {
+				newModification = updateGoogleDoc(entry.getUpdateUrl(),
+						entry.etag, data);
+			}
+			if (newModification != null) {
+				updateModificationDate(title, newModification);
+			}
+		}
+		cursor.close();
+		Log.d(TAG, "sendDocuments - end");
+	}
+
+	private Date createGoogleDoc(GenericUrl targetUrl, SendData sendData) {
+		Date newModification = null;
+		Log.d(TAG, "createGoogleDoc: url=" + targetUrl + ", data=" + sendData);
 		InputStreamContent content = new InputStreamContent();
 		AtomContent atom = new AtomContent();
 		GDocEntry entry = new GDocEntry();
-		Category category = new Category();
 		atom.namespaceDictionary = DICTIONARY;
 		atom.entry = entry;
-		category.scheme = "http://schemas.google.com/g/2005#kind";
-		category.term = "http://schemas.google.com/docs/2007#file";
-		category.label = "application/x-go-sgf";
-		entry.categories = new ArrayList();
+		entry.categories = new ArrayList<Category>();
+		Category category = new Category(CATEGORY_KIND, CATEGORY_DOCUMENT,
+				"document");
 		entry.categories.add(category);
+		entry.convert = false;
+		Log.d(TAG, "category: " + category);
+
 		try {
 			HttpRequest request = transport.buildPostRequest();
-			request.url = getDocUrl();
+			request.url = targetUrl;
 			((GoogleHeaders) request.headers)
 					.setSlugFromFileName(sendData.fileName);
 			MultipartRelatedContent mpContent = MultipartRelatedContent
 					.forRequest(request);
-			content.inputStream = getContentResolver().openInputStream(
-					sendData.uri);
-			content.type = sendData.contentType;
+			content.inputStream = sendData.getInputStream();
+			content.type = "text/plain";
 			// content.length = sendData.contentLength;
 			mpContent.parts.add(content);
 			mpContent.parts.add(atom);
@@ -507,7 +581,10 @@ public final class GoogleSync extends Activity {
 			Log.d(TAG, "request: " + request);
 			HttpResponse response = request.execute();
 			Log.d(TAG, "status was " + response.statusMessage);
-			response.ignore();
+			entry = response.parseAs(GDocEntry.class);
+			Log.d(TAG, "new entry: " + entry);
+			newModification = entry.getUpdated();
+			Log.d(TAG, "newModification: " + newModification);
 		} catch (Exception e) {
 			Log.e(TAG, "exception in createDoc: " + e);
 			e.printStackTrace();
@@ -518,32 +595,66 @@ public final class GoogleSync extends Activity {
 				Log.e(TAG, "exception in createDoc: " + e);
 			}
 		}
+		return newModification;
 	}
 
-	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-		/*
-		 * AdapterContextMenuInfo info = (AdapterContextMenuInfo)
-		 * item.getMenuInfo(); AlbumEntry album = albums.get((int) info.id); try
-		 * { switch (item.getItemId()) { case CONTEXT_EDIT: AlbumEntry
-		 * patchedAlbum = album.clone(); patchedAlbum.title = album.title +
-		 * " UPDATED " + new DateTime(new Date());
-		 * patchedAlbum.executePatchRelativeToOriginal(transport, album);
-		 * executeRefreshAlbums(); return true; case CONTEXT_DELETE:
-		 * album.executeDelete(transport); executeRefreshAlbums(); return true;
-		 * case CONTEXT_LOGGING: SharedPreferences settings =
-		 * getSharedPreferences(PREF, 0); boolean logging =
-		 * settings.getBoolean("logging", false); setLogging(!logging); return
-		 * true; default: return super.onContextItemSelected(item); } } catch
-		 * (IOException e) { handleException(e); }
-		 */
-		return false;
+	private Date updateGoogleDoc(GenericUrl targetUrl, String etag,
+			SendData sendData) {
+		Date newModification = null;
+		Log.d(TAG, "updateGoogleDoc: url=" + targetUrl + ", etag=" + etag
+				+ ", data=" + sendData);
+		InputStreamContent content = new InputStreamContent();
+		AtomContent atom = new AtomContent();
+		GDocEntry entry = new GDocEntry();
+		atom.namespaceDictionary = DICTIONARY;
+		atom.entry = entry;
+		entry.categories = new ArrayList<Category>();
+		Category category = new Category(CATEGORY_KIND, CATEGORY_DOCUMENT,
+				"document");
+		entry.categories.add(category);
+		entry.convert = false;
+		entry.etag = etag;
+		atom.entry = entry;
+
+		try {
+			HttpRequest request = transport.buildPutRequest();
+			request.url = targetUrl;
+			((GoogleHeaders) request.headers)
+					.setSlugFromFileName(sendData.fileName);
+			MultipartRelatedContent mpContent = MultipartRelatedContent
+					.forRequest(request);
+			content.inputStream = sendData.getInputStream();
+			content.type = "text/plain";
+			// content.length = sendData.contentLength;
+			mpContent.parts.add(content);
+			mpContent.parts.add(atom);
+			request.content = mpContent;
+
+			Log.d(TAG, "content: " + content);
+			Log.d(TAG, "request: " + request);
+			HttpResponse response = request.execute();
+			Log.d(TAG, "status was " + response.statusMessage);
+			entry = response.parseAs(GDocEntry.class);
+			Log.d(TAG, "new entry: " + entry);
+			newModification = entry.getUpdated();
+			Log.d(TAG, "newModification: " + newModification);
+		} catch (Exception e) {
+			Log.e(TAG, "exception in createDoc: " + e);
+			e.printStackTrace();
+		} finally {
+			try {
+				content.inputStream.close();
+			} catch (Exception e) {
+				Log.e(TAG, "exception in createDoc: " + e);
+			}
+		}
+		return newModification;
 	}
 
 	private void setLogging(boolean logging) {
 		Logger.getLogger("com.google.api.client").setLevel(
-				logging ? Level.CONFIG : Level.OFF);
-		SharedPreferences settings = getSharedPreferences(PREF, 0);
+				logging ? Level.FINEST : Level.OFF);
+		SharedPreferences settings = getSharedPreferences(PREFS, 0);
 		boolean currentSetting = settings.getBoolean("logging", false);
 		if (currentSetting != logging) {
 			SharedPreferences.Editor editor = settings.edit();
@@ -552,9 +663,20 @@ public final class GoogleSync extends Activity {
 		}
 	}
 
+	private void updateModificationDate(String title, Date modificationDate) {
+		ContentResolver resolver = getContentResolver();
+		ContentValues values = new ContentValues();
+		String[] args = { title };
+
+		values.put(GameInfo.KEY_MODIFIED_DATE, modificationDate.getTime());
+
+		Log.d(TAG, "values: " + values);
+		resolver.update(SGFProvider.CONTENT_URI, values,
+				SGFProvider.QUERY_STRING, args);
+	}
+
 	private void handleException(Throwable e) {
 		Log.d(TAG, "handleException: " + e);
-		e.printStackTrace();
 		while (e instanceof RuntimeException) {
 			e = e.getCause();
 		}
@@ -565,7 +687,7 @@ public final class GoogleSync extends Activity {
 			try {
 				response.ignore();
 			} catch (IOException e1) {
-				e1.printStackTrace();
+				showError("I'm sorry", e1);
 			}
 			if (statusCode == 401 || statusCode == 403) {
 				Log.d(TAG, "handleException: login required");
@@ -575,8 +697,18 @@ public final class GoogleSync extends Activity {
 			try {
 				Log.e(TAG, response.parseAsString());
 			} catch (IOException parseException) {
-				parseException.printStackTrace();
+				showError("I'm sorry", parseException);
 			}
+		} else {
+			showError("I'm sorry", e);
 		}
 	}
+
+	private void showError(String message, Throwable ex) {
+		Context context = getApplicationContext();
+		int duration = Toast.LENGTH_LONG;
+		Toast toast = Toast.makeText(context, message + ": " + ex, duration);
+		toast.show();
+	}
+
 }

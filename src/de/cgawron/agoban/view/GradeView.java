@@ -18,37 +18,12 @@ package de.cgawron.agoban.view;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
-import android.content.ContentValues;
-import android.content.res.TypedArray;
-import android.database.Cursor;
-import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
-
-import de.cgawron.agoban.SGFApplication;
-import de.cgawron.agoban.R;
-
-import de.cgawron.go.sgf.GameTree;
-import de.cgawron.go.sgf.Property.GameInfo;
-import de.cgawron.go.sgf.Property;
-import de.cgawron.go.sgf.PropertyList;
-import de.cgawron.go.sgf.Value;
 
 /**
  * A {@link View} to be used for grade properties (i.e. BR[] and WR[])
@@ -57,7 +32,7 @@ import de.cgawron.go.sgf.Value;
 public class GradeView extends PropertyView {
 	private static String TAG = "GradeView";
 
-	private DanKyuFilter[] filters = { new DanKyuFilter() };
+	private final DanKyuFilter[] filters = { new DanKyuFilter() };
 
 	private class DanKyuFilter implements InputFilter {
 		public CharSequence filter(CharSequence source, int start, int end,

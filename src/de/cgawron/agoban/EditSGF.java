@@ -17,33 +17,20 @@
 package de.cgawron.agoban;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
-import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.Shape;
-import android.graphics.drawable.shapes.OvalShape;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Looper;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -54,22 +41,18 @@ import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import de.cgawron.agoban.R;
+import de.cgawron.agoban.provider.SGFProvider;
+import de.cgawron.agoban.sync.GoogleSync;
 import de.cgawron.agoban.view.GameTreeControls;
 import de.cgawron.agoban.view.GameTreeControls.GameTreeNavigationListener;
 import de.cgawron.agoban.view.GobanView;
 import de.cgawron.agoban.view.GobanView.GobanContextMenuInfo;
 import de.cgawron.agoban.view.tool.MoveTool;
-import de.cgawron.agoban.provider.SGFProvider;
-import de.cgawron.agoban.sync.GoogleSync;
 import de.cgawron.go.Goban;
-import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
 import de.cgawron.go.sgf.GameTree;
 import de.cgawron.go.sgf.Node;
 import de.cgawron.go.sgf.Property;
-import de.cgawron.go.sgf.Value;
 
 /**
  * Provides an sgf editor.
@@ -87,7 +70,7 @@ public class EditSGF extends Activity implements GobanEventListener,
 	private GameTree gameTree;
 	private GameTreeControls gameTreeControls;
 	private Node currentNode;
-	private Map<Point, Node> variations = new HashMap<Point, Node>();
+	private final Map<Point, Node> variations = new HashMap<Point, Node>();
 	private SGFApplication application;
 	private SharedPreferences settings;
 

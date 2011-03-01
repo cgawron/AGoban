@@ -16,19 +16,9 @@
 
 package de.cgawron.agoban.provider;
 
-import android.database.Cursor;
-import android.database.MatrixCursor;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
-import android.content.ContentProvider;
-import android.content.ContentValues;
-import android.net.Uri;
-import android.net.UrlQuerySanitizer;
-import android.os.Debug;
-import android.os.Environment;
-import android.os.ParcelFileDescriptor;
-import android.util.Log;
+import static de.cgawron.agoban.provider.GameInfo.KEY_FILENAME;
+import static de.cgawron.agoban.provider.GameInfo.KEY_ID;
+import static de.cgawron.agoban.provider.GameInfo.KEY_MODIFIED_DATE;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -38,10 +28,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static de.cgawron.agoban.provider.GameInfo.KEY_ID;
-import static de.cgawron.agoban.provider.GameInfo.KEY_FILENAME;
-import static de.cgawron.agoban.provider.GameInfo.KEY_MODIFIED_DATE;
-import de.cgawron.go.sgf.Property.Key;
+import android.content.ContentProvider;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
+import android.net.Uri;
+import android.net.UrlQuerySanitizer;
+import android.os.Environment;
+import android.os.ParcelFileDescriptor;
+import android.util.Log;
 
 public class SGFProvider extends ContentProvider {
 	private static String TAG = "SGFProvider";
@@ -49,7 +45,7 @@ public class SGFProvider extends ContentProvider {
 			.authority("de.cgawron.agoban").build();
 	final public static String SGF_TYPE = "application/x-go-sgf";
 
-	final static String QUERY_STRING = "_id=?";
+	public final static String QUERY_STRING = "_id=?";
 	final static String[] COLUMNS_FILENAME_ONLY = { GameInfo.KEY_FILENAME };
 	final static String[] COLUMNS_ID_FILENAME = { KEY_ID, KEY_FILENAME };
 	final static File SGF_DIRECTORY;
@@ -194,6 +190,7 @@ public class SGFProvider extends ContentProvider {
 		updateThread = null;
 	}
 
+	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sortOrder) {
 		Log.d(TAG, String.format("query(uri=%s, projection=%s, selection=%s)",
@@ -210,6 +207,7 @@ public class SGFProvider extends ContentProvider {
 		return cursor;
 	}
 
+	@Override
 	public Uri insert(Uri uri, ContentValues values) {
 		Log.d(TAG, String.format("insert(uri=%s, values=%s)", uri, values));
 		String path = uri.getPath();
@@ -225,6 +223,7 @@ public class SGFProvider extends ContentProvider {
 		return uri;
 	}
 
+	@Override
 	public int update(Uri uri, ContentValues values, String selection,
 			String[] selectionArgs) {
 		Log.d(TAG, String.format("update(uri=%s, values=%s, selection=%s)",
@@ -232,14 +231,17 @@ public class SGFProvider extends ContentProvider {
 		return 0;
 	}
 
+	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
 		return 0;
 	}
 
+	@Override
 	public String getType(Uri uri) {
 		return SGF_TYPE;
 	}
 
+	@Override
 	public boolean onCreate() {
 		Log.d(TAG, "onCreate");
 		dbHelper = new SGFDBOpenHelper(getContext());
@@ -255,6 +257,7 @@ public class SGFProvider extends ContentProvider {
 		return columns;
 	}
 
+	@Override
 	public ParcelFileDescriptor openFile(Uri uri, String mode)
 			throws java.io.FileNotFoundException {
 		Log.d(TAG, String.format("openFile(uri=%s, mode=%s)", uri, mode));
