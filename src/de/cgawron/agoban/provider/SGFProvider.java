@@ -28,7 +28,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -39,16 +42,17 @@ import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
-public class SGFProvider extends ContentProvider {
+public class SGFProvider extends ContentProvider 
+{
 	private static String TAG = "SGFProvider";
-	final public static Uri CONTENT_URI = new Uri.Builder().scheme("content")
-			.authority("de.cgawron.agoban").build();
+	final public static String AUTHORITY = "de.cgawron.agoban";
+	final public static Uri CONTENT_URI = new Uri.Builder().scheme("content").authority(AUTHORITY).build();
 	final public static String SGF_TYPE = "application/x-go-sgf";
 
 	public final static String QUERY_STRING = "_id=?";
 	final static String[] COLUMNS_FILENAME_ONLY = { GameInfo.KEY_FILENAME };
 	final static String[] COLUMNS_ID_FILENAME = { KEY_ID, KEY_FILENAME };
-	final static File SGF_DIRECTORY;
+	public final static File SGF_DIRECTORY;
 	static {
 		// TODO: Handle exceptions here
 		SGF_DIRECTORY = new File(Environment.getExternalStorageDirectory(),
@@ -305,4 +309,5 @@ public class SGFProvider extends ContentProvider {
 	public static File getSGFDirectory() {
 		return SGF_DIRECTORY;
 	}
+
 }

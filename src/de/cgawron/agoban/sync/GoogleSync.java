@@ -245,12 +245,11 @@ public final class GoogleSync extends Activity {
 
 		SendData(Cursor cursor) {
 			Log.d(TAG, "SendData: " + cursor.getString(1));
-			this.fileName = cursor.getString(cursor
-					.getColumnIndexOrThrow(GameInfo.KEY_FILENAME));
+			this.fileName = cursor.getString(cursor.getColumnIndexOrThrow(GameInfo.KEY_FILENAME));
 		}
 
 		public InputStream getInputStream() throws FileNotFoundException {
-			return new FileInputStream(fileName);
+			return new FileInputStream(new File(SGFProvider.SGF_DIRECTORY, fileName));
 		}
 		/*
 		 * SendData(Intent intent, ContentResolver contentResolver) { Bundle
@@ -527,7 +526,7 @@ public final class GoogleSync extends Activity {
 
 		while (cursor.moveToNext()) {
 			String title = cursor.getString(1);
-			Date localModification = new Date(cursor.getLong(4));
+			Date localModification = new Date(cursor.getLong(2));
 			Log.d(TAG, "sendDocuments: '" + title + "'");
 			Log.d(TAG, "local date: " + localModification);
 
@@ -677,6 +676,7 @@ public final class GoogleSync extends Activity {
 
 	private void handleException(Throwable e) {
 		Log.d(TAG, "handleException: " + e);
+		e.printStackTrace();
 		while (e instanceof RuntimeException) {
 			e = e.getCause();
 		}

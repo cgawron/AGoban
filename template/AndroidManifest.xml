@@ -6,7 +6,10 @@
     android:versionName="1.0">
   <application android:label="@string/app_name" android:icon="@drawable/icon" android:name="de.cgawron.agoban.SGFApplication">
 
-    <provider android:authorities="de.cgawron.agoban" android:name="de.cgawron.agoban.provider.SGFProvider"/>
+    <provider android:authorities="de.cgawron.agoban" 
+			  android:name="de.cgawron.agoban.provider.SGFProvider" 
+			  android:syncable="true"
+			  />
 
     <activity android:name="de.cgawron.agoban.EditSGF"
 	      android:label="@string/app_name">
@@ -49,14 +52,31 @@
     <activity android:name="de.cgawron.agoban.SGFApplication$EditPreferences"
 	    android:label="@string/app_name">
     </activity>
+
+    <service
+	android:name=".sync.SyncService"
+	android:exported="true">
+      <intent-filter>
+	<action
+	    android:name="android.content.SyncAdapter" />
+      </intent-filter>
+      <meta-data
+	  android:name="android.content.SyncAdapter"
+	  android:resource="@xml/syncadapter" />
+    </service>
+    
   </application>
 
   <uses-sdk android:targetSdkVersion="8" android:minSdkVersion="8"/>
 
   <uses-permission android:name="android.permission.GET_ACCOUNTS" />
   <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+  <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
   <uses-permission android:name="android.permission.USE_CREDENTIALS" />
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.READ_SYNC_STATS" />
+  <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+  <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
 
 </manifest> 
