@@ -42,7 +42,6 @@ import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.cgawron.agoban.provider.SGFProvider;
-import de.cgawron.agoban.sync.GoogleSync;
 import de.cgawron.agoban.view.GameTreeControls;
 import de.cgawron.agoban.view.GameTreeControls.GameTreeNavigationListener;
 import de.cgawron.agoban.view.GobanView;
@@ -186,10 +185,6 @@ public class EditSGF extends Activity implements GobanEventListener,
 
 		case R.id.game_info:
 			showGameInfo();
-			return true;
-
-		case R.id.google_sync:
-			googleSync();
 			return true;
 
 		case R.id.preferences:
@@ -382,15 +377,6 @@ public class EditSGF extends Activity implements GobanEventListener,
 			toast.show();
 		}
 
-	}
-
-	public void googleSync() {
-		Intent send = new Intent(Intent.ACTION_SEND, application.getData(),
-				this, GoogleSync.class);
-		send.setType("application/x-go-sgf");
-		send.putExtra(Intent.EXTRA_STREAM, application.getData());
-		startActivity(send);
-		finish();
 	}
 
 	public void showGameInfo(View view) {

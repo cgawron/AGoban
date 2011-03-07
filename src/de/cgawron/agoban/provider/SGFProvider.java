@@ -18,7 +18,8 @@ package de.cgawron.agoban.provider;
 
 import static de.cgawron.agoban.provider.GameInfo.KEY_FILENAME;
 import static de.cgawron.agoban.provider.GameInfo.KEY_ID;
-import static de.cgawron.agoban.provider.GameInfo.KEY_MODIFIED_DATE;
+import static de.cgawron.agoban.provider.GameInfo.KEY_LOCAL_MODIFIED_DATE;
+import static de.cgawron.agoban.provider.GameInfo.KEY_REMOTE_MODIFIED_DATE;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -28,10 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.content.ContentProvider;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -55,8 +53,7 @@ public class SGFProvider extends ContentProvider
 	public final static File SGF_DIRECTORY;
 	static {
 		// TODO: Handle exceptions here
-		SGF_DIRECTORY = new File(Environment.getExternalStorageDirectory(),
-				"sgf");
+		SGF_DIRECTORY = new File(Environment.getExternalStorageDirectory(), "sgf");
 		if (!SGF_DIRECTORY.exists())
 			SGF_DIRECTORY.mkdir();
 	}
@@ -70,7 +67,8 @@ public class SGFProvider extends ContentProvider
 	private void initColumns() {
 		ArrayList<String> _columns = new ArrayList<String>();
 		_columns.add(KEY_ID);
-		_columns.add(KEY_MODIFIED_DATE);
+		_columns.add(KEY_LOCAL_MODIFIED_DATE);
+		_columns.add(KEY_REMOTE_MODIFIED_DATE);
 		Field[] fields = GameInfo.class.getFields();
 		for (Field field : fields) {
 			try {
@@ -152,7 +150,7 @@ public class SGFProvider extends ContentProvider
 
 					if (cursor.getCount() > 0
 							&& cursor.getLong(cursor
-									.getColumnIndex(KEY_MODIFIED_DATE)) == lastModified) {
+									.getColumnIndex(KEY_LOCAL_MODIFIED_DATE)) == lastModified) {
 						Log.d(TAG, "found entry");
 					} else {
 						Log.d(TAG, "parsing " + file);

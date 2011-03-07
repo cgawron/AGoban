@@ -53,8 +53,9 @@ public class GameInfo {
 	public @interface SGFProperty {
 	}
 
-	final public static String KEY_MODIFIED_DATE = "MDATE";
 	final public static String KEY_ID = "_id";
+	final public static String KEY_LOCAL_MODIFIED_DATE = "MDATE";
+	final public static String KEY_REMOTE_MODIFIED_DATE = "RDATE";
 	final public static @Column
 	String KEY_URI = "URI";
 	final public static @Column
@@ -82,10 +83,9 @@ public class GameInfo {
 	String KEY_BLACK_RANK = "BR";
 
 	private static Key[] sgfKeys;
-	// private static String[] displayColumns = { KEY_ID, KEY_MODIFIED_DATE,
-	// KEY_PLAYER_WHITE, KEY_PLAYER_BLACK };
-	private static String[] displayColumns = { KEY_ID, KEY_FILENAME,
-			KEY_MODIFIED_DATE };
+	private static String[] displayColumns = { KEY_ID, 
+											   KEY_FILENAME,
+											   KEY_LOCAL_MODIFIED_DATE };
 	private File file;
 	private ContentValues values;
 
@@ -112,12 +112,14 @@ public class GameInfo {
 	 * @todo This should be optimized - it's not necessary to create the whole
 	 *       GameTree structure to build the GameInfo.
 	 */
-	public GameInfo(File file, Cursor cursor) throws Exception {
+	public GameInfo(File file, Cursor cursor) throws Exception 
+	{
 		this.file = file;
 		init(cursor);
 	}
 
-	private void init(Cursor cursor) {
+	private void init(Cursor cursor) 
+	{
 		if (sgfKeys == null)
 			initSGFKeys();
 
@@ -128,14 +130,15 @@ public class GameInfo {
 		}
 	}
 
-	private void init(GameTree gameTree) {
+	private void init(GameTree gameTree) 
+	{
 		if (sgfKeys == null)
 			initSGFKeys();
 
 		values = new ContentValues();
 		values.put(KEY_ID, file.hashCode());
 		values.put(KEY_FILENAME, file.getName());
-		values.put(KEY_MODIFIED_DATE, file.lastModified());
+		values.put(KEY_LOCAL_MODIFIED_DATE, file.lastModified());
 
 		for (Key key : sgfKeys) {
 			Property property = gameTree.getRoot().get(key);
@@ -144,7 +147,8 @@ public class GameInfo {
 		}
 	}
 
-	private void initSGFKeys() {
+	private void initSGFKeys() 
+	{
 		ArrayList<Key> keys = new ArrayList<Key>();
 		Field[] fields = GameInfo.class.getFields();
 		for (Field field : fields) {

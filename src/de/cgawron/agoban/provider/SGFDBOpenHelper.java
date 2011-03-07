@@ -23,8 +23,10 @@ import android.util.Log;
 
 import java.lang.reflect.Field;
 
-class SGFDBOpenHelper extends SQLiteOpenHelper {
-	private static final int DATABASE_VERSION = 1;
+class SGFDBOpenHelper extends SQLiteOpenHelper 
+{
+	private static final String TAG = "SGFDBOpenHelper";
+	private static final int DATABASE_VERSION = 2;
 	private static final String DATABASE_NAME = "AGoban";
 	static final String SGF_TABLE_NAME = "sgf";
 
@@ -34,16 +36,36 @@ class SGFDBOpenHelper extends SQLiteOpenHelper {
 	}
 
 	@Override
-	public void onCreate(SQLiteDatabase db) {
-		Log.d("SGFDBOpenHelper", "onCreate");
+	public void onCreate(SQLiteDatabase db) 
+	{
+		Log.d(TAG, "onCreate");
 		db.execSQL(getCreateStatement());
 	}
 
 	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) 
+	{
+		String upgradeStatement = null;
+		if (oldVersion == 1 && newVersion == 2) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("ALTER TABLE ").append(SGF_TABLE_NAME)
+				.append(" ADD COLUMN ")
+				.append(GameInfo.KEY_REMOTE_MODIFIED_DATE).append(" INTEGER);");
+			upgradeStatement = sb.toString();
+		}
+		
+		if (upgradeStatement != null) {
+			Log.d(TAG, "upgrade: " + upgradeStatement);
+			db.execSQL(getCreateStatement());
+		}
+		else {
+			Log.e(TAG, String.format("upgrade from version %d to %d not possible", oldVersion, newVersion));
+			throw new RuntimeException("upgrade not possible");
+		}
 	}
 
-	public String getCreateStatement() {
+	public String getCreateStatement() 
+	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("CREATE TABLE ").append(SGF_TABLE_NAME).append(" (")
 				.append(GameInfo.KEY_ID).append(" INTEGER PRIMARY KEY, ");
@@ -51,7 +73,7 @@ class SGFDBOpenHelper extends SQLiteOpenHelper {
 		for (Field field : fields) {
 			if (field.getAnnotation(GameInfo.Column.class) != null) {
 				try {
-					Log.d("SGFDBOpenHelper", "Key: " + field.getName() + " "
+					Log.d(TAG, "Key: " + field.getName() + " "
 							+ field.get(null));
 					sb.append(field.get(null)).append(" TEXT, ");
 				} catch (IllegalAccessException ex) {
@@ -59,8 +81,9 @@ class SGFDBOpenHelper extends SQLiteOpenHelper {
 				}
 			}
 		}
-		sb.append(GameInfo.KEY_MODIFIED_DATE).append(" INTEGER);");
-		Log.d("SGFDBOpenHelper", "SQL: " + sb.toString());
+		sb.append(GameInfo.KEY_LOCAL_MODIFIED_DATE).append(" INTEGER);");
+		sb.append(GameInfo.KEY_REMOTE_MODIFIED_DATE).append(" INTEGER);");
+		Log.d(TAG, "SQL: " + sb.toString());
 
 		return sb.toString();
 	}

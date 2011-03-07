@@ -18,7 +18,6 @@ package de.cgawron.agoban.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.preference.ListPreference;
@@ -33,6 +32,7 @@ public class AccountPreference extends ListPreference {
 		super(context);
 	}
 
+	@Override
 	protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
 		final AccountManager manager = AccountManager.get(getContext());
 		final Account[] accounts = manager.getAccountsByType("com.google");

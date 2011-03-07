@@ -19,48 +19,26 @@ package de.cgawron.agoban.sync;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.text.DateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.google.api.client.apache.ApacheHttpTransport;
 import com.google.api.client.googleapis.GoogleHeaders;
-import com.google.api.client.googleapis.GoogleTransport;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpResponse;
-import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.InputStreamContent;
-import com.google.api.client.http.MultipartRelatedContent;
+import com.google.api.client.http.apache.ApacheHttpTransport;
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Key;
 import com.google.api.client.xml.XmlNamespaceDictionary;
-import com.google.api.client.xml.atom.AtomContent;
 import com.google.api.client.xml.atom.AtomParser;
 
 import de.cgawron.agoban.provider.GameInfo;
@@ -69,15 +47,19 @@ import de.cgawron.agoban.provider.SGFProvider;
 /**
  * Sync SGF files with Google documents. Based on sample code from google java
  * api client library.
+ * <p>
+ * To enable logging of HTTP requests/responses, run this command:
+ * {@code adb shell setprop log.tag.HttpTransport DEBUG}.
+ * </p>
  * 
  * @author Christian Gawron
  */
-public final class GoogleSync extends Activity {
-
+public final class GoogleUtility
+{
 	/** The token type for authentication */
 	private static final String AUTH_TOKEN_TYPE = "writely";
 	private static final String PREFS = "SyncPrefs";
-	private static final String TAG = "GoogleSync";
+	private static final String TAG = "GoogleUtility";
 	private static final String FOLDER_SGF = "SGF";
 	private static final String CATEGORY_KIND = "http://schemas.google.com/g/2005#kind";
 	private static final String CATEGORY_DOCUMENT = "http://schemas.google.com/docs/2007#document";
@@ -90,22 +72,20 @@ public final class GoogleSync extends Activity {
 	private String sgfFolder;
 
 	private static final String[] PROJECTION = new String[] { GameInfo.KEY_ID,
-			GameInfo.KEY_FILENAME, GameInfo.KEY_MODIFIED_DATE };
+															  GameInfo.KEY_FILENAME, 
+															  GameInfo.KEY_LOCAL_MODIFIED_DATE, 
+															  GameInfo.KEY_REMOTE_MODIFIED_DATE };
 
-	public static final XmlNamespaceDictionary DICTIONARY = new XmlNamespaceDictionary();
-
-	static {
-		Map<String, String> map = DICTIONARY.namespaceAliasToUriMap;
-		map.put("", "http://www.w3.org/2005/Atom");
-		map.put("app", "http://www.w3.org/2007/app");
-		map.put("atom", "http://www.w3.org/2005/Atom");
-		map.put("batch", "http://schemas.google.com/gdata/batch");
-		map.put("docs", "http://schemas.google.com/docs/2007");
-		map.put("gAcl", "http://schemas.google.com/acl/2007");
-		map.put("gd", "http://schemas.google.com/g/2005");
-		map.put("openSearch", "http://a9.com/-/spec/opensearch/1.1/");
-		map.put("xml", "http://www.w3.org/XML/1998/namespace");
-	}
+	private static final XmlNamespaceDictionary DICTIONARY = 
+		new XmlNamespaceDictionary()
+		.set("", "http://www.w3.org/2005/Atom")
+		.set("app", "http://www.w3.org/2007/app")
+		.set("batch", "http://schemas.google.com/gdata/batch")
+		.set("docs", "http://schemas.google.com/docs/2007")
+		.set("gAcl", "http://schemas.google.com/acl/2007")
+		.set("gd", "http://schemas.google.com/g/2005")
+		.set("openSearch", "http://a9.com/-/spec/opensearch/1.1/")
+		.set("xml", "http://www.w3.org/XML/1998/namespace");
 
 	public static class GDocFeed {
 		@Key("openSearch:totalResults")
@@ -116,6 +96,11 @@ public final class GoogleSync extends Activity {
 
 		@Key("link")
 		public List<Link> links;
+
+		public GDocFeed()
+		{
+			Log.d(TAG, "GDocFeed()");
+		}
 	}
 
 	public static class GDocEntry {
@@ -139,6 +124,7 @@ public final class GoogleSync extends Activity {
 
 		@Key("category")
 		public List<Category> categories;
+
 
 		public Date getUpdated() {
 			return new Date(updated.value);
@@ -238,6 +224,14 @@ public final class GoogleSync extends Activity {
 		}
 	}
 
+	public static class GDocUrl extends GenericUrl 
+	{
+		@Key("updated-min") String updatedMin;
+		@Key("max-results") Integer maxResults;
+		
+		GDocUrl(String url) { super(url); }
+	}
+
 	static class SendData {
 		String fileName;
 		String contentType;
@@ -267,183 +261,101 @@ public final class GoogleSync extends Activity {
 	}
 
 	private GenericUrl getDocUrl() {
-		GenericUrl url = new GenericUrl(
-				"https://docs.google.com/feeds/default/private/full");
+		GenericUrl url = new GenericUrl("https://docs.google.com/feeds/default/private/full");
 
 		return url;
 	}
 
 	private GenericUrl getFolderUrl() {
-		GenericUrl url = new GenericUrl(sgfFolder);
-		url.appendRawPath("/contents");
+		//GenericUrl url = new GenericUrl(sgfFolder);
+		GenericUrl url = new GenericUrl("https://docs.google.com/feeds/default/private/full");
+		url.appendRawPath("folder%3A0B2zBOoPdAGqnN2RiMzQ5YjQtMjE0ZS00OGIyLTg3ZjktZWZjMTgwNTk3NTQ2");
+		url.appendRawPath("contents");
 
 		return url;
 	}
 
-	public GoogleSync() {
-		HttpTransport.setLowLevelHttpTransport(ApacheHttpTransport.INSTANCE);
-		transport = GoogleTransport.create();
-		GoogleHeaders headers = (GoogleHeaders) transport.defaultHeaders;
-		headers.setApplicationName("NotePad");
+	public GoogleUtility() 
+	{
+		//transport = new NetHttpTransport();
+		transport = new ApacheHttpTransport();
+		GoogleHeaders headers = new GoogleHeaders();
+		headers.setApplicationName("AGoban");
 		headers.gdataVersion = "3";
+		transport.defaultHeaders = headers;
 		AtomParser parser = new AtomParser();
 		parser.namespaceDictionary = DICTIONARY;
+		Log.d(TAG, "AtomParser: " + parser.namespaceDictionary);
 		transport.addParser(parser);
 	}
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		getSharedPreferences(PREFS, 0);
-		setLogging(true);
-		gotAccount(true);
-	}
 
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		switch (id) {
-		case DIALOG_ACCOUNTS:
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("Select a Google account");
-			final AccountManager manager = AccountManager.get(this);
-			final Account[] accounts = manager.getAccountsByType("com.google");
-			final int size = accounts.length;
-			String[] names = new String[size];
-			for (int i = 0; i < size; i++) {
-				names[i] = accounts[i].name;
-			}
-			builder.setItems(names, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					gotAccount(manager, accounts[which]);
-				}
-			});
-			return builder.create();
-		}
-		return null;
-	}
-
-	private void gotAccount(boolean tokenExpired) {
-		Log.d(TAG, "gotAccount: " + tokenExpired);
-		SharedPreferences settings = getSharedPreferences(PREFS, 0);
-		String accountName = settings.getString("accountName", null);
-		if (accountName != null) {
-			Log.d(TAG, "gotAccount: looking for " + accountName);
-			AccountManager manager = AccountManager.get(this);
-			Account[] accounts = manager.getAccountsByType("com.google");
-			int size = accounts.length;
-			for (int i = 0; i < size; i++) {
-				Account account = accounts[i];
-				Log.d(TAG, "gotAccount: got " + account.name);
-				if (accountName.equals(account.name)) {
-					if (tokenExpired) {
-						manager.invalidateAuthToken("com.google",
-								this.authToken);
-					}
-					gotAccount(manager, account);
-					return;
-				}
-			}
-		}
-		showDialog(DIALOG_ACCOUNTS);
-	}
-
-	private void gotAccount(final AccountManager manager, final Account account) {
-		Log.d(TAG, "gotAccount: " + manager + ", " + account);
-		SharedPreferences settings = getSharedPreferences(PREFS, 0);
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putString("accountName", account.name);
-		editor.commit();
-		new Thread() {
-
-			@Override
-			public void run() {
-				try {
-					final Bundle bundle = manager.getAuthToken(account,
-							AUTH_TOKEN_TYPE, true, null, null).getResult();
-					runOnUiThread(new Runnable() {
-
-						public void run() {
-							try {
-								if (bundle
-										.containsKey(AccountManager.KEY_INTENT)) {
-									Intent intent = bundle
-											.getParcelable(AccountManager.KEY_INTENT);
-									int flags = intent.getFlags();
-									flags &= ~Intent.FLAG_ACTIVITY_NEW_TASK;
-									intent.setFlags(flags);
-									startActivityForResult(intent,
-											REQUEST_AUTHENTICATE);
-								} else if (bundle
-										.containsKey(AccountManager.KEY_AUTHTOKEN)) {
-									Log.d(TAG,
-											"gotAccount: login "
-													+ bundle.getString(AccountManager.KEY_AUTHTOKEN));
-									authenticatedClientLogin(bundle
-											.getString(AccountManager.KEY_AUTHTOKEN));
-								}
-							} catch (Exception e) {
-								handleException(e);
-							}
-						}
-					});
-				} catch (Exception e) {
-					handleException(e);
-				}
-			}
-		}.start();
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		switch (requestCode) {
-		case REQUEST_AUTHENTICATE:
-			if (resultCode == RESULT_OK) {
-				gotAccount(false);
-			} else {
-				showDialog(DIALOG_ACCOUNTS);
-			}
-			break;
-		}
-	}
-
-	private void authenticatedClientLogin(String authToken) {
+	public void setAuthToken(String authToken) 
+	{
 		this.authToken = authToken;
 		Log.d(TAG, "authToken: " + authToken);
 		((GoogleHeaders) transport.defaultHeaders).setGoogleLogin(authToken);
-		try {
-			authenticated();
-		} catch (Exception ex) {
-			handleException(ex);
-		}
-		finish();
 	}
 
-	private void authenticated() {
+	public List<GDocEntry> getDocumentList(Date updateMin) throws IOException
+	{
+		String query = null;
+		String date = "<null>";
+		if (updateMin != null) {
+			DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+			date = df.format(updateMin);
+			//query = "?updated-min=" + date;
+		}
+		Log.d(TAG, String.format("getDocumentList(%s)", date));
+		List<GDocEntry> entries;
+		HttpRequest request = transport.buildGetRequest();
+		request.url = getFolderUrl();
+
+		Log.d(TAG, "url: " + request.url);
+		Log.d(TAG, "headers: " + request.headers);
+		HttpResponse response = request.execute();
+		GDocFeed feed = response.parseAs(GDocFeed.class);
+		Log.d(TAG, String.format("feed: totalresults=%d", feed.totalResults));
+		Log.d(TAG, String.format("feed: %s", feed));
+		entries = feed.entries;
+		return entries;
+	}
+
+	/*
+	public InputStream retrieve(GDocEntry entry) 
+	{
+		Log.d(TAG, "retrieving " + entry.title);
+
+		try {
+			InputStream is = entry.getStream();
+			File file = new File(SGFProvider.getSGFDirectory(), entry.title);
+			OutputStream os = new FileOutputStream(file);
+			Log.d(TAG, "saving " + entry.title + " to " + file);
+			byte buf[] = new byte[1024];
+			int count;
+			while ((count = is.read(buf)) > 0)
+				os.write(buf, 0, count);
+			os.close();
+			is.close();
+			Log.d(TAG, "succesfully saved " + entry.title);
+			// SGFProvider.doUpdateDatabase();
+		} catch (IOException ex) {
+			Log.e(TAG, "retrieveDocuments: caught " + ex);
+		}
+	}
+	*/
+
+	/*
+	public void sync() 
+	{
 		Log.d(TAG, "authenticated");
 
 		Map<String, GDocEntry> docMap = retrieveDocuments();
 		sendDocuments(docMap);
 	}
 
-	private List<GDocEntry> getDocumentList() {
-		List<GDocEntry> entries;
-		try {
-			HttpRequest request = transport.buildGetRequest();
-			request.url = getDocUrl();
-			Log.d(TAG, "url: " + request.url);
-			Log.d(TAG, "headers: " + request.headers);
-			HttpResponse response = request.execute();
-			GDocFeed feed = response.parseAs(GDocFeed.class);
-			Log.d(TAG, "feed: " + feed);
-			entries = feed.entries;
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		return entries;
-	}
-
-	private Map<String, GDocEntry> retrieveDocuments() {
+	public Map<String, GDocEntry> retrieveDocuments() 
+	{
 		Map<String, GDocEntry> docMap = new HashMap<String, GDocEntry>();
 		ContentResolver resolver = getContentResolver();
 		List<GDocEntry> entries = getDocumentList();
@@ -495,26 +407,6 @@ public final class GoogleSync extends Activity {
 		return docMap;
 	}
 
-	private void retrieve(GDocEntry entry, boolean create) {
-		Log.d(TAG, "retrieving " + entry.title);
-
-		try {
-			InputStream is = entry.getStream();
-			File file = new File(SGFProvider.getSGFDirectory(), entry.title);
-			OutputStream os = new FileOutputStream(file);
-			Log.d(TAG, "saving " + entry.title + " to " + file);
-			byte buf[] = new byte[1024];
-			int count;
-			while ((count = is.read(buf)) > 0)
-				os.write(buf, 0, count);
-			os.close();
-			is.close();
-			Log.d(TAG, "succesfully saved " + entry.title);
-			// SGFProvider.doUpdateDatabase();
-		} catch (IOException ex) {
-			Log.e(TAG, "retrieveDocuments: caught " + ex);
-		}
-	}
 
 	private void sendDocuments(Map<String, GDocEntry> docMap) {
 		// Perform a managed query. The Activity will handle closing and
@@ -673,42 +565,5 @@ public final class GoogleSync extends Activity {
 		resolver.update(SGFProvider.CONTENT_URI, values,
 				SGFProvider.QUERY_STRING, args);
 	}
-
-	private void handleException(Throwable e) {
-		Log.d(TAG, "handleException: " + e);
-		e.printStackTrace();
-		while (e instanceof RuntimeException) {
-			e = e.getCause();
-		}
-		if (e instanceof HttpResponseException) {
-			HttpResponse response = ((HttpResponseException) e).response;
-			int statusCode = response.statusCode;
-			Log.d(TAG, "handleException: status=" + statusCode);
-			try {
-				response.ignore();
-			} catch (IOException e1) {
-				showError("I'm sorry", e1);
-			}
-			if (statusCode == 401 || statusCode == 403) {
-				Log.d(TAG, "handleException: login required");
-				gotAccount(true);
-				return;
-			}
-			try {
-				Log.e(TAG, response.parseAsString());
-			} catch (IOException parseException) {
-				showError("I'm sorry", parseException);
-			}
-		} else {
-			showError("I'm sorry", e);
-		}
-	}
-
-	private void showError(String message, Throwable ex) {
-		Context context = getApplicationContext();
-		int duration = Toast.LENGTH_LONG;
-		Toast toast = Toast.makeText(context, message + ": " + ex, duration);
-		toast.show();
-	}
-
+	*/
 }
