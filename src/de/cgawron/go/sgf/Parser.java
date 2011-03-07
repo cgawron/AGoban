@@ -15,20 +15,24 @@ import java.util.logging.Logger;
  * 
  * @version Tue Feb 08 22:13:45 CET 2011
  */
-public class Parser extends java_cup.runtime.lr_parser {
+public class Parser extends java_cup.runtime.lr_parser
+{
 
 	/** Default constructor. */
-	public Parser() {
+	public Parser()
+	{
 		super();
 	}
 
 	/** Constructor which sets the default scanner. */
-	public Parser(java_cup.runtime.Scanner s) {
+	public Parser(java_cup.runtime.Scanner s)
+	{
 		super(s);
 	}
 
 	/** Constructor which sets the default scanner. */
-	public Parser(java_cup.runtime.Scanner s, java_cup.runtime.SymbolFactory sf) {
+	public Parser(java_cup.runtime.Scanner s, java_cup.runtime.SymbolFactory sf)
+	{
 		super(s, sf);
 	}
 
@@ -40,7 +44,8 @@ public class Parser extends java_cup.runtime.lr_parser {
 			+ "\010\003" });
 
 	/** Access to production table. */
-	public short[][] production_table() {
+	public short[][] production_table()
+	{
 		return _production_table;
 	}
 
@@ -62,7 +67,8 @@ public class Parser extends java_cup.runtime.lr_parser {
 			+ "\005\ufffd\001\002" });
 
 	/** Access to parse-action table. */
-	public short[][] action_table() {
+	public short[][] action_table()
+	{
 		return _action_table;
 	}
 
@@ -77,7 +83,8 @@ public class Parser extends java_cup.runtime.lr_parser {
 			+ "\004\003\025\001\001\000\002\001\001\000\002\001\001" + "" });
 
 	/** Access to <code>reduce_goto</code> table. */
-	public short[][] reduce_table() {
+	public short[][] reduce_table()
+	{
 		return _reduce_table;
 	}
 
@@ -85,41 +92,48 @@ public class Parser extends java_cup.runtime.lr_parser {
 	protected CUP$Parser$actions action_obj;
 
 	/** Action encapsulation object initializer. */
-	protected void init_actions() {
+	protected void init_actions()
+	{
 		action_obj = new CUP$Parser$actions(this);
 	}
 
 	/** Invoke a user supplied parse action. */
 	public java_cup.runtime.Symbol do_action(int act_num,
 			java_cup.runtime.lr_parser parser, java.util.Stack stack, int top)
-			throws java.lang.Exception {
+			throws java.lang.Exception
+	{
 		/* call code in generated class */
 		return action_obj.CUP$Parser$do_action(act_num, parser, stack, top);
 	}
 
 	/** Indicates start state. */
-	public int start_state() {
+	public int start_state()
+	{
 		return 0;
 	}
 
 	/** Indicates start production. */
-	public int start_production() {
+	public int start_production()
+	{
 		return 1;
 	}
 
 	/** <code>EOF</code> Symbol index. */
-	public int EOF_sym() {
+	public int EOF_sym()
+	{
 		return 0;
 	}
 
 	/** <code>error</code> Symbol index. */
-	public int error_sym() {
+	public int error_sym()
+	{
 		return 1;
 	}
 
 	private static Logger logger = Logger.getLogger(Parser.class.getName());
 
-	public void report_error(String message, Symbol info) {
+	public void report_error(String message, Symbol info)
+	{
 		java_cup.runtime.Scanner scanner = getScanner();
 
 		if (scanner instanceof InputPosition)
@@ -128,17 +142,20 @@ public class Parser extends java_cup.runtime.lr_parser {
 			throw new ParseError(message, info);
 	}
 
-	public void syntax_error(Symbol cur_token) {
+	public void syntax_error(Symbol cur_token)
+	{
 		logger.warning("Syntax error at " + cur_token);
 		report_error("Syntax error", cur_token);
 	}
 
-	public void debug_message(String mess) {
+	public void debug_message(String mess)
+	{
 		if (logger.isLoggable(Level.FINE))
 			logger.fine(mess);
 	}
 
-	public Symbol scan() throws java.lang.Exception {
+	public Symbol scan() throws java.lang.Exception
+	{
 		Symbol sym = getScanner().next_token();
 		sym = (sym != null) ? sym : new Symbol(EOF_sym());
 		return sym;
@@ -147,14 +164,16 @@ public class Parser extends java_cup.runtime.lr_parser {
 }
 
 /** Cup generated class to encapsulate user supplied action code. */
-class CUP$Parser$actions {
+class CUP$Parser$actions
+{
 
 	private static Logger logger = Logger.getLogger(Parser.class.getName());
 
 	private final Parser parser;
 
 	/** Constructor */
-	CUP$Parser$actions(Parser parser) {
+	CUP$Parser$actions(Parser parser)
+	{
 		this.parser = parser;
 	}
 
@@ -163,7 +182,8 @@ class CUP$Parser$actions {
 			int CUP$Parser$act_num,
 			java_cup.runtime.lr_parser CUP$Parser$parser,
 			java.util.Stack CUP$Parser$stack, int CUP$Parser$top)
-			throws java.lang.Exception {
+			throws java.lang.Exception
+	{
 		/* Symbol object for return from actions */
 		java_cup.runtime.Symbol CUP$Parser$result;
 

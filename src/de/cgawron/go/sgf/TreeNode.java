@@ -25,7 +25,8 @@ import java.util.Enumeration;
  * @author Scott Violet
  */
 
-public interface TreeNode {
+public interface TreeNode
+{
 	/**
 	 * Returns the child <code>TreeNode</code> at index <code>childIndex</code>.
 	 */

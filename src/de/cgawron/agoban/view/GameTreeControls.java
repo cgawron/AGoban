@@ -47,7 +47,8 @@ import de.cgawron.go.sgf.Node;
  * 
  */
 public class GameTreeControls extends LinearLayout implements
-		View.OnClickListener, AdapterView.OnItemSelectedListener {
+		View.OnClickListener, AdapterView.OnItemSelectedListener
+{
 	private static String TAG = "GameTreeControls";
 
 	private final SharedPreferences settings;
@@ -63,31 +64,37 @@ public class GameTreeControls extends LinearLayout implements
 	private final List<GameTreeNavigationListener> listeners = new ArrayList<GameTreeNavigationListener>();
 	private Node currentNode;
 
-	public interface GameTreeNavigationListener {
+	public interface GameTreeNavigationListener
+	{
 		public void setCurrentNode(Node node);
 
 	}
 
-	public class SavedState extends View.BaseSavedState {
+	public class SavedState extends View.BaseSavedState
+	{
 		private final int nodeId;
 
-		private SavedState(Parcel in) {
+		private SavedState(Parcel in)
+		{
 			super(in);
 			nodeId = in.readInt();
 		}
 
-		public SavedState(Parcelable superState, Node n) {
+		public SavedState(Parcelable superState, Node n)
+		{
 			super(superState);
 			nodeId = n.getId();
 		}
 
 		@Override
-		public void writeToParcel(Parcel out, int flags) {
+		public void writeToParcel(Parcel out, int flags)
+		{
 			out.writeInt(nodeId);
 		}
 
 		@Override
-		public String toString() {
+		public String toString()
+		{
 			return "GameTreeControls.SavedState " + nodeId;
 		}
 
@@ -100,19 +107,23 @@ public class GameTreeControls extends LinearLayout implements
 		 * } };
 		 */
 
-		public Node getNode(GameTree gameTree) {
+		public Node getNode(GameTree gameTree)
+		{
 			return gameTree.getNode(nodeId);
 		}
 	}
 
-	private class VariationAdapter extends BaseAdapter {
+	private class VariationAdapter extends BaseAdapter
+	{
 		Node currentNode = null;
 
-		public long getItemId(int position) {
+		public long getItemId(int position)
+		{
 			return position;
 		}
 
-		public int getCount() {
+		public int getCount()
+		{
 			Log.d(TAG,
 					"getCount: "
 							+ (currentNode != null ? currentNode
@@ -125,12 +136,14 @@ public class GameTreeControls extends LinearLayout implements
 				return 0;
 		}
 
-		public Object getItem(int position) {
+		public Object getItem(int position)
+		{
 			Log.d(TAG, "getItem: " + position);
 			return currentNode.getParent().getChildren().get(position);
 		}
 
-		public View getView(int position, View convertView, ViewGroup parent) {
+		public View getView(int position, View convertView, ViewGroup parent)
+		{
 			TextView view = (TextView) getDropDownView(position, convertView,
 					parent);
 			view.setEms(3);
@@ -139,7 +152,8 @@ public class GameTreeControls extends LinearLayout implements
 
 		@Override
 		public View getDropDownView(int position, View convertView,
-				ViewGroup parent) {
+				ViewGroup parent)
+		{
 			Node node = (Node) getItem(position);
 			Log.d(TAG, "getView: " + position + " " + node);
 			if (convertView == null) {
@@ -151,14 +165,16 @@ public class GameTreeControls extends LinearLayout implements
 			return convertView;
 		}
 
-		public int getPosition(Node node) {
+		public int getPosition(Node node)
+		{
 			if (currentNode.getParent() != null)
 				return currentNode.getParent().getChildren().indexOf(node);
 			else
 				return 0;
 		}
 
-		public void setCurrentNode(Node node, AbsSpinner spinner) {
+		public void setCurrentNode(Node node, AbsSpinner spinner)
+		{
 			Log.d(TAG, "VariationTreeAdapter.setCurrentNode: " + node);
 			currentNode = node;
 			spinner.setSelection(getPosition(node));
@@ -166,7 +182,8 @@ public class GameTreeControls extends LinearLayout implements
 		}
 	}
 
-	public GameTreeControls(Context context, AttributeSet attrs) {
+	public GameTreeControls(Context context, AttributeSet attrs)
+	{
 		super(context, attrs);
 		LayoutInflater.from(context).inflate(R.layout.game_control, this);
 		settings = context.getSharedPreferences(SGFApplication.PREF, 0);
@@ -188,7 +205,8 @@ public class GameTreeControls extends LinearLayout implements
 		initView(context);
 	}
 
-	private void initView(Context context) {
+	private void initView(Context context)
+	{
 		buttonPrev.setOnClickListener(this);
 		buttonFirst.setOnClickListener(this);
 		buttonLast.setOnClickListener(this);
@@ -197,16 +215,19 @@ public class GameTreeControls extends LinearLayout implements
 	}
 
 	public void onItemSelected(AdapterView<?> parent, View view, int position,
-			long id) {
+			long id)
+	{
 		Node node = (Node) variationAdapter.getItem(position);
 		Log.d(TAG, "onItemSelected: " + node);
 		setCurrentNode(node);
 	}
 
-	public void onNothingSelected(AdapterView<?> parent) {
+	public void onNothingSelected(AdapterView<?> parent)
+	{
 	}
 
-	public void onClick(View v) {
+	public void onClick(View v)
+	{
 		if (buttonPrev.equals(v)) {
 			Log.d(TAG, "button pressed: prev");
 			prevNode();
@@ -223,18 +244,21 @@ public class GameTreeControls extends LinearLayout implements
 	}
 
 	public void addGameTreeNavigationListener(
-			GameTreeNavigationListener listener) {
+			GameTreeNavigationListener listener)
+	{
 		this.listeners.add(listener);
 	}
 
-	public void setGameTree(GameTree gameTree) {
+	public void setGameTree(GameTree gameTree)
+	{
 		Log.d(TAG, "setGameTree: " + gameTree);
 		this.gameTree = gameTree;
 		if (currentNode == null || currentNode.getGameTree() != gameTree)
 			setCurrentNode(gameTree.getRoot());
 	}
 
-	public void setCurrentNode(Node node) {
+	public void setCurrentNode(Node node)
+	{
 		Log.d(TAG, "setCurrentNode: " + node);
 		this.currentNode = node;
 		variationAdapter.setCurrentNode(node, variations);
@@ -244,14 +268,16 @@ public class GameTreeControls extends LinearLayout implements
 		}
 	}
 
-	public void nextNode() {
+	public void nextNode()
+	{
 		if (currentNode != null && currentNode.getChildCount() > 0) {
 			if (settings.getBoolean("sortVariations", false)) {
 				Log.d(TAG, "nextNode: sort children by depth");
 				final List<Node> children = currentNode.getChildren();
 
 				final java.util.Comparator<Node> comparator = new java.util.Comparator<Node>() {
-					public int compare(Node n1, Node n2) {
+					public int compare(Node n1, Node n2)
+					{
 						int d1 = n1.getDepth();
 						int d2 = n2.getDepth();
 
@@ -270,20 +296,23 @@ public class GameTreeControls extends LinearLayout implements
 		}
 	}
 
-	public void prevNode() {
+	public void prevNode()
+	{
 		if (currentNode != null && currentNode.getParent() != null) {
 			setCurrentNode(currentNode.getParent());
 		}
 	}
 
-	public void lastNode() {
+	public void lastNode()
+	{
 		while (currentNode != null && currentNode.getChildCount() > 0) {
 			currentNode = currentNode.getChildAt(0);
 		}
 		setCurrentNode(currentNode);
 	}
 
-	public void firstNode() {
+	public void firstNode()
+	{
 		while (currentNode != null && currentNode.getParent() != null) {
 			currentNode = currentNode.getParent();
 		}
@@ -291,7 +320,8 @@ public class GameTreeControls extends LinearLayout implements
 	}
 
 	@Override
-	protected Parcelable onSaveInstanceState() {
+	protected Parcelable onSaveInstanceState()
+	{
 		Parcelable state = super.onSaveInstanceState();
 		Log.d(TAG, "onSaveInstanceState: superState class: " + state.getClass());
 
@@ -301,7 +331,8 @@ public class GameTreeControls extends LinearLayout implements
 	}
 
 	@Override
-	protected void onRestoreInstanceState(Parcelable state) {
+	protected void onRestoreInstanceState(Parcelable state)
+	{
 		Log.d(TAG, "onRestoreInstanceState: " + state + " " + state.getClass());
 		SavedState saved = (SavedState) state;
 		super.onRestoreInstanceState(saved.getSuperState());

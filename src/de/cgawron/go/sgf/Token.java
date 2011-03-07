@@ -20,7 +20,8 @@ import java_cup.runtime.Symbol;
 
 import java.util.logging.Logger;
 
-class Token extends Symbol {
+class Token extends Symbol
+{
 	private static Logger logger = Logger.getLogger(Token.class.getName());
 
 	public int m_index;
@@ -28,11 +29,13 @@ class Token extends Symbol {
 	public int m_line;
 	public int m_charBegin;
 
-	Token(int index, String text, int line, int charBegin) {
+	Token(int index, String text, int line, int charBegin)
+	{
 		this(index, text, line, charBegin, null);
 	}
 
-	Token(int index, String text, int line, int charBegin, Object o) {
+	Token(int index, String text, int line, int charBegin, Object o)
+	{
 		super(index, charBegin, charBegin + text.length(), null);
 		m_index = index;
 		m_text = new String(text);
@@ -41,7 +44,8 @@ class Token extends Symbol {
 		value = o;
 	}
 
-	public String toString() {
+	public String toString()
+	{
 		return "Token #" + m_index + ": " + m_text + " (line " + m_line + ")";
 	}
 }

@@ -29,7 +29,8 @@ import java.util.logging.Logger;
 /**
  * An abstract base class for implementations of {@link Value}.
  */
-public abstract class AbstractValue implements Value {
+public abstract class AbstractValue implements Value
+{
 	private static Logger logger = Logger.getLogger(AbstractValue.class
 			.getName());
 
@@ -44,7 +45,8 @@ public abstract class AbstractValue implements Value {
 	/**
 	 * A factory class for Values.
 	 */
-	protected static class Factory {
+	protected static class Factory
+	{
 		/**
 		 * Create a Value from an Object. Depending on the class of the Object,
 		 * an appropriate sub-class is returned.
@@ -53,7 +55,8 @@ public abstract class AbstractValue implements Value {
 		 *            an Object to wrap into an Value.
 		 * @return A Value representing the Object.
 		 */
-		public Value createValue(Object o) {
+		public Value createValue(Object o)
+		{
 			if (o instanceof String)
 				return new AbstractValue.Text((String) o);
 			else if (o instanceof Integer)
@@ -71,7 +74,8 @@ public abstract class AbstractValue implements Value {
 		 *            the SGF representation of a {@link de.cgawon.go.Point}.
 		 * @return A {@link Value.Point} representing the String.
 		 */
-		public Value createPoint(String text) {
+		public Value createPoint(String text)
+		{
 			return new AbstractValue.Point(text);
 		}
 
@@ -82,7 +86,8 @@ public abstract class AbstractValue implements Value {
 		 *            the Point to wrap in a {@link de.cgawon.go.Point}.
 		 * @return A {@link Value.Point} representing the Point.
 		 */
-		public Value createPoint(de.cgawron.go.Point point) {
+		public Value createPoint(de.cgawron.go.Point point)
+		{
 			return new AbstractValue.Point(point);
 		}
 
@@ -95,7 +100,8 @@ public abstract class AbstractValue implements Value {
 		 *            the label text.
 		 * @return A {@link Value.Label}.
 		 */
-		public Value createLabel(String pt, String text) {
+		public Value createLabel(String pt, String text)
+		{
 			return new AbstractValue.Label(pt, text);
 		}
 
@@ -104,7 +110,8 @@ public abstract class AbstractValue implements Value {
 		 * 
 		 * @return An empty {@link Value.PointList}.
 		 */
-		public Value createPointList() {
+		public Value createPointList()
+		{
 			return new AbstractValue.PointList();
 		}
 
@@ -116,7 +123,8 @@ public abstract class AbstractValue implements Value {
 		 *            .
 		 * @return A {@link Value.PointList} representing the String.
 		 */
-		public Value createPointList(String text) {
+		public Value createPointList(String text)
+		{
 			return new AbstractValue.PointList(text);
 		}
 
@@ -125,7 +133,8 @@ public abstract class AbstractValue implements Value {
 		 * 
 		 * @return An empty {@link Value.ValueList}.
 		 */
-		public static Value.ValueList createValueList() {
+		public static Value.ValueList createValueList()
+		{
 			return new AbstractValue.ValueList();
 		}
 
@@ -136,11 +145,13 @@ public abstract class AbstractValue implements Value {
 		 *            the value to wrap in a {@link Value.ValueList}
 		 * @return A {@link Value.ValueList} consisting of value.
 		 */
-		public static Value.ValueList createValueList(Value value) {
+		public static Value.ValueList createValueList(Value value)
+		{
 			return new AbstractValue.ValueList(value);
 		}
 
-		public static Value parseResult(Value value) {
+		public static Value parseResult(Value value)
+		{
 			return new AbstractValue.Result(value);
 		}
 	}
@@ -152,7 +163,8 @@ public abstract class AbstractValue implements Value {
 	 * 
 	 * @return a Factory instance.
 	 */
-	protected static Factory getFactory() {
+	protected static Factory getFactory()
+	{
 		if (factory == null)
 			factory = new Factory();
 		return factory;
@@ -163,7 +175,8 @@ public abstract class AbstractValue implements Value {
 	 * 
 	 * @return A copy of this Value.
 	 */
-	public Value clone() {
+	public Value clone()
+	{
 		try {
 			return (Value) super.clone();
 		} catch (CloneNotSupportedException ex) {
@@ -179,7 +192,8 @@ public abstract class AbstractValue implements Value {
 	 *            an Object to wrap into an Value.
 	 * @return A Value representing the Object.
 	 */
-	public static Value createValue(Object o) {
+	public static Value createValue(Object o)
+	{
 		return getFactory().createValue(o);
 	}
 
@@ -190,7 +204,8 @@ public abstract class AbstractValue implements Value {
 	 *            the SGF representation of a {@link de.cgawon.go.Point}.
 	 * @return A {@link Value.Point} representing the String.
 	 */
-	public static Value createPoint(String text) {
+	public static Value createPoint(String text)
+	{
 		return getFactory().createPoint(text);
 	}
 
@@ -201,7 +216,8 @@ public abstract class AbstractValue implements Value {
 	 *            the Point to wrap in a {@link de.cgawon.go.Point}.
 	 * @return A {@link Value.Point} representing the Point.
 	 */
-	public static Value createPoint(de.cgawron.go.Point point) {
+	public static Value createPoint(de.cgawron.go.Point point)
+	{
 		return getFactory().createPoint(point);
 	}
 
@@ -214,7 +230,8 @@ public abstract class AbstractValue implements Value {
 	 *            the label text.
 	 * @return A {@link Value.Label}.
 	 */
-	public static Value createLabel(String pt, String text) {
+	public static Value createLabel(String pt, String text)
+	{
 		return getFactory().createLabel(pt, text);
 	}
 
@@ -223,7 +240,8 @@ public abstract class AbstractValue implements Value {
 	 * 
 	 * @return An empty {@link Value.PointList}.
 	 */
-	public static Value createPointList() {
+	public static Value createPointList()
+	{
 		return getFactory().createPointList();
 	}
 
@@ -234,7 +252,8 @@ public abstract class AbstractValue implements Value {
 	 *            the SGF representation of a {@link de.cgawon.go.PointList}.
 	 * @return A {@link Value.PointList} representing the String.
 	 */
-	public static Value createPointList(String text) {
+	public static Value createPointList(String text)
+	{
 		return getFactory().createPointList(text);
 	}
 
@@ -243,7 +262,8 @@ public abstract class AbstractValue implements Value {
 	 * 
 	 * @return An empty {@link Value.ValueList}.
 	 */
-	public static Value.ValueList createValueList() {
+	public static Value.ValueList createValueList()
+	{
 		return getFactory().createValueList();
 	}
 
@@ -254,101 +274,124 @@ public abstract class AbstractValue implements Value {
 	 *            the value to wrap in a {@link Value.ValueList}
 	 * @return A {@link Value.ValueList} consisting of value.
 	 */
-	public static Value.ValueList createValueList(Value value) {
+	public static Value.ValueList createValueList(Value value)
+	{
 		return getFactory().createValueList(value);
 	}
 
-	public static Value parseResult(Value text) {
+	public static Value parseResult(Value text)
+	{
 		return getFactory().parseResult(text);
 	}
 
-	public String getString() {
+	public String getString()
+	{
 		return toString();
 	}
 
-	public boolean equals(Object o) {
+	public boolean equals(Object o)
+	{
 		return toString().equals(o.toString());
 	}
 
-	private static class Void extends AbstractValue implements Value.Void {
-		private Void() {
+	private static class Void extends AbstractValue implements Value.Void
+	{
+		private Void()
+		{
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			return "<null>";
 		}
 
-		public void write(PrintWriter out) {
+		public void write(PrintWriter out)
+		{
 			out.print("[");
 			out.print("]");
 		}
 	}
 
-	private static class Point extends AbstractValue implements Value.Point {
+	private static class Point extends AbstractValue implements Value.Point
+	{
 		de.cgawron.go.Point point;
 
-		public Point(String text) {
+		public Point(String text)
+		{
 			point = new de.cgawron.go.Point(text);
 		}
 
-		public Point(de.cgawron.go.Point p) {
+		public Point(de.cgawron.go.Point p)
+		{
 			point = new de.cgawron.go.Point(p);
 		}
 
-		public Point(short x, short y) {
+		public Point(short x, short y)
+		{
 			point = new de.cgawron.go.Point(x, y);
 		}
 
-		public de.cgawron.go.Point getPoint() {
+		public de.cgawron.go.Point getPoint()
+		{
 			return point;
 		}
 
-		public short getX() {
+		public short getX()
+		{
 			return point.getX();
 		}
 
-		public short getY() {
+		public short getY()
+		{
 			return point.getY();
 		}
 
-		public void write(PrintWriter out) {
+		public void write(PrintWriter out)
+		{
 			out.print("[");
 			out.print(point.sgfString());
 			out.print("]");
 		}
 
-		public void transform(Symmetry s) {
+		public void transform(Symmetry s)
+		{
 			// HACK! A point value should know about the board size ...
 			point = s.transform(point, (short) 19);
 			logger.info(toString() + ": transform(" + s + ")");
 		}
 	}
 
-	private static class Label extends AbstractValue implements Value.Label {
+	private static class Label extends AbstractValue implements Value.Label
+	{
 		de.cgawron.go.Point point;
 		String text;
 
-		public Label(String pt, String text) {
+		public Label(String pt, String text)
+		{
 			point = new de.cgawron.go.Point(pt);
 			this.text = text;
 			logger.fine("Value.Label " + text);
 		}
 
-		public void transform(Symmetry s) {
+		public void transform(Symmetry s)
+		{
 			// HACK! A point value should know about the board size ...
 			point = s.transform(point, (short) 19);
 			logger.info(toString() + ": transform(" + s + ")");
 		}
 
-		public de.cgawron.go.Point getPoint() {
+		public de.cgawron.go.Point getPoint()
+		{
 			return point;
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			return text;
 		}
 
-		public void write(PrintWriter out) {
+		public void write(PrintWriter out)
+		{
 			out.print("[");
 			out.print(getPoint().sgfString());
 			out.print(":");
@@ -360,33 +403,40 @@ public abstract class AbstractValue implements Value {
 
 	private static class PointList extends
 			java.util.AbstractCollection<de.cgawron.go.Point> implements
-			Value.PointList {
+			Value.PointList
+	{
 		short lx = 255;
 		short ly = 255;
 		short ux = -1;
 		short uy = -1;
 		SortedSet<de.cgawron.go.Point> points = new TreeSet<de.cgawron.go.Point>();
 
-		public short getMinX() {
+		public short getMinX()
+		{
 			return lx;
 		}
 
-		public short getMinY() {
+		public short getMinY()
+		{
 			return ly;
 		}
 
-		public short getMaxX() {
+		public short getMaxX()
+		{
 			return ux;
 		}
 
-		public short getMaxY() {
+		public short getMaxY()
+		{
 			return uy;
 		}
 
-		public PointList() {
+		public PointList()
+		{
 		}
 
-		public PointList(String text) {
+		public PointList(String text)
+		{
 			if (logger.isLoggable(Level.FINE))
 				logger.fine("PointList(" + text + ")");
 			if (text.length() == 0) {
@@ -444,18 +494,21 @@ public abstract class AbstractValue implements Value {
 				throw new ClassCastException(text + " is not a PointList");
 		}
 
-		public Value clone() {
+		public Value clone()
+		{
 			PointList list = new AbstractValue.PointList();
 			for (de.cgawron.go.Point p : points)
 				list.add(p);
 			return list;
 		}
 
-		public int size() {
+		public int size()
+		{
 			return points.size();
 		}
 
-		public boolean add(Value o) {
+		public boolean add(Value o)
+		{
 			if (o instanceof Value.Point)
 				return this.add(((Value.Point) o).getPoint());
 			else if (o instanceof de.cgawron.go.Point)
@@ -472,7 +525,8 @@ public abstract class AbstractValue implements Value {
 								+ o.getClass().getName());
 		}
 
-		public boolean add(de.cgawron.go.Point p) {
+		public boolean add(de.cgawron.go.Point p)
+		{
 			if (p.getX() < lx)
 				lx = p.getX();
 			if (p.getX() > ux)
@@ -484,13 +538,15 @@ public abstract class AbstractValue implements Value {
 			return points.add(p);
 		}
 
-		public boolean remove(de.cgawron.go.Point p) {
+		public boolean remove(de.cgawron.go.Point p)
+		{
 			boolean b = points.remove(p);
 			revalidate();
 			return b;
 		}
 
-		private void revalidate() {
+		private void revalidate()
+		{
 			lx = 255;
 			ly = 255;
 			ux = -1;
@@ -510,11 +566,13 @@ public abstract class AbstractValue implements Value {
 			}
 		}
 
-		public Iterator<de.cgawron.go.Point> iterator() {
+		public Iterator<de.cgawron.go.Point> iterator()
+		{
 			return points.iterator();
 		}
 
-		public void transform(Symmetry s) {
+		public void transform(Symmetry s)
+		{
 			logger.info(toString() + ": transform(" + s + ")");
 			Iterator it = iterator();
 			while (it.hasNext()) {
@@ -526,7 +584,8 @@ public abstract class AbstractValue implements Value {
 		}
 
 		void getMaximumRectangle(SortedSet<de.cgawron.go.Point> ts,
-				SortedSet<de.cgawron.go.Point> r, de.cgawron.go.Point p) {
+				SortedSet<de.cgawron.go.Point> r, de.cgawron.go.Point p)
+		{
 			short width = 0;
 			short height = 0;
 
@@ -555,7 +614,8 @@ public abstract class AbstractValue implements Value {
 			}
 		}
 
-		public void write(PrintWriter out) {
+		public void write(PrintWriter out)
+		{
 			if (true) {
 				// write a compressed PointList
 				TreeSet<de.cgawron.go.Point> ts = new TreeSet<de.cgawron.go.Point>();
@@ -602,11 +662,13 @@ public abstract class AbstractValue implements Value {
 			}
 		}
 
-		public String getString() {
+		public String getString()
+		{
 			return toString();
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			StringBuffer s = new StringBuffer();
 			Iterator it = points.iterator();
 			while (it.hasNext()) {
@@ -616,22 +678,27 @@ public abstract class AbstractValue implements Value {
 		}
 	}
 
-	private static class Text extends AbstractValue implements Value.Text {
+	private static class Text extends AbstractValue implements Value.Text
+	{
 		String text;
 
-		public Text(String text) {
+		public Text(String text)
+		{
 			this.text = text;
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			return text;
 		}
 
-		public boolean equals(Object o) {
+		public boolean equals(Object o)
+		{
 			return toString().equals(o.toString());
 		}
 
-		public void write(PrintWriter out) {
+		public void write(PrintWriter out)
+		{
 			out.print("[");
 			for (int i = 0; i < text.length(); i++) {
 				char c = text.charAt(i);
@@ -648,11 +715,13 @@ public abstract class AbstractValue implements Value {
 		}
 	}
 
-	private static class Result extends AbstractValue implements Value.Result {
+	private static class Result extends AbstractValue implements Value.Result
+	{
 		String text;
 		Pattern win = Pattern.compile("(B|W)\\+([0-9.]+|R|T|F)");
 
-		public Result(Value value) {
+		public Result(Value value)
+		{
 			this.text = value.toString();
 			Matcher matcher = win.matcher(text);
 			if (matcher.matches()) {
@@ -661,11 +730,13 @@ public abstract class AbstractValue implements Value {
 			}
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			return text;
 		}
 
-		public void write(PrintWriter out) {
+		public void write(PrintWriter out)
+		{
 			out.print("[");
 			for (int i = 0; i < text.length(); i++) {
 				char c = text.charAt(i);
@@ -682,33 +753,40 @@ public abstract class AbstractValue implements Value {
 		}
 	}
 
-	private static class Number extends AbstractValue implements Value.Number {
+	private static class Number extends AbstractValue implements Value.Number
+	{
 		Integer number;
 
-		public Number(String text) {
+		public Number(String text)
+		{
 			this.number = Integer.getInteger(text);
 		}
 
-		public Number(Integer number) {
+		public Number(Integer number)
+		{
 			this.number = number;
 		}
 
-		public int intValue() {
+		public int intValue()
+		{
 			return number.intValue();
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			return number.toString();
 		}
 
-		public boolean equals(Object o) {
+		public boolean equals(Object o)
+		{
 			if (o instanceof Value.Number) {
 				return intValue() == ((Value.Number) o).intValue();
 			} else
 				return false;
 		}
 
-		public void write(PrintWriter out) {
+		public void write(PrintWriter out)
+		{
 			out.print("[");
 			out.print(number);
 			out.print("]");
@@ -716,17 +794,21 @@ public abstract class AbstractValue implements Value {
 	}
 
 	private static class ValueList extends AbstractValue implements
-			Value.ValueList {
+			Value.ValueList
+	{
 		List<Value> values = new ArrayList<Value>();
 
-		public ValueList() {
+		public ValueList()
+		{
 		}
 
-		public ValueList(Value v) {
+		public ValueList(Value v)
+		{
 			values.add(v);
 		}
 
-		public boolean add(Value v) {
+		public boolean add(Value v)
+		{
 			if (!(v instanceof Value))
 				throw new ClassCastException(
 						"Only a Value can be added to a ValueList");
@@ -738,23 +820,28 @@ public abstract class AbstractValue implements Value {
 				return values.add(v);
 		}
 
-		public int size() {
+		public int size()
+		{
 			return values.size();
 		}
 
-		public boolean isEmpty() {
+		public boolean isEmpty()
+		{
 			return values.isEmpty();
 		}
 
-		public boolean contains(Object o) {
+		public boolean contains(Object o)
+		{
 			return values.contains(o);
 		}
 
-		public Iterator<Value> iterator() {
+		public Iterator<Value> iterator()
+		{
 			return values.iterator();
 		}
 
-		public void transform(Symmetry s) {
+		public void transform(Symmetry s)
+		{
 			logger.info(toString() + ": transform(" + s + ")");
 			Iterator it = iterator();
 			while (it.hasNext()) {
@@ -765,89 +852,110 @@ public abstract class AbstractValue implements Value {
 			}
 		}
 
-		public Object[] toArray() {
+		public Object[] toArray()
+		{
 			return values.toArray();
 		}
 
-		public <T> T[] toArray(T a[]) {
+		public <T> T[] toArray(T a[])
+		{
 			return values.toArray(a);
 		}
 
-		public boolean remove(Object o) {
+		public boolean remove(Object o)
+		{
 			return values.remove(o);
 		}
 
-		public boolean containsAll(Collection<?> c) {
+		public boolean containsAll(Collection<?> c)
+		{
 			return values.containsAll(c);
 		}
 
-		public boolean addAll(Collection<? extends Value> c) {
+		public boolean addAll(Collection<? extends Value> c)
+		{
 			return values.addAll(c);
 		}
 
-		public boolean addAll(int index, Collection<? extends Value> c) {
+		public boolean addAll(int index, Collection<? extends Value> c)
+		{
 			return values.addAll(index, c);
 		}
 
-		public boolean removeAll(Collection<?> c) {
+		public boolean removeAll(Collection<?> c)
+		{
 			return values.removeAll(c);
 		}
 
-		public boolean retainAll(Collection<?> c) {
+		public boolean retainAll(Collection<?> c)
+		{
 			return values.retainAll(c);
 		}
 
-		public void clear() {
+		public void clear()
+		{
 			values.clear();
 		}
 
-		public boolean equals(Object o) {
+		public boolean equals(Object o)
+		{
 			return values.equals(o);
 		}
 
-		public int hashCode() {
+		public int hashCode()
+		{
 			return values.hashCode();
 		}
 
-		public Value get(int index) {
+		public Value get(int index)
+		{
 			return values.get(index);
 		}
 
 		public Value set(int index, Value element)
-				throws UnsupportedOperationException {
+				throws UnsupportedOperationException
+		{
 			throw new UnsupportedOperationException();
 		}
 
 		public void add(int index, Value element)
-				throws UnsupportedOperationException {
+				throws UnsupportedOperationException
+		{
 			throw new UnsupportedOperationException();
 		}
 
-		public Value remove(int index) {
+		public Value remove(int index)
+		{
 			return values.remove(index);
 		}
 
-		public int indexOf(Object o) {
+		public int indexOf(Object o)
+		{
 			return values.indexOf(o);
 		}
 
-		public int lastIndexOf(Object o) {
+		public int lastIndexOf(Object o)
+		{
 			return values.lastIndexOf(o);
 		}
 
-		public ListIterator<Value> listIterator() {
+		public ListIterator<Value> listIterator()
+		{
 			return values.listIterator();
 		}
 
-		public ListIterator<Value> listIterator(int index) {
+		public ListIterator<Value> listIterator(int index)
+		{
 			return values.listIterator(index);
 		}
 
-		public List<Value> subList(int fromIndex, int toIndex) {
+		public List<Value> subList(int fromIndex, int toIndex)
+		{
 			return values.subList(fromIndex, toIndex);
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			String s = "";
 			Iterator i = iterator();
 			while (i.hasNext()) {
@@ -857,7 +965,8 @@ public abstract class AbstractValue implements Value {
 			return s;
 		}
 
-		public void write(PrintWriter out) {
+		public void write(PrintWriter out)
+		{
 			Iterator it = iterator();
 			while (it.hasNext()) {
 				Value p = (Value) it.next();
@@ -865,7 +974,8 @@ public abstract class AbstractValue implements Value {
 			}
 		}
 
-		public Value clone() {
+		public Value clone()
+		{
 			Value.ValueList list = new AbstractValue.ValueList();
 			for (Value v : values) {
 				list.add((Value) (v.clone()));

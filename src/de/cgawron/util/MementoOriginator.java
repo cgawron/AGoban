@@ -18,8 +18,10 @@
 
 package de.cgawron.util;
 
-public interface MementoOriginator {
-	class InvalidMementoException extends RuntimeException {
+public interface MementoOriginator
+{
+	class InvalidMementoException extends RuntimeException
+	{
 	}
 
 	void setMemento(Memento memento) throws InvalidMementoException;

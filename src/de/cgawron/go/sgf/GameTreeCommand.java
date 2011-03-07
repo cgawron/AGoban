@@ -22,7 +22,8 @@ package de.cgawron.go.sgf;
  * A command to be run on a GameTree. Instances of this interface may be
  * {@link #run} on a {@link GameTree}.
  */
-public interface GameTreeCommand {
+public interface GameTreeCommand
+{
 	/**
 	 * Runs the command on a {@link GameTree}.
 	 */

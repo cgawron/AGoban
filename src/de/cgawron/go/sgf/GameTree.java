@@ -62,7 +62,8 @@ import de.cgawron.util.MiscEncodingReader;
  * This class represents an SGF game tree.
  */
 public class GameTree implements TreeModel, PropertyChangeListener,
-		MementoOriginator {
+		MementoOriginator
+{
 	private static Logger logger = Logger.getLogger(GameTree.class.getName());
 
 	private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
@@ -80,7 +81,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	private boolean collection = false;
 	private final boolean rootOnly = false;
 
-	interface GobanFactory<M extends Goban> {
+	interface GobanFactory<M extends Goban>
+	{
 		M getGoban(short boardsize);
 
 		M getGoban(Goban m);
@@ -88,29 +90,34 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 
 	GobanFactory factory;
 
-	abstract class NodeCount extends TreeVisitor<GameTree, Node> {
+	abstract class NodeCount extends TreeVisitor<GameTree, Node>
+	{
 		private int count;
 
-		NodeCount() {
+		NodeCount()
+		{
 			super(GameTree.this);
 			count = 0;
 			visit();
 		}
 
-		public int getCount() {
+		public int getCount()
+		{
 			return count;
 		}
 
 		public abstract boolean predicate(Node n);
 
 		@Override
-		public void visitNode(Node n) {
+		public void visitNode(Node n)
+		{
 			if (predicate(n))
 				count++;
 		}
 	}
 
-	private void init(GameTree tree) {
+	private void init(GameTree tree)
+	{
 		logger.info("init: this=" + this + ", tree=" + tree);
 		this.root = tree.root;
 
@@ -119,7 +126,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 		setModified(false);
 	}
 
-	private void init(Node root) {
+	private void init(Node root)
+	{
 		logger.info("init: this=" + this + ", root=" + root);
 		if (root instanceof RootNode)
 			setRoot((RootNode) root);
@@ -134,7 +142,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	/**
 	 * Constructs an empty GameTree, consisting only of a <code>RootNode</code>
 	 */
-	public GameTree() {
+	public GameTree()
+	{
 		listeners = new HashSet<EventListener>();
 		Node root = new RootNode(this);
 		root.setGameTree(this);
@@ -149,7 +158,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 *            the <code>Node</code> used as root. If o is not an instace of
 	 *            <code>RootNode</code>, it will be wrapped appropriately.
 	 */
-	public GameTree(Node o) {
+	public GameTree(Node o)
+	{
 		listeners = new HashSet<EventListener>();
 		name = "<created from node>";
 		init(o);
@@ -161,7 +171,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * @param file
 	 *            the SGF file used to construct the <code>GameTree</code>.
 	 */
-	public GameTree(File file) throws Exception {
+	public GameTree(File file) throws Exception
+	{
 		this(new FileInputStream(file));
 		this.file = file;
 		name = file.getPath();
@@ -173,10 +184,12 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * @param file
 	 *            the SGF file used to construct the <code>GameTree</code>.
 	 */
-	public GameTree(final RandomAccessFile file) throws Exception {
+	public GameTree(final RandomAccessFile file) throws Exception
+	{
 		this(new InputStream() {
 			@Override
-			public int read() throws IOException {
+			public int read() throws IOException
+			{
 				return file.read();
 			}
 		});
@@ -188,7 +201,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * @param in
 	 *            the SGF stream used to construct the <code>GameTree</code>.
 	 */
-	public GameTree(InputStream in) throws Exception {
+	public GameTree(InputStream in) throws Exception
+	{
 		this(new MiscEncodingReader(in));
 	}
 
@@ -200,7 +214,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 *            the reader from which the SGF is read to construct the
 	 *            <code>GameTree</code>.
 	 */
-	public GameTree(Reader reader) throws Exception {
+	public GameTree(Reader reader) throws Exception
+	{
 		name = "<unknown input>";
 		listeners = new HashSet<EventListener>();
 		Yylex lexer = new Yylex(reader);
@@ -226,7 +241,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * @param movesPerFigure
 	 *            Number of moves per figure.
 	 */
-	public void addCanonicalDiagrams(int movesPerFigure) {
+	public void addCanonicalDiagrams(int movesPerFigure)
+	{
 		logger.info("adding canonical diagrams");
 		List leafs = getLeafs();
 		Iterator it = leafs.iterator();
@@ -247,31 +263,36 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * diagram is added at every leaf node and - if this property is set - every
 	 * <code>godiagram.movesPerDiagram</code> moves.
 	 */
-	public void addCanonicalDiagrams() {
+	public void addCanonicalDiagrams()
+	{
 		int movesPerFigure = Integer
 				.getInteger("godiagram.movesPerDiagram", -1);
 		addCanonicalDiagrams(movesPerFigure);
 	}
 
-	Goban getGoban(short boardSize) {
+	Goban getGoban(short boardSize)
+	{
 		if (factory != null)
 			return factory.getGoban(boardSize);
 		else
 			return new SimpleGoban(boardSize);
 	}
 
-	Goban getGoban(Goban m) {
+	Goban getGoban(Goban m)
+	{
 		if (factory != null)
 			return factory.getGoban(m);
 		else
 			return new SimpleGoban(m);
 	}
 
-	public Memento createMemento() {
+	public Memento createMemento()
+	{
 		return new GameTreeMemento(this);
 	}
 
-	public void setMemento(Memento memento) {
+	public void setMemento(Memento memento)
+	{
 		logger.info("GameTree: setMemento: " + memento);
 		GameTreeMemento m = (GameTreeMemento) memento;
 		m.setMemento(root);
@@ -279,11 +300,13 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 		fireTreeStructureChanged(ev);
 	}
 
-	public boolean isCollection() {
+	public boolean isCollection()
+	{
 		return collection;
 	}
 
-	public Collection<Node> getRoots() {
+	public Collection<Node> getRoots()
+	{
 		Collection<Node> c = new ArrayList<Node>();
 		if (isCollection())
 			c.addAll(getRoot().getChildren());
@@ -292,7 +315,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 		return c;
 	}
 
-	public String getBaseName() {
+	public String getBaseName()
+	{
 		if (file == null)
 			return getName();
 		else {
@@ -305,15 +329,18 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 		}
 	}
 
-	public File getFile() {
+	public File getFile()
+	{
 		return file;
 	}
 
-	public void save() throws IOException {
+	public void save() throws IOException
+	{
 		save(getFile());
 	}
 
-	public void save(File file) throws IOException {
+	public void save(File file) throws IOException
+	{
 		logger.info("Saving gametree in " + file);
 		if (file.exists()) {
 			if (!file.renameTo(new File(file.toString() + "~")))
@@ -324,7 +351,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 		save(new FileOutputStream(file));
 	}
 
-	public void save(OutputStream stream) throws IOException {
+	public void save(OutputStream stream) throws IOException
+	{
 		Node root = getRoot();
 		String charset = null;
 		if (root.get(Property.CHARACTER_SET) != null)
@@ -336,7 +364,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 
 		TreeIterator<Node> iterator = new PreorderIterator<Node>(root) {
 			@Override
-			public void endNode(Node parent) {
+			public void endNode(Node parent)
+			{
 				if (parent == null || parent.getChildren().size() > 1) {
 					out.write(")");
 				}
@@ -370,7 +399,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * @param charset
 	 *            Charset to set.
 	 */
-	public void setCharset(Charset charset) {
+	public void setCharset(Charset charset)
+	{
 		Node root = getRoot();
 		Property ca = Property.createProperty(Property.CHARACTER_SET,
 				charset.name());
@@ -382,7 +412,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * 
 	 * @return value of name.
 	 */
-	public String getName() {
+	public String getName()
+	{
 		return name;
 	}
 
@@ -392,7 +423,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * @param v
 	 *            Value to assign to name.
 	 */
-	public void setName(String v) {
+	public void setName(String v)
+	{
 		this.name = v;
 	}
 
@@ -401,7 +433,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * 
 	 * @return value of modified.
 	 */
-	public boolean isModified() {
+	public boolean isModified()
+	{
 		return modified;
 	}
 
@@ -411,7 +444,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * @param v
 	 *            Value to assign to modified.
 	 */
-	public void setModified(boolean newValue) {
+	public void setModified(boolean newValue)
+	{
 		boolean oldValue = modified;
 		logger.fine("GameTree.setModified: " + oldValue + ", " + newValue);
 		if (newValue != modified) {
@@ -421,11 +455,13 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	}
 
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		return "GameTree " + name;
 	}
 
-	public void propertyChange(PropertyChangeEvent event) {
+	public void propertyChange(PropertyChangeEvent event)
+	{
 		logger.info("GameTree.propertyChange: " + event + " "
 				+ event.getPropertyName());
 		noOfDiagrams = -1;
@@ -442,7 +478,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * @param l
 	 *            the listener to add
 	 */
-	public void addTreeModelListener(TreeModelListener l) {
+	public void addTreeModelListener(TreeModelListener l)
+	{
 		logger.fine("Adding listener " + l);
 		listeners.add(l);
 	}
@@ -458,7 +495,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 *            a node in the tree, obtained from this data source
 	 * @return the child of <I>parent</I> at index <I>index</I>
 	 */
-	public TreeNode getChild(TreeNode parent, int index) {
+	public TreeNode getChild(TreeNode parent, int index)
+	{
 		if (parent instanceof TreeNode) {
 			TreeNode node = parent;
 			return node.getChildAt(index);
@@ -479,7 +517,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 *            a node in the tree, obtained from this data source
 	 * @return the number of children of the node <I>parent</I>
 	 */
-	public int getChildCount(Object parent) {
+	public int getChildCount(Object parent)
+	{
 		TreeNode node = (TreeNode) parent;
 		if (node == null)
 			return -1;
@@ -488,7 +527,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	}
 
 	/** Returns the index of child in parent. */
-	public int getIndexOfChild(Object parent, Object child) {
+	public int getIndexOfChild(Object parent, Object child)
+	{
 		TreeNode node = (TreeNode) parent;
 		if (node == null)
 			return -1;
@@ -496,7 +536,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 			return node.getIndex((TreeNode) child);
 	}
 
-	public String getSignature() {
+	public String getSignature()
+	{
 		return (getRoot()).getSignature();
 	}
 
@@ -505,11 +546,13 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * 
 	 * @return the root of the tree
 	 */
-	public RootNode getRoot() {
+	public RootNode getRoot()
+	{
 		return root;
 	}
 
-	public void setRoot(Object o) {
+	public void setRoot(Object o)
+	{
 		if (o instanceof RootNode)
 			setRoot((RootNode) o);
 		else if (o instanceof GameTree)
@@ -519,7 +562,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 					+ "?");
 	}
 
-	public void setRoot(final RootNode newRoot) {
+	public void setRoot(final RootNode newRoot)
+	{
 		Node oldRoot = root;
 		if (oldRoot != null) {
 			if (oldRoot.equals(newRoot))
@@ -535,7 +579,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 			TreeVisitor<GameTree, Node> visitor = new TreeVisitor<GameTree, Node>(
 					this) {
 				@Override
-				protected void visitNode(Node n) {
+				protected void visitNode(Node n)
+				{
 					Goban goban = null;
 
 					if (logger.isLoggable(Level.FINE))
@@ -610,7 +655,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 *            specifies the node to return
 	 * @return the specified node
 	 */
-	public Node getNode(String nodeSpec) throws Exception {
+	public Node getNode(String nodeSpec) throws Exception
+	{
 		if ("root".equals(nodeSpec))
 			return getRoot();
 		else
@@ -625,7 +671,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 *            The node id to search.
 	 * @return the specified node or null if the id is not found
 	 */
-	public Node getNode(int id) {
+	public Node getNode(int id)
+	{
 		Iterator<Node> it = new PreorderIterator<Node>(getRoot());
 		Node n;
 		while (it.hasNext()) {
@@ -636,11 +683,13 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 		return null;
 	}
 
-	public String getGameName() {
+	public String getGameName()
+	{
 		return ((Node) getRoot()).getGameName();
 	}
 
-	public Node appendNode(Node currentNode) {
+	public Node appendNode(Node currentNode)
+	{
 		Node newNode = new Node(this);
 		logger.info("appending node " + newNode + " at " + currentNode);
 		int newIndex = currentNode.getChildCount();
@@ -663,7 +712,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 		return newNode;
 	}
 
-	public int getNoOfMoves() {
+	public int getNoOfMoves()
+	{
 		int moves = 0;
 		Node node = getRoot();
 		while (node != null) {
@@ -677,11 +727,13 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 		return moves;
 	}
 
-	public int getNoOfDiagrams() {
+	public int getNoOfDiagrams()
+	{
 		if (noOfDiagrams < 0) {
 			NodeCount counter = new NodeCount() {
 				@Override
-				public boolean predicate(Node node) {
+				public boolean predicate(Node node)
+				{
 					return !node.isMainVariation() && node.isDiagram();
 				}
 			};
@@ -690,11 +742,13 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 		return noOfDiagrams;
 	}
 
-	public int getNoOfFigures() {
+	public int getNoOfFigures()
+	{
 		if (noOfFigures < 0) {
 			NodeCount counter = new NodeCount() {
 				@Override
-				public boolean predicate(Node node) {
+				public boolean predicate(Node node)
+				{
 					return node.isMainVariation() && node.isDiagram();
 				}
 			};
@@ -713,7 +767,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 *            a node in the tree, obtained from this data source
 	 * @return true if <I>node</I> is a leaf
 	 */
-	public boolean isLeaf(Object node) {
+	public boolean isLeaf(Object node)
+	{
 		return getChildCount(node) == 0;
 	}
 
@@ -722,12 +777,14 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * 
 	 * @return A List containing all leaf nodes
 	 */
-	public List<Node> getLeafs() {
+	public List<Node> getLeafs()
+	{
 		final List<Node> leafs = new ArrayList<Node>();
 		TreeVisitor<GameTree, Node> visitor = new TreeVisitor<GameTree, Node>(
 				this) {
 			@Override
-			protected void visitNode(Node node) {
+			protected void visitNode(Node node)
+			{
 				if (node.isLeaf())
 					leafs.add(node);
 			}
@@ -743,7 +800,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 *            the number of the move to get
 	 * @return the node containing the specified move
 	 */
-	public Node getMove(int moveNo) {
+	public Node getMove(int moveNo)
+	{
 		Node node = root;
 		int currentMoveNo = 0;
 		while (node != null && currentMoveNo != moveNo) {
@@ -762,11 +820,13 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * @param l
 	 *            the listener to remove
 	 */
-	public void removeTreeModelListener(TreeModelListener l) {
+	public void removeTreeModelListener(TreeModelListener l)
+	{
 		listeners.remove(l);
 	}
 
-	void fireTreeStructureChanged(TreeModelEvent ev) {
+	void fireTreeStructureChanged(TreeModelEvent ev)
+	{
 		Iterator it = listeners.iterator();
 		while (it.hasNext()) {
 			TreeModelListener l = (TreeModelListener) it.next();
@@ -774,7 +834,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 		}
 	}
 
-	void fireTreeNodesInserted(TreeModelEvent ev) {
+	void fireTreeNodesInserted(TreeModelEvent ev)
+	{
 		Iterator it = listeners.iterator();
 		while (it.hasNext()) {
 			TreeModelListener l = (TreeModelListener) it.next();
@@ -782,32 +843,38 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 		}
 	}
 
-	public class NodePropertyChangedEvent extends TreeModelEvent {
+	public class NodePropertyChangedEvent extends TreeModelEvent
+	{
 		PropertyChangeEvent event;
 
-		NodePropertyChangedEvent(PropertyChangeEvent e) {
+		NodePropertyChangedEvent(PropertyChangeEvent e)
+		{
 			super(GameTree.this, new TreePath(e.getSource()));
 			this.event = e;
 		}
 
-		public PropertyChangeEvent getPropertyChangeEvent() {
+		public PropertyChangeEvent getPropertyChangeEvent()
+		{
 			return this.event;
 		}
 	}
 
-	public void fireTreeNodeChanged(PropertyChangeEvent event) {
+	public void fireTreeNodeChanged(PropertyChangeEvent event)
+	{
 		setModified(true);
 		TreeModelEvent ev = new NodePropertyChangedEvent(event);
 		fireTreeNodesChanged(ev);
 	}
 
-	public void fireTreeNodeChanged(Node n) {
+	public void fireTreeNodeChanged(Node n)
+	{
 		setModified(true);
 		TreeModelEvent ev = new TreeModelEvent(this, new TreePath(n));
 		fireTreeNodesChanged(ev);
 	}
 
-	void fireTreeNodesChanged(TreeModelEvent e) {
+	void fireTreeNodesChanged(TreeModelEvent e)
+	{
 		Iterator it = listeners.iterator();
 		while (it.hasNext()) {
 			TreeModelListener l = (TreeModelListener) it.next();
@@ -825,7 +892,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * @param newValue
 	 *            the new value from the TreeCellEditor.
 	 */
-	public void valueForPathChanged(TreePath path, Object newValue) {
+	public void valueForPathChanged(TreePath path, Object newValue)
+	{
 		if (path != null)
 			fireTreeNodesChanged(new TreeModelEvent(newValue, path));
 	}
@@ -835,15 +903,18 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * a leaf node's children is requested.
 	 */
 	public static final Iterator EMPTY_ITERATOR = new Iterator() {
-		public boolean hasNext() {
+		public boolean hasNext()
+		{
 			return false;
 		}
 
-		public Object next() {
+		public Object next()
+		{
 			throw new NoSuchElementException("No more elements");
 		}
 
-		public void remove() {
+		public void remove()
+		{
 			throw new UnsupportedOperationException();
 		}
 	};
@@ -855,7 +926,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * @param listener
 	 *            The PropertyChangeListener to be added
 	 */
-	public void addPropertyChangeListener(PropertyChangeListener listener) {
+	public void addPropertyChangeListener(PropertyChangeListener listener)
+	{
 		logger.info("GameTree.addPropertyChangeListener: " + listener);
 		pcs.addPropertyChangeListener(listener);
 	}
@@ -867,7 +939,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * @param listener
 	 *            The PropertyChangeListener to be removed
 	 */
-	public void removePropertyChangeListener(PropertyChangeListener listener) {
+	public void removePropertyChangeListener(PropertyChangeListener listener)
+	{
 		logger.info("GameTree.removePropertyChangeListener: " + listener);
 		pcs.removePropertyChangeListener(listener);
 	}
@@ -883,7 +956,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 *            The PropertyChangeListener to be added
 	 */
 	public void addPropertyChangeListener(String propertyName,
-			PropertyChangeListener listener) {
+			PropertyChangeListener listener)
+	{
 		logger.info("GameTree.addPropertyChangeListener: " + listener + ", "
 				+ propertyName);
 		pcs.addPropertyChangeListener(propertyName, listener);
@@ -898,7 +972,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 *            The PropertyChangeListener to be removed
 	 */
 	public void removePropertyChangeListener(String propertyName,
-			PropertyChangeListener listener) {
+			PropertyChangeListener listener)
+	{
 		logger.info("GameTree.removePropertyChangeListener: " + listener + ", "
 				+ propertyName);
 		pcs.removePropertyChangeListener(propertyName, listener);
@@ -916,7 +991,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 *            The new value of the property.
 	 */
 	public void firePropertyChange(String propertyName, Object oldValue,
-			Object newValue) {
+			Object newValue)
+	{
 		pcs.firePropertyChange(propertyName, oldValue, newValue);
 	}
 
@@ -934,7 +1010,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 *            The new value of the property.
 	 */
 	public void firePropertyChange(String propertyName, int oldValue,
-			int newValue) {
+			int newValue)
+	{
 		pcs.firePropertyChange(propertyName, oldValue, newValue);
 	}
 
@@ -952,7 +1029,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 *            The new value of the property.
 	 */
 	public void firePropertyChange(String propertyName, boolean oldValue,
-			boolean newValue) {
+			boolean newValue)
+	{
 		pcs.firePropertyChange(propertyName, oldValue, newValue);
 	}
 
@@ -964,7 +1042,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * @param evt
 	 *            The PropertyChangeEvent object.
 	 */
-	public void firePropertyChange(PropertyChangeEvent evt) {
+	public void firePropertyChange(PropertyChangeEvent evt)
+	{
 		pcs.firePropertyChange(evt);
 	}
 
@@ -976,11 +1055,13 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	 * @return <code>true</code>if there are one or more listeners for the given
 	 *         property
 	 */
-	public boolean hasListeners(String propertyName) {
+	public boolean hasListeners(String propertyName)
+	{
 		return pcs.hasListeners(propertyName);
 	}
 
-	public void join(GameTree tree, Node theirSetup) {
+	public void join(GameTree tree, Node theirSetup)
+	{
 		Node mySetup = getRoot();
 		while (mySetup != null && !mySetup.isBoardSetup())
 			mySetup = (Node) mySetup.getChildAt(0);
@@ -1007,11 +1088,13 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 		((Node) getRoot()).join(tree.getRoot());
 	}
 
-	public void transform(final Symmetry s) {
+	public void transform(final Symmetry s)
+	{
 		TreeVisitor<GameTree, Node> visitor = new TreeVisitor<GameTree, Node>(
 				this) {
 			@Override
-			protected void visitNode(Node n) {
+			protected void visitNode(Node n)
+			{
 				Iterator it = n.entrySet().iterator();
 				while (it.hasNext()) {
 					Map.Entry entry = (Map.Entry) it.next();
@@ -1029,17 +1112,20 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 		visitor.visit();
 	}
 
-	public static class GameTreeTest {
+	public static class GameTreeTest
+	{
 		MarkupModel.Stone blackStone;
 		MarkupModel.Stone whiteStone;
 		MarkupModel.Move move1;
 		MarkupModel.Move move5;
 
-		public GameTreeTest() {
+		public GameTreeTest()
+		{
 		}
 
 		@Before
-		public void setUp() {
+		public void setUp()
+		{
 			blackStone = new MarkupModel.Stone(BoardType.BLACK);
 			whiteStone = new MarkupModel.Stone(BoardType.WHITE);
 			move1 = new MarkupModel.Move(BoardType.BLACK, 1);
@@ -1047,7 +1133,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 		}
 
 		@Test
-		public void testInheritedProperties() throws Exception {
+		public void testInheritedProperties() throws Exception
+		{
 			List<Node> leafs;
 			GameTree gameTree = new GameTree(
 					new StringReader(
@@ -1062,7 +1149,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 		}
 
 		@Test
-		public void testExplicitDiagrams() throws Exception {
+		public void testExplicitDiagrams() throws Exception
+		{
 			List<Node> leafs;
 			MarkupModel goban;
 
@@ -1097,7 +1185,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 		}
 
 		@Test
-		public void testDefaultDiagrams() throws Exception {
+		public void testDefaultDiagrams() throws Exception
+		{
 			System.setProperty("godiagram.movesPerDiagram", "50");
 			List<Node> leafs;
 			MarkupModel goban;

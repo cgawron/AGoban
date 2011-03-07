@@ -26,23 +26,28 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class PropertyList extends TreeMap<Property.Key, Property> {
+public class PropertyList extends TreeMap<Property.Key, Property>
+{
 	private static Logger logger = Logger.getLogger(PropertyList.class
 			.getName());
 
-	public PropertyList() {
+	public PropertyList()
+	{
 	}
 
-	public PropertyList(Property p) {
+	public PropertyList(Property p)
+	{
 		put(p.getKey(), p);
 	}
 
-	public PropertyList(PropertyList pl) {
+	public PropertyList(PropertyList pl)
+	{
 		super();
 		addAll(pl);
 	}
 
-	public void addAll(PropertyList pl) {
+	public void addAll(PropertyList pl)
+	{
 		Iterator<Map.Entry<Property.Key, Property>> it = pl.entrySet()
 				.iterator();
 		while (it.hasNext()) {
@@ -51,7 +56,8 @@ public class PropertyList extends TreeMap<Property.Key, Property> {
 		}
 	}
 
-	public Value getValue(Property.Key s) {
+	public Value getValue(Property.Key s)
+	{
 		Property prop = (Property) get(s);
 		if (prop == null) {
 			logger.info(s + " not found");
@@ -60,7 +66,8 @@ public class PropertyList extends TreeMap<Property.Key, Property> {
 			return prop.getValue();
 	}
 
-	public Point getPoint(Property.Key s) {
+	public Point getPoint(Property.Key s)
+	{
 		Property prop = (Property) get(s);
 		if (prop == null) {
 			return null;
@@ -72,7 +79,8 @@ public class PropertyList extends TreeMap<Property.Key, Property> {
 		}
 	}
 
-	public Value.PointList getPointList(Property.Key s) {
+	public Value.PointList getPointList(Property.Key s)
+	{
 		Property prop = (Property) get(s);
 		if (prop == null) {
 			return null;
@@ -90,15 +98,18 @@ public class PropertyList extends TreeMap<Property.Key, Property> {
 		}
 	}
 
-	public boolean contains(Object o) {
+	public boolean contains(Object o)
+	{
 		return containsKey(o);
 	}
 
-	public void add(Property p) {
+	public void add(Property p)
+	{
 		put(p);
 	}
 
-	public Property put(Property.Key k, Property v) {
+	public Property put(Property.Key k, Property v)
+	{
 		if (contains(k)) {
 			Property p = get(k);
 			if (p instanceof Property.Joinable) {
@@ -117,11 +128,13 @@ public class PropertyList extends TreeMap<Property.Key, Property> {
 			return super.put(k, v);
 	}
 
-	public void put(Property p) {
+	public void put(Property p)
+	{
 		put(p.getKey(), p);
 	}
 
-	public void write(PrintWriter out) {
+	public void write(PrintWriter out)
+	{
 		out.print(";");
 		Iterator it = values().iterator();
 		while (it.hasNext()) {

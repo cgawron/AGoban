@@ -23,12 +23,14 @@ package de.cgawron.go.sgf;
  * interface. A child class only has to implement the {@link #visitNode} method.
  */
 public abstract class AbstractGameTreeVisitor extends
-		TreeVisitor<GameTree, Node> implements GameTreeVisitor, GameTreeCommand {
+		TreeVisitor<GameTree, Node> implements GameTreeVisitor, GameTreeCommand
+{
 	/**
 	 * Constructs a AbstractGameTreeVisitor without an underlying
 	 * {@link GameTree}.
 	 */
-	public AbstractGameTreeVisitor() {
+	public AbstractGameTreeVisitor()
+	{
 	}
 
 	/**
@@ -38,7 +40,8 @@ public abstract class AbstractGameTreeVisitor extends
 	 * @param gameTree
 	 *            - the {@link GameTree} to set.
 	 */
-	public AbstractGameTreeVisitor(GameTree gameTree) {
+	public AbstractGameTreeVisitor(GameTree gameTree)
+	{
 		setModel(gameTree);
 	}
 
@@ -51,7 +54,8 @@ public abstract class AbstractGameTreeVisitor extends
 	 *             - if any {@link visitNode} throws an exception, it will be
 	 *             reported here.
 	 */
-	public void run(GameTree gameTree) throws Exception {
+	public void run(GameTree gameTree) throws Exception
+	{
 		setModel(gameTree);
 		visit();
 	}

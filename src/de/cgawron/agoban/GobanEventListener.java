@@ -16,6 +16,7 @@
 
 package de.cgawron.agoban;
 
-public interface GobanEventListener {
+public interface GobanEventListener
+{
 	void onGobanEvent(GobanEvent gobanEvent);
 }

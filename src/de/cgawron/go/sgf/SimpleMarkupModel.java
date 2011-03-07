@@ -36,7 +36,8 @@ import java.util.logging.Logger;
  * <code>SimpleGoban</code>
  */
 public class SimpleMarkupModel extends SimpleGoban implements MarkupModel,
-		PropertyChangeListener {
+		PropertyChangeListener
+{
 	private static Logger logger = Logger.getLogger(SimpleMarkupModel.class
 			.getName());
 	protected MarkupModel.Markup[][] markup;
@@ -46,12 +47,14 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel,
 	private int moveNo = 1;
 
 	/** SimpleMarkupModel constructor comment. */
-	public SimpleMarkupModel() {
+	public SimpleMarkupModel()
+	{
 		super();
 	}
 
 	/** SimpleGoban constructor comment. */
-	public SimpleMarkupModel(short size) {
+	public SimpleMarkupModel(short size)
+	{
 		super(size);
 	}
 
@@ -61,7 +64,8 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel,
 	 * @param m
 	 *            gawron.go.goban.Goban
 	 */
-	public SimpleMarkupModel(Goban m) {
+	public SimpleMarkupModel(Goban m)
+	{
 		super(m);
 		if (m instanceof MarkupModel) {
 			MarkupModel mm = (MarkupModel) m;
@@ -71,7 +75,8 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel,
 		}
 	}
 
-	public void propertyChange(PropertyChangeEvent event) {
+	public void propertyChange(PropertyChangeEvent event)
+	{
 		logger.info("SimpleMarkupModel.propertyChange: " + event);
 		if (event.getSource() instanceof Region) {
 			firePropertyChange(null, null, null);
@@ -87,7 +92,8 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel,
 	 *            gawron.go.goban.Goban
 	 */
 	@Override
-	public void copy(Goban m) {
+	public void copy(Goban m)
+	{
 		super.copy(m);
 		if (m instanceof SimpleMarkupModel) {
 			SimpleMarkupModel smp = (SimpleMarkupModel) m;
@@ -120,7 +126,8 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel,
 		fireModelChanged();
 	}
 
-	public void resetMarkup() {
+	public void resetMarkup()
+	{
 		if (logger.isLoggable(Level.FINE))
 			logger.fine("reset markup: " + this);
 		short i;
@@ -141,18 +148,21 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel,
 	}
 
 	/** getStone method comment. */
-	public MarkupModel.Markup getMarkup(Point p) {
+	public MarkupModel.Markup getMarkup(Point p)
+	{
 		return markup[p.getX()][p.getY()];
 	}
 
 	/** getStone method comment. */
-	public MarkupModel.Markup getMarkup(short x, short y) {
+	public MarkupModel.Markup getMarkup(short x, short y)
+	{
 		return markup[x][y];
 	}
 
 	/** setBoardSize method comment. */
 	@Override
-	public void setBoardSize(int s) {
+	public void setBoardSize(int s)
+	{
 		if (size != s) {
 			super.setBoardSize(s);
 			short i, j;
@@ -163,7 +173,8 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel,
 
 	/** setBoardSize method comment. */
 	@Override
-	protected void setBoardSizeNoInit(int s) {
+	protected void setBoardSizeNoInit(int s)
+	{
 		if (size != s) {
 			super.setBoardSizeNoInit(s);
 			size = s;
@@ -172,12 +183,14 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel,
 	}
 
 	/** setMarkup method comment. */
-	public void setMarkup(Point p, MarkupModel.Markup m) {
+	public void setMarkup(Point p, MarkupModel.Markup m)
+	{
 		setMarkup(p.getX(), p.getY(), m);
 	}
 
 	/** setMarkup method comment. */
-	public void setMarkup(short x, short y, MarkupModel.Markup m) {
+	public void setMarkup(short x, short y, MarkupModel.Markup m)
+	{
 		if (x < 0 || y < 0 || x >= getBoardSize() || y >= getBoardSize())
 			return;
 
@@ -207,7 +220,8 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel,
 		}
 	}
 
-	MarkupModel.Markup getConflictLabel(MarkupModel.Stone s) {
+	MarkupModel.Markup getConflictLabel(MarkupModel.Stone s)
+	{
 		Iterator<Conflict> it = conflicts.iterator();
 
 		short n = 0;
@@ -219,37 +233,43 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel,
 	}
 
 	/** putStone method comment. */
-	public void putStone(short x, short y, BoardType color) {
+	public void putStone(short x, short y, BoardType color)
+	{
 		if (logger.isLoggable(Level.FINE))
 			logger.fine("putStone: " + x + ", " + y + ", " + color);
 		super.putStone(x, y, color);
 		setMarkup(x, y, new Stone(color));
 	}
 
-	protected void setStone(short x, short y, BoardType color) {
+	protected void setStone(short x, short y, BoardType color)
+	{
 		if (logger.isLoggable(Level.FINE))
 			logger.fine("setStone: " + x + ", " + y + ", " + color);
 		super.setStone(x, y, color);
 	}
 
 	/** move method comment. */
-	public void move(short x, short y, BoardType color) {
+	public void move(short x, short y, BoardType color)
+	{
 		super.move(x, y, color);
 		setMarkup(x, y, new Move(color, moveNo++));
 	}
 
 	/** move method comment. */
-	public void move(short x, short y, BoardType color, int moveNo) {
+	public void move(short x, short y, BoardType color, int moveNo)
+	{
 		this.moveNo = moveNo;
 		super.move(x, y, color, moveNo);
 		setMarkup(x, y, new Move(color, moveNo++));
 	}
 
-	public Region getRegion() {
+	public Region getRegion()
+	{
 		return region;
 	}
 
-	public void setRegion(Region newRegion) {
+	public void setRegion(Region newRegion)
+	{
 		Region oldRegion = region;
 		if (logger.isLoggable(Level.FINE))
 			logger.fine("Setting region to " + newRegion);
@@ -265,23 +285,27 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel,
 			newRegion.addPropertyChangeListener(this);
 	}
 
-	public SortedSet<Conflict> getConflicts() {
+	public SortedSet<Conflict> getConflicts()
+	{
 		if (logger.isLoggable(Level.FINE))
 			logger.fine("Conflicts: " + conflicts);
 		return conflicts;
 	}
 
 	/** addGobanListener method comment. */
-	public void addGobanListener(GobanListener l) {
+	public void addGobanListener(GobanListener l)
+	{
 		listeners.add(l);
 	}
 
 	/** addGobanListener method comment. */
-	public void removeGobanListener(GobanListener l) {
+	public void removeGobanListener(GobanListener l)
+	{
 		listeners.remove(l);
 	}
 
-	protected void fireRegionChanged() {
+	protected void fireRegionChanged()
+	{
 		if (logger.isLoggable(Level.FINE))
 			logger.fine("SimpleMarkupModel.fireRegionChanged");
 
@@ -292,7 +316,8 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel,
 		}
 	}
 
-	public String toString() {
+	public String toString()
+	{
 		StringBuffer s = new StringBuffer(512);
 		int i, j;
 		BoardType p;
@@ -322,15 +347,18 @@ public class SimpleMarkupModel extends SimpleGoban implements MarkupModel,
 		return s.toString();
 	}
 
-	public String getToolTipText(Point p) {
+	public String getToolTipText(Point p)
+	{
 		return (String) toolTipMap.get(p);
 	}
 
-	public void setToolTipText(Point p, String s) {
+	public void setToolTipText(Point p, String s)
+	{
 		toolTipMap.put(p, s);
 	}
 
-	public Goban clone() throws CloneNotSupportedException {
+	public Goban clone() throws CloneNotSupportedException
+	{
 		Goban model = new SimpleMarkupModel(this);
 		return model;
 	}

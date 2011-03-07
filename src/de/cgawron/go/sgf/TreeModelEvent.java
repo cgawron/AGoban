@@ -45,7 +45,8 @@ import java.util.EventObject;
  * @author Ray Ryan
  * @author Scott Violet
  */
-public class TreeModelEvent extends EventObject {
+public class TreeModelEvent extends EventObject
+{
 	private static final long serialVersionUID = 615897123779784218L;
 	/** Path to the parent of the nodes that have changed. */
 	protected TreePath path;
@@ -129,7 +130,8 @@ public class TreeModelEvent extends EventObject {
 	 * @see TreePath
 	 */
 	public TreeModelEvent(Object source, Object[] path, int[] childIndices,
-			Object[] children) {
+			Object[] children)
+	{
 		this(source, new TreePath(path), childIndices, children);
 	}
 
@@ -156,7 +158,8 @@ public class TreeModelEvent extends EventObject {
 	 * @see #TreeModelEvent(Object,Object[],int[],Object[])
 	 */
 	public TreeModelEvent(Object source, TreePath path, int[] childIndices,
-			Object[] children) {
+			Object[] children)
+	{
 		super(source);
 		this.path = path;
 		this.childIndices = childIndices;
@@ -184,7 +187,8 @@ public class TreeModelEvent extends EventObject {
 	 *            object stored at the changed node
 	 * @see TreePath
 	 */
-	public TreeModelEvent(Object source, Object[] path) {
+	public TreeModelEvent(Object source, Object[] path)
+	{
 		this(source, new TreePath(path));
 	}
 
@@ -206,7 +210,8 @@ public class TreeModelEvent extends EventObject {
 	 * 
 	 * @see #TreeModelEvent(Object,Object[])
 	 */
-	public TreeModelEvent(Object source, TreePath path) {
+	public TreeModelEvent(Object source, TreePath path)
+	{
 		super(source);
 		this.path = path;
 		this.childIndices = new int[0];
@@ -225,7 +230,8 @@ public class TreeModelEvent extends EventObject {
 	 * @return the TreePath used in identifying the changed nodes.
 	 * @see TreePath#getLastPathComponent
 	 */
-	public TreePath getTreePath() {
+	public TreePath getTreePath()
+	{
 		return path;
 	}
 
@@ -237,7 +243,8 @@ public class TreeModelEvent extends EventObject {
 	 *         the root and the last object is the one stored at the node
 	 *         identified by the path
 	 */
-	public Object[] getPath() {
+	public Object[] getPath()
+	{
 		if (path != null)
 			return path.getPath();
 		return null;
@@ -253,7 +260,8 @@ public class TreeModelEvent extends EventObject {
 	 * @see #getPath
 	 * @see #getChildIndices
 	 */
-	public Object[] getChildren() {
+	public Object[] getChildren()
+	{
 		if (children != null) {
 			int cCount = children.length;
 			Object[] retChildren = new Object[cCount];
@@ -274,7 +282,8 @@ public class TreeModelEvent extends EventObject {
 	 * @return an array of <code>int</code> containing index locations for the
 	 *         children specified by the event
 	 */
-	public int[] getChildIndices() {
+	public int[] getChildIndices()
+	{
 		if (childIndices != null) {
 			int cCount = childIndices.length;
 			int[] retArray = new int[cCount];
@@ -290,7 +299,8 @@ public class TreeModelEvent extends EventObject {
 	 * 
 	 * @return a String representation of this object
 	 */
-	public String toString() {
+	public String toString()
+	{
 		StringBuffer retBuffer = new StringBuffer();
 
 		retBuffer.append(getClass().getName() + " "

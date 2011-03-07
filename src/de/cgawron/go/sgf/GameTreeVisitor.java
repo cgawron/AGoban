@@ -24,6 +24,7 @@ package de.cgawron.go.sgf;
  * 
  * @author Christian Gawron
  */
-public interface GameTreeVisitor {
+public interface GameTreeVisitor
+{
 	void visitNode(Object o) throws Exception;
 }

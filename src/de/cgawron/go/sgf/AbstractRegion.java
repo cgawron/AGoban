@@ -28,7 +28,8 @@ import java.beans.PropertyChangeSupport;
  * @author Christian Gawron
  * @version $Revision: 154 $
  */
-public abstract class AbstractRegion implements Region {
+public abstract class AbstractRegion implements Region
+{
 	private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
 	/**
@@ -38,7 +39,8 @@ public abstract class AbstractRegion implements Region {
 	 * @param listener
 	 *            The PropertyChangeListener to be added
 	 */
-	public void addPropertyChangeListener(PropertyChangeListener listener) {
+	public void addPropertyChangeListener(PropertyChangeListener listener)
+	{
 		pcs.addPropertyChangeListener(listener);
 	}
 
@@ -49,7 +51,8 @@ public abstract class AbstractRegion implements Region {
 	 * @param listener
 	 *            The PropertyChangeListener to be removed
 	 */
-	public void removePropertyChangeListener(PropertyChangeListener listener) {
+	public void removePropertyChangeListener(PropertyChangeListener listener)
+	{
 		pcs.removePropertyChangeListener(listener);
 	}
 
@@ -64,7 +67,8 @@ public abstract class AbstractRegion implements Region {
 	 *            The PropertyChangeListener to be added
 	 */
 	public void addPropertyChangeListener(String propertyName,
-			PropertyChangeListener listener) {
+			PropertyChangeListener listener)
+	{
 		pcs.addPropertyChangeListener(propertyName, listener);
 	}
 
@@ -77,7 +81,8 @@ public abstract class AbstractRegion implements Region {
 	 *            The PropertyChangeListener to be removed
 	 */
 	public void removePropertyChangeListener(String propertyName,
-			PropertyChangeListener listener) {
+			PropertyChangeListener listener)
+	{
 		pcs.removePropertyChangeListener(propertyName, listener);
 	}
 
@@ -93,7 +98,8 @@ public abstract class AbstractRegion implements Region {
 	 *            The new value of the property.
 	 */
 	public void firePropertyChange(String propertyName, Object oldValue,
-			Object newValue) {
+			Object newValue)
+	{
 		pcs.firePropertyChange(propertyName, oldValue, newValue);
 	}
 
@@ -111,7 +117,8 @@ public abstract class AbstractRegion implements Region {
 	 *            The new value of the property.
 	 */
 	public void firePropertyChange(String propertyName, int oldValue,
-			int newValue) {
+			int newValue)
+	{
 		pcs.firePropertyChange(propertyName, oldValue, newValue);
 	}
 
@@ -129,7 +136,8 @@ public abstract class AbstractRegion implements Region {
 	 *            The new value of the property.
 	 */
 	public void firePropertyChange(String propertyName, boolean oldValue,
-			boolean newValue) {
+			boolean newValue)
+	{
 		pcs.firePropertyChange(propertyName, oldValue, newValue);
 	}
 
@@ -141,7 +149,8 @@ public abstract class AbstractRegion implements Region {
 	 * @param evt
 	 *            The PropertyChangeEvent object.
 	 */
-	public void firePropertyChange(PropertyChangeEvent evt) {
+	public void firePropertyChange(PropertyChangeEvent evt)
+	{
 		pcs.firePropertyChange(evt);
 	}
 
@@ -153,15 +162,18 @@ public abstract class AbstractRegion implements Region {
 	 * @return <code>true</code>if there are one or more listeners for the given
 	 *         property
 	 */
-	public boolean hasListeners(String propertyName) {
+	public boolean hasListeners(String propertyName)
+	{
 		return pcs.hasListeners(propertyName);
 	}
 
-	public AbstractRegion() {
+	public AbstractRegion()
+	{
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public Object clone() throws CloneNotSupportedException
+	{
 		return super.clone();
 	}
 }

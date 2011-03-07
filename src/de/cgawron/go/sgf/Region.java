@@ -25,7 +25,8 @@ import java.beans.PropertyChangeListener;
  * A Region represents a region, i.e. a (usually connected) set of points, on a
  * Goban
  */
-public interface Region extends Cloneable {
+public interface Region extends Cloneable
+{
 	/**
 	 * Returns a <code>Shape</code> describing the region. The coordinates of
 	 * the shape are board coordinates, i.e. values between 0 and the board

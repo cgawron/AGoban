@@ -52,7 +52,8 @@ import demo.MultiTouchController.PositionAndScale;
  * 
  */
 public class GobanView extends View implements
-		demo.MultiTouchController.MultiTouchObjectCanvas<Object> {
+		demo.MultiTouchController.MultiTouchObjectCanvas<Object>
+{
 	private static String TAG = "GobanView";
 
 	private Goban goban;
@@ -73,7 +74,8 @@ public class GobanView extends View implements
 	 * This interface represents an abstract "tool" for a Goban which can
 	 * implement functions like moving, adding a stone, etc.
 	 */
-	public interface Tool {
+	public interface Tool
+	{
 		/**
 		 * Get a {@code Drawable} for the cursor.
 		 * 
@@ -83,15 +85,18 @@ public class GobanView extends View implements
 		void onGobanEvent(GobanEvent event);
 	}
 
-	public class GobanContextMenuInfo implements ContextMenuInfo {
+	public class GobanContextMenuInfo implements ContextMenuInfo
+	{
 		public PointF pointF;
 
-		GobanContextMenuInfo(PointF pointF) {
+		GobanContextMenuInfo(PointF pointF)
+		{
 			this.pointF = pointF;
 		}
 
 		@Override
-		public String toString() {
+		public String toString()
+		{
 			return String.format("GobanContextMenuInfo(%s)", pointF);
 		}
 	}
@@ -102,7 +107,8 @@ public class GobanView extends View implements
 	 * 
 	 * @param context
 	 */
-	public GobanView(Context context) {
+	public GobanView(Context context)
+	{
 		super(context);
 		settings = context.getSharedPreferences(SGFApplication.PREF, 0);
 		// mOrientationListener = new MyOrientationEventListener(context);
@@ -117,7 +123,8 @@ public class GobanView extends View implements
 	 * @see android.view.View#View(android.content.Context,
 	 *      android.util.AttributeSet)
 	 */
-	public GobanView(Context context, AttributeSet attrs) {
+	public GobanView(Context context, AttributeSet attrs)
+	{
 		super(context, attrs);
 		settings = context.getSharedPreferences(SGFApplication.PREF, 0);
 		initGobanView();
@@ -133,7 +140,8 @@ public class GobanView extends View implements
 		a.recycle();
 	}
 
-	private final void initGobanView() {
+	private final void initGobanView()
+	{
 		blowupScale = settings.getFloat("blowupScale", 4f);
 		blowupWidth = settings.getFloat("blowupWidth", 8.5f);
 
@@ -146,7 +154,8 @@ public class GobanView extends View implements
 		renderer = new GobanRenderer(this);
 	}
 
-	public void addMarkup(Goban goban, Markup property) {
+	public void addMarkup(Goban goban, Markup property)
+	{
 		if (property instanceof Property.Label) {
 			Value.ValueList vl = (Value.ValueList) property.getValue();
 			for (Value v : vl) {
@@ -168,23 +177,28 @@ public class GobanView extends View implements
 		}
 	}
 
-	public void addLabel(Point p, String text) {
+	public void addLabel(Point p, String text)
+	{
 		markupList.add(renderer.new Label(p, text));
 	}
 
-	public void addVariation(Point p) {
+	public void addVariation(Point p)
+	{
 		markupList.add(renderer.new VariationMark(p));
 	}
 
-	public void markLastMove(Point p) {
+	public void markLastMove(Point p)
+	{
 		markupList.add(renderer.new LastMoveMark(p));
 	}
 
-	public void resetMarkup() {
+	public void resetMarkup()
+	{
 		markupList.clear();
 	}
 
-	public Iterable<GobanRenderer.Markup> getMarkup() {
+	public Iterable<GobanRenderer.Markup> getMarkup()
+	{
 		return markupList;
 	}
 
@@ -194,7 +208,8 @@ public class GobanView extends View implements
 	 * @param text
 	 *            The text to display. This will be drawn as one line.
 	 */
-	public void setGoban(Goban goban) {
+	public void setGoban(Goban goban)
+	{
 		if (goban == null)
 			throw new NullPointerException("setGoban: goban must not be null!");
 		this.goban = goban;
@@ -202,7 +217,8 @@ public class GobanView extends View implements
 	}
 
 	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
+	{
 		int width = MeasureSpec.getSize(widthMeasureSpec);
 		int height = MeasureSpec.getSize(heightMeasureSpec);
 		int min = width < height ? width : height;
@@ -218,7 +234,8 @@ public class GobanView extends View implements
 	 * @see android.view.View#onDraw(android.graphics.Canvas)
 	 */
 	@Override
-	protected void onDraw(Canvas canvas) {
+	protected void onDraw(Canvas canvas)
+	{
 		super.onDraw(canvas);
 		Rect bounds = new Rect();
 		boolean clip = canvas.getClipBounds(bounds);
@@ -271,7 +288,8 @@ public class GobanView extends View implements
 		}
 	}
 
-	public void setBlowup(GobanEvent event) {
+	public void setBlowup(GobanEvent event)
+	{
 		Log.d(TAG, "setBlowup: " + event);
 		MotionEvent me = event.getBaseEvent();
 		switch (me.getAction()) {
@@ -305,26 +323,30 @@ public class GobanView extends View implements
 	}
 
 	@Override
-	public boolean onTrackballEvent(MotionEvent event) {
+	public boolean onTrackballEvent(MotionEvent event)
+	{
 		if (!gobanEventHandler.onTrackballEvent(event))
 			return super.onTrackballEvent(event);
 		else
 			return true;
 	}
 
-	public Object getDraggableObjectAtPoint(PointInfo pt) {
+	public Object getDraggableObjectAtPoint(PointInfo pt)
+	{
 		// We do not support dragging on a goban
 		return null;
 	}
 
 	public void getPositionAndScale(Object obj,
-			PositionAndScale objPosAndScaleOut) {
+			PositionAndScale objPosAndScaleOut)
+	{
 		// We start at 0.0f each time the drag position is replaced, because we
 		// just want the relative drag distance
 		objPosAndScaleOut.set(xOff, yOff, relativeScale);
 	}
 
-	public void selectObject(Object obj, PointInfo pt) {
+	public void selectObject(Object obj, PointInfo pt)
+	{
 		int width = getWidth();
 		int height = getHeight();
 		int size = goban.getBoardSize();
@@ -342,7 +364,8 @@ public class GobanView extends View implements
 	}
 
 	public boolean setPositionAndScale(Object obj, PositionAndScale update,
-			PointInfo touchPoint) {
+			PointInfo touchPoint)
+	{
 		// Get new offsets and coords
 		float newRelativeScale = update.getScale();
 		Log.d("Goban", "multitouch: " + newRelativeScale);
@@ -350,15 +373,18 @@ public class GobanView extends View implements
 		return true;
 	}
 
-	public int getBoardSize() {
+	public int getBoardSize()
+	{
 		return goban.getBoardSize();
 	}
 
-	public void addGobanEventListener(GobanEventListener listener) {
+	public void addGobanEventListener(GobanEventListener listener)
+	{
 		listeners.add(listener);
 	}
 
-	public void fireGobanEvent(GobanEvent gobanEvent) {
+	public void fireGobanEvent(GobanEvent gobanEvent)
+	{
 		if (tool != null)
 			tool.onGobanEvent(gobanEvent);
 		for (GobanEventListener listener : listeners) {
@@ -366,20 +392,24 @@ public class GobanView extends View implements
 		}
 	}
 
-	public void setCursorPosition(PointF point) {
+	public void setCursorPosition(PointF point)
+	{
 		cursorPosition = point;
 	}
 
-	public PointF getCursorPosition() {
+	public PointF getCursorPosition()
+	{
 		return cursorPosition;
 	}
 
 	@Override
-	public ContextMenuInfo getContextMenuInfo() {
+	public ContextMenuInfo getContextMenuInfo()
+	{
 		return new GobanContextMenuInfo(cursorPosition);
 	}
 
-	public void setTool(Tool tool) {
+	public void setTool(Tool tool)
+	{
 		this.tool = tool;
 	}
 }

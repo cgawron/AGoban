@@ -53,7 +53,8 @@ package de.cgawron.go.sgf;
  * @author Rob Davis
  * @author Ray Ryan
  */
-public interface TreeModel {
+public interface TreeModel
+{
 
 	/**
 	 * Returns the root of the tree. Returns <code>null</code> only if the tree

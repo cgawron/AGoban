@@ -21,19 +21,22 @@ package de.cgawron.go.sgf;
 import java.util.Collection;
 import java.util.Iterator;
 
-public class Sequence extends Node {
+public class Sequence extends Node
+{
 	Node first = null;
 	Node last = null;
 	int len = 0;
 
-	public Sequence(Node n) {
+	public Sequence(Node n)
+	{
 		super(n);
 		first = this;
 		last = this;
 		len = 1;
 	}
 
-	public boolean addAll(Collection<Node> c) {
+	public boolean addAll(Collection<Node> c)
+	{
 		Iterator<Node> i = c.iterator();
 		while (i.hasNext()) {
 			last.add(i.next());
@@ -41,7 +44,8 @@ public class Sequence extends Node {
 		return true;
 	}
 
-	public boolean append(Node o) {
+	public boolean append(Node o)
+	{
 		boolean b = false;
 		if (last == this)
 			b = super.add(o);
@@ -52,15 +56,18 @@ public class Sequence extends Node {
 		return b;
 	}
 
-	public int size() {
+	public int size()
+	{
 		return len;
 	}
 
-	public Node getFirst() {
+	public Node getFirst()
+	{
 		return first;
 	}
 
-	public String toString() {
+	public String toString()
+	{
 		String s = "Sequence: length " + size() + ": ";
 		s += super.toString();
 		return s;

@@ -40,11 +40,12 @@ import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
-public class SGFProvider extends ContentProvider 
+public class SGFProvider extends ContentProvider
 {
 	private static String TAG = "SGFProvider";
 	final public static String AUTHORITY = "de.cgawron.agoban";
-	final public static Uri CONTENT_URI = new Uri.Builder().scheme("content").authority(AUTHORITY).build();
+	final public static Uri CONTENT_URI = new Uri.Builder().scheme("content")
+			.authority(AUTHORITY).build();
 	final public static String SGF_TYPE = "application/x-go-sgf";
 
 	public final static String QUERY_STRING = "_id=?";
@@ -53,7 +54,8 @@ public class SGFProvider extends ContentProvider
 	public final static File SGF_DIRECTORY;
 	static {
 		// TODO: Handle exceptions here
-		SGF_DIRECTORY = new File(Environment.getExternalStorageDirectory(), "sgf");
+		SGF_DIRECTORY = new File(Environment.getExternalStorageDirectory(),
+				"sgf");
 		if (!SGF_DIRECTORY.exists())
 			SGF_DIRECTORY.mkdir();
 	}
@@ -64,7 +66,8 @@ public class SGFProvider extends ContentProvider
 	private long lastChecked = 0;
 	private static Map<Long, GameInfo> sgfMap = new HashMap<Long, GameInfo>();
 
-	private void initColumns() {
+	private void initColumns()
+	{
 		ArrayList<String> _columns = new ArrayList<String>();
 		_columns.add(KEY_ID);
 		_columns.add(KEY_LOCAL_MODIFIED_DATE);
@@ -82,7 +85,8 @@ public class SGFProvider extends ContentProvider
 		columns = _columns.toArray(new String[0]);
 	}
 
-	private Cursor queryDB(String[] projection, String query, String[] args) {
+	private Cursor queryDB(String[] projection, String query, String[] args)
+	{
 		Log.d(TAG,
 				String.format("queryDB(%s, %s, %s)", projection, query, args));
 
@@ -93,7 +97,8 @@ public class SGFProvider extends ContentProvider
 		return cursor;
 	}
 
-	private void deleteDB(String id) {
+	private void deleteDB(String id)
+	{
 		Log.i(TAG, "deleting " + id);
 		String[] args = { id };
 		db.delete(SGFDBOpenHelper.SGF_TABLE_NAME, QUERY_STRING, args);
@@ -101,9 +106,11 @@ public class SGFProvider extends ContentProvider
 
 	Thread updateThread = null;
 
-	private void updateDatabase() {
+	private void updateDatabase()
+	{
 		Runnable runnable = new Runnable() {
-			public void run() {
+			public void run()
+			{
 				doUpdateDatabase();
 			}
 		};
@@ -118,7 +125,8 @@ public class SGFProvider extends ContentProvider
 		}
 	}
 
-	public void doUpdateDatabase() {
+	public void doUpdateDatabase()
+	{
 		Log.d(TAG, "updateDatabase");
 		// Debug.startMethodTracing("updateDatabase");
 
@@ -127,7 +135,8 @@ public class SGFProvider extends ContentProvider
 		if (Environment.MEDIA_MOUNTED.equals(state)) {
 			Log.d(TAG, "reading directory " + SGF_DIRECTORY);
 			File[] files = SGF_DIRECTORY.listFiles(new FilenameFilter() {
-				public boolean accept(File dir, String fileName) {
+				public boolean accept(File dir, String fileName)
+				{
 					return fileName.endsWith(".sgf");
 				}
 			});
@@ -194,7 +203,8 @@ public class SGFProvider extends ContentProvider
 
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
-			String[] selectionArgs, String sortOrder) {
+			String[] selectionArgs, String sortOrder)
+	{
 		Log.d(TAG, String.format("query(uri=%s, projection=%s, selection=%s)",
 				uri, projection, selection));
 		updateDatabase();
@@ -210,7 +220,8 @@ public class SGFProvider extends ContentProvider
 	}
 
 	@Override
-	public Uri insert(Uri uri, ContentValues values) {
+	public Uri insert(Uri uri, ContentValues values)
+	{
 		Log.d(TAG, String.format("insert(uri=%s, values=%s)", uri, values));
 		String path = uri.getPath();
 		Log.d(TAG, String.format("path=%s", path));
@@ -227,24 +238,28 @@ public class SGFProvider extends ContentProvider
 
 	@Override
 	public int update(Uri uri, ContentValues values, String selection,
-			String[] selectionArgs) {
+			String[] selectionArgs)
+	{
 		Log.d(TAG, String.format("update(uri=%s, values=%s, selection=%s)",
 				uri, values, selection));
 		return 0;
 	}
 
 	@Override
-	public int delete(Uri uri, String selection, String[] selectionArgs) {
+	public int delete(Uri uri, String selection, String[] selectionArgs)
+	{
 		return 0;
 	}
 
 	@Override
-	public String getType(Uri uri) {
+	public String getType(Uri uri)
+	{
 		return SGF_TYPE;
 	}
 
 	@Override
-	public boolean onCreate() {
+	public boolean onCreate()
+	{
 		Log.d(TAG, "onCreate");
 		dbHelper = new SGFDBOpenHelper(getContext());
 		db = dbHelper.getWritableDatabase();
@@ -252,7 +267,8 @@ public class SGFProvider extends ContentProvider
 		return true;
 	}
 
-	public String[] getColumns() {
+	public String[] getColumns()
+	{
 		if (columns == null)
 			initColumns();
 
@@ -261,7 +277,8 @@ public class SGFProvider extends ContentProvider
 
 	@Override
 	public ParcelFileDescriptor openFile(Uri uri, String mode)
-			throws java.io.FileNotFoundException {
+			throws java.io.FileNotFoundException
+	{
 		Log.d(TAG, String.format("openFile(uri=%s, mode=%s)", uri, mode));
 		File file;
 		String query = uri.getQuery();
@@ -299,12 +316,14 @@ public class SGFProvider extends ContentProvider
 		return ParcelFileDescriptor.open(file, _mode);
 	}
 
-	public static GameInfo getGameInfo(long id) {
+	public static GameInfo getGameInfo(long id)
+	{
 		Log.d(TAG, String.format("getGameInfo(%d)=%s", id, sgfMap.get(id)));
 		return sgfMap.get(id);
 	}
 
-	public static File getSGFDirectory() {
+	public static File getSGFDirectory()
+	{
 		return SGF_DIRECTORY;
 	}
 

@@ -1,6 +1,6 @@
 /*
  *
- * $Id$
+ * $Id: MutablePoint.java 38 2003-09-12 19:22:24Z cgawron $
  *
  * (c) 2001 Christian Gawron. All rights reserved.
  *
@@ -18,11 +18,13 @@ package de.cgawron.go;
  * 
  * @author Christian Gawron
  */
-public class MutablePoint extends Point {
+public class MutablePoint extends Point
+{
 	/**
 	 * MutablePoint constructor comment.
 	 */
-	public MutablePoint() {
+	public MutablePoint()
+	{
 		super();
 	}
 
@@ -32,7 +34,8 @@ public class MutablePoint extends Point {
 	 * @param p
 	 *            - Point from which to initialize the coordinates.
 	 */
-	public MutablePoint(Point p) {
+	public MutablePoint(Point p)
+	{
 		super(p);
 	}
 
@@ -44,7 +47,8 @@ public class MutablePoint extends Point {
 	 * @param y
 	 *            - the y coordinate
 	 */
-	public MutablePoint(int x, int y) {
+	public MutablePoint(int x, int y)
+	{
 		super(x, y);
 	}
 
@@ -55,7 +59,8 @@ public class MutablePoint extends Point {
 	 *            - the new x coordinate
 	 * @return the modified MutablePoint
 	 */
-	public final MutablePoint setX(int x) {
+	public final MutablePoint setX(int x)
+	{
 		this.x = (short) x;
 		return this;
 	}
@@ -67,7 +72,8 @@ public class MutablePoint extends Point {
 	 *            - the new y coordinate
 	 * @return the modified MutablePoint
 	 */
-	public final MutablePoint setY(int y) {
+	public final MutablePoint setY(int y)
+	{
 		this.y = (short) y;
 		return this;
 	}
@@ -79,7 +85,8 @@ public class MutablePoint extends Point {
 	 *            - a Point from which the coordinates are copied
 	 * @return the modified MutablePoint
 	 */
-	public MutablePoint set(Point p) {
+	public MutablePoint set(Point p)
+	{
 		this.x = p.x;
 		this.y = p.y;
 		return this;

@@ -29,13 +29,15 @@ import de.cgawron.go.sgf.GameTree;
 /**
  * Shows the game info
  */
-public class ShowGameInfo extends TabActivity {
+public class ShowGameInfo extends TabActivity
+{
 	private SGFApplication application;
 	private GameTree gameTree;
 
 	/** Called when the activity is first created. */
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState)
+	{
 		super.onCreate(savedInstanceState);
 		application = (SGFApplication) getApplication();
 		setContentView(R.layout.game_info);
@@ -68,7 +70,8 @@ public class ShowGameInfo extends TabActivity {
 	}
 
 	@Override
-	protected void onStop() {
+	protected void onStop()
+	{
 		Log.d("ShowGameInfo", "onStop");
 		super.onStop();
 
@@ -76,7 +79,8 @@ public class ShowGameInfo extends TabActivity {
 	}
 
 	@Override
-	protected void onPause() {
+	protected void onPause()
+	{
 		Log.d("ShowGameInfo", "onPause");
 		super.onPause();
 

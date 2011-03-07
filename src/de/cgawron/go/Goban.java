@@ -22,14 +22,17 @@ import java.beans.PropertyChangeListener;
  * goban.
  * 
  * @author Christian Gawron
- * @version $Id$
+ * @version $Id: GobanModel.java 369 2006-04-14 17:04:02Z cgawron $
  * @see Goban
  */
-public interface Goban extends Cloneable {
-	public enum BoardType {
+public interface Goban extends Cloneable
+{
+	public enum BoardType
+	{
 		EMPTY, BLACK, WHITE;
 
-		BoardType opposite() {
+		BoardType opposite()
+		{
 			switch (this) {
 			case BLACK:
 				return WHITE;
@@ -51,8 +54,7 @@ public interface Goban extends Cloneable {
 	 * 
 	 * @see #zobristHash
 	 */
-	public int[] zobrist = {
-			0x01d1072b, 0x70e87214, 0x2a8d0e50, 0x31c52658,
+	public int[] zobrist = { 0x01d1072b, 0x70e87214, 0x2a8d0e50, 0x31c52658,
 			0x4a544bdc, 0x77308958, 0x05a09446, 0x1e5b5112, 0x1401c094,
 			0x32bc8122, 0x3f000c12, 0x299162b4, 0x5556948e, 0x2fb20b00,
 			0x5e4e7508, 0x759b2840, 0x197872f0, 0x25b94d2a, 0x168fb5de,

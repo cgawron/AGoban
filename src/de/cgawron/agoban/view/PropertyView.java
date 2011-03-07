@@ -35,7 +35,8 @@ import de.cgawron.go.sgf.Value;
  * A {@link View} to be used for SGF properties
  * 
  */
-public class PropertyView extends EditText {
+public class PropertyView extends EditText
+{
 	private static String TAG = "PropertyView";
 	private PropertyList properties;
 	private GameInfo property;
@@ -51,7 +52,8 @@ public class PropertyView extends EditText {
 	 * @see android.view.View#View(android.content.Context,
 	 *      android.util.AttributeSet)
 	 */
-	public PropertyView(Context context) {
+	public PropertyView(Context context)
+	{
 		super(context);
 	}
 
@@ -63,18 +65,22 @@ public class PropertyView extends EditText {
 	 * @see android.view.View#View(android.content.Context,
 	 *      android.util.AttributeSet)
 	 */
-	public PropertyView(Context context, AttributeSet attrs) {
+	public PropertyView(Context context, AttributeSet attrs)
+	{
 		super(context, attrs);
 		key = attrs.getAttributeValue("http://cgawron", "property");
 	}
 
 	@Override
-	protected void onAttachedToWindow() {
+	protected void onAttachedToWindow()
+	{
 		super.onAttachedToWindow();
 		Context context = getContext();
-		if (isInEditMode()) return;
-		
-		SGFApplication application = (SGFApplication) context.getApplicationContext();
+		if (isInEditMode())
+			return;
+
+		SGFApplication application = (SGFApplication) context
+				.getApplicationContext();
 
 		// TODO: Rethink initialization
 		if (application.getGameTree() != null) {
@@ -82,7 +88,8 @@ public class PropertyView extends EditText {
 		}
 	}
 
-	protected void initText() {
+	protected void initText()
+	{
 		if (property != null) {
 			Value value = property.getValue();
 			if (value != null)
@@ -98,7 +105,8 @@ public class PropertyView extends EditText {
 	 * @param text
 	 *            The text to display. This will be drawn as one line.
 	 */
-	public void setPropertyList(PropertyList properties) {
+	public void setPropertyList(PropertyList properties)
+	{
 		this.properties = properties;
 		if (this.key != null) {
 			Property.Key key = new Property.Key(this.key);
@@ -119,19 +127,22 @@ public class PropertyView extends EditText {
 		initText();
 	}
 
-	public void setValue(String value) {
+	public void setValue(String value)
+	{
 		valueText = value;
 		setText(valueText);
 	}
 
-	public void setValue(ContentValues values) {
+	public void setValue(ContentValues values)
+	{
 		valueText = values.get(key).toString();
 		if (valueText == null)
 			valueText = "";
 		setText(valueText);
 	}
 
-	public void setValue(Cursor cursor, int position) {
+	public void setValue(Cursor cursor, int position)
+	{
 		Log.d(TAG, String.format("setValue(%s, %d)", cursor, position));
 		int oldPosition = cursor.getPosition();
 		cursor.moveToPosition(position);
@@ -144,7 +155,8 @@ public class PropertyView extends EditText {
 	}
 
 	@Override
-	public void onTextChanged(CharSequence s, int start, int count, int after) {
+	public void onTextChanged(CharSequence s, int start, int count, int after)
+	{
 		Log.d(TAG, "onTextChanged: " + s);
 		if (property == null) {
 		}

@@ -18,18 +18,21 @@
 
 package de.cgawron.go.sgf;
 
-public class ParseError extends RuntimeException {
+public class ParseError extends RuntimeException
+{
 	int line;
 	int column;
 	String text;
 	String message;
 
-	public ParseError(String message, Object info) {
+	public ParseError(String message, Object info)
+	{
 		super(message + " at " + info);
 		this.message = message + " at " + info;
 	}
 
-	public ParseError(String message, InputPosition position, Object info) {
+	public ParseError(String message, InputPosition position, Object info)
+	{
 		super(message + " at " + info);
 		this.message = message + " at " + info;
 		text = position.getCurrentLine();
@@ -37,7 +40,8 @@ public class ParseError extends RuntimeException {
 		column = position.getColumn();
 	}
 
-	public String getMessage() {
+	public String getMessage()
+	{
 		int i;
 		StringBuffer buffer = new StringBuffer();
 

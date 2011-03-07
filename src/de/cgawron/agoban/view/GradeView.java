@@ -29,14 +29,17 @@ import android.view.View;
  * A {@link View} to be used for grade properties (i.e. BR[] and WR[])
  * 
  */
-public class GradeView extends PropertyView {
+public class GradeView extends PropertyView
+{
 	private static String TAG = "GradeView";
 
 	private final DanKyuFilter[] filters = { new DanKyuFilter() };
 
-	private class DanKyuFilter implements InputFilter {
+	private class DanKyuFilter implements InputFilter
+	{
 		public CharSequence filter(CharSequence source, int start, int end,
-				Spanned dest, int dstart, int dend) {
+				Spanned dest, int dstart, int dend)
+		{
 			StringBuilder builder = new StringBuilder();
 			if (dest != null) {
 				builder.append(dest, 0, dstart);
@@ -71,7 +74,8 @@ public class GradeView extends PropertyView {
 			}
 		}
 
-		public boolean isGrade(char c) {
+		public boolean isGrade(char c)
+		{
 			switch (c) {
 			case 'k':
 			case 'd':
@@ -92,12 +96,14 @@ public class GradeView extends PropertyView {
 	 * @see android.view.View#View(android.content.Context,
 	 *      android.util.AttributeSet)
 	 */
-	public GradeView(Context context, AttributeSet attrs) {
+	public GradeView(Context context, AttributeSet attrs)
+	{
 		super(context, attrs);
 	}
 
 	@Override
-	protected void onAttachedToWindow() {
+	protected void onAttachedToWindow()
+	{
 		super.onAttachedToWindow();
 
 		getText().setFilters(filters);

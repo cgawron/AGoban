@@ -30,7 +30,8 @@ import de.cgawron.util.MiscEncodingReader;
  * 1.4.3 on 17.01.11 23:23 from the specification file
  * <tt>C:/Android/AGoban/src/de/cgawron/go/sgf/sgf.lex</tt>
  */
-public class Yylex implements java_cup.runtime.Scanner, InputPosition {
+public class Yylex implements java_cup.runtime.Scanner, InputPosition
+{
 
 	/** This character denotes the end of file */
 	public static final int YYEOF = -1;
@@ -83,14 +84,16 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 			+ "\2\0\1\21\2\0\1\26\1\0\1\27\1\30\3\0"
 			+ "\1\31\7\0\1\32\1\0\1\33\1\34";
 
-	private static int[] zzUnpackAction() {
+	private static int[] zzUnpackAction()
+	{
 		int[] result = new int[90];
 		int offset = 0;
 		offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
 		return result;
 	}
 
-	private static int zzUnpackAction(String packed, int offset, int[] result) {
+	private static int zzUnpackAction(String packed, int offset, int[] result)
+	{
 		int i = 0; /* index in packed string */
 		int j = offset; /* index in unpacked array */
 		int l = packed.length();
@@ -122,14 +125,16 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 			+ "\0\u0294\0\u02a3\0\u02b2\0\u02c1\0\u02d0\0\u02df\0\264\0\u02ee"
 			+ "\0\264\0\264";
 
-	private static int[] zzUnpackRowMap() {
+	private static int[] zzUnpackRowMap()
+	{
 		int[] result = new int[90];
 		int offset = 0;
 		offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
 		return result;
 	}
 
-	private static int zzUnpackRowMap(String packed, int offset, int[] result) {
+	private static int zzUnpackRowMap(String packed, int offset, int[] result)
+	{
 		int i = 0; /* index in packed string */
 		int j = offset; /* index in unpacked array */
 		int l = packed.length();
@@ -187,14 +192,16 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 			+ "\6\0\1\131\10\0\1\100\1\0\1\130\1\100\1\130"
 			+ "\1\0\1\132\6\100\1\130\1\100";
 
-	private static int[] zzUnpackTrans() {
+	private static int[] zzUnpackTrans()
+	{
 		int[] result = new int[765];
 		int offset = 0;
 		offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
 		return result;
 	}
 
-	private static int zzUnpackTrans(String packed, int offset, int[] result) {
+	private static int zzUnpackTrans(String packed, int offset, int[] result)
+	{
 		int i = 0; /* index in packed string */
 		int j = offset; /* index in unpacked array */
 		int l = packed.length();
@@ -229,14 +236,16 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 			+ "\1\11\6\0\3\11\2\1\1\0\2\11\2\0\1\1"
 			+ "\2\0\1\11\1\0\2\11\3\0\1\11\7\0\1\11" + "\1\0\2\11";
 
-	private static int[] zzUnpackAttribute() {
+	private static int[] zzUnpackAttribute()
+	{
 		int[] result = new int[90];
 		int offset = 0;
 		offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
 		return result;
 	}
 
-	private static int zzUnpackAttribute(String packed, int offset, int[] result) {
+	private static int zzUnpackAttribute(String packed, int offset, int[] result)
+	{
 		int i = 0; /* index in packed string */
 		int j = offset; /* index in unpacked array */
 		int l = packed.length();
@@ -311,15 +320,18 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 
 	private int level = 0;
 
-	public int getLine() {
+	public int getLine()
+	{
 		return yyline + 1;
 	}
 
-	public int getColumn() {
+	public int getColumn()
+	{
 		return yycolumn + 1;
 	}
 
-	public String getCurrentLine() {
+	public String getCurrentLine()
+	{
 		int beg = zzCurrentPos;
 		int end = zzCurrentPos;
 		while (beg > 0 && zzBuffer[beg - 1] != '\n')
@@ -332,12 +344,14 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 
 	private static Yylex theLexer = null;
 
-	public static void setCharset(String charSetName) {
+	public static void setCharset(String charSetName)
+	{
 		if (theLexer != null)
 			theLexer._setCharset(charSetName);
 	}
 
-	public void _setCharset(String charSetName) {
+	public void _setCharset(String charSetName)
+	{
 		MiscEncodingReader mer = (MiscEncodingReader) zzReader;
 		try {
 			mer.setCharset(charSetName, zzMarkedPos);
@@ -359,7 +373,8 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 	 * @param in
 	 *            the java.io.Reader to read input from.
 	 */
-	public Yylex(java.io.Reader in) {
+	public Yylex(java.io.Reader in)
+	{
 		theLexer = this;
 		this.zzReader = in;
 	}
@@ -371,7 +386,8 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 	 * @param in
 	 *            the java.io.Inputstream to read input from.
 	 */
-	public Yylex(java.io.InputStream in) {
+	public Yylex(java.io.InputStream in)
+	{
 		this(new java.io.InputStreamReader(in));
 	}
 
@@ -382,7 +398,8 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 	 *            the packed character translation table
 	 * @return the unpacked character translation table
 	 */
-	private static char[] zzUnpackCMap(String packed) {
+	private static char[] zzUnpackCMap(String packed)
+	{
 		char[] map = new char[0x10000];
 		int i = 0; /* index in packed string */
 		int j = 0; /* index in unpacked array */
@@ -404,7 +421,8 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 	 * @exception java.io.IOException
 	 *                if any I/O-Error occurs
 	 */
-	private boolean zzRefill() throws java.io.IOException {
+	private boolean zzRefill() throws java.io.IOException
+	{
 
 		/* first: make room (if you can) */
 		if (zzStartRead > 0) {
@@ -453,7 +471,8 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 	/**
 	 * Closes the input stream.
 	 */
-	public final void yyclose() throws java.io.IOException {
+	public final void yyclose() throws java.io.IOException
+	{
 		zzAtEOF = true; /* indicate end of file */
 		zzEndRead = zzStartRead; /* invalidate buffer */
 
@@ -472,7 +491,8 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 	 * @param reader
 	 *            the new input stream
 	 */
-	public final void yyreset(java.io.Reader reader) {
+	public final void yyreset(java.io.Reader reader)
+	{
 		zzReader = reader;
 		zzAtBOL = true;
 		zzAtEOF = false;
@@ -486,7 +506,8 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 	/**
 	 * Returns the current lexical state.
 	 */
-	public final int yystate() {
+	public final int yystate()
+	{
 		return zzLexicalState;
 	}
 
@@ -496,14 +517,16 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 	 * @param newState
 	 *            the new lexical state
 	 */
-	public final void yybegin(int newState) {
+	public final void yybegin(int newState)
+	{
 		zzLexicalState = newState;
 	}
 
 	/**
 	 * Returns the text matched by the current regular expression.
 	 */
-	public final String yytext() {
+	public final String yytext()
+	{
 		return new String(zzBuffer, zzStartRead, zzMarkedPos - zzStartRead);
 	}
 
@@ -518,14 +541,16 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 	 * 
 	 * @return the character at position pos
 	 */
-	public final char yycharat(int pos) {
+	public final char yycharat(int pos)
+	{
 		return zzBuffer[zzStartRead + pos];
 	}
 
 	/**
 	 * Returns the length of the matched text region.
 	 */
-	public final int yylength() {
+	public final int yylength()
+	{
 		return zzMarkedPos - zzStartRead;
 	}
 
@@ -543,7 +568,8 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 	 * @param errorCode
 	 *            the code of the errormessage to display
 	 */
-	private void zzScanError(int errorCode) {
+	private void zzScanError(int errorCode)
+	{
 		String message;
 		try {
 			message = ZZ_ERROR_MSG[errorCode];
@@ -563,7 +589,8 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 	 *            the number of characters to be read again. This number must
 	 *            not be greater than yylength()!
 	 */
-	public void yypushback(int number) {
+	public void yypushback(int number)
+	{
 		if (number > yylength())
 			zzScanError(ZZ_PUSHBACK_2BIG);
 
@@ -574,7 +601,8 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 	 * Contains user EOF-code, which will be executed exactly once, when the end
 	 * of file is reached
 	 */
-	private void zzDoEOF() {
+	private void zzDoEOF()
+	{
 		if (!zzEOFDone) {
 			zzEOFDone = true;
 			logger.info("eof reached");
@@ -590,7 +618,8 @@ public class Yylex implements java_cup.runtime.Scanner, InputPosition {
 	 * @exception java.io.IOException
 	 *                if any I/O-Error occurs
 	 */
-	public java_cup.runtime.Symbol next_token() throws java.io.IOException {
+	public java_cup.runtime.Symbol next_token() throws java.io.IOException
+	{
 		int zzInput;
 		int zzAction;
 

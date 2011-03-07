@@ -24,24 +24,29 @@ import java.io.PrintWriter;
 /**
  * A value of a {@link Property}
  */
-public interface Value extends Cloneable {
+public interface Value extends Cloneable
+{
 	void write(PrintWriter out);
 
 	String getString();
 
-	public interface Transformable {
+	public interface Transformable
+	{
 		void transform(Symmetry symmetry);
 	}
 
-	public interface Void extends Value {
+	public interface Void extends Value
+	{
 	}
 
-	public interface Point extends Value, Transformable {
+	public interface Point extends Value, Transformable
+	{
 		de.cgawron.go.Point getPoint();
 	}
 
 	public interface PointList extends Value, Transformable,
-			java.util.Collection<de.cgawron.go.Point> {
+			java.util.Collection<de.cgawron.go.Point>
+	{
 		short getMinX();
 
 		short getMinY();
@@ -51,21 +56,26 @@ public interface Value extends Cloneable {
 		short getMaxY();
 	}
 
-	public interface Label extends Value, Transformable {
+	public interface Label extends Value, Transformable
+	{
 		de.cgawron.go.Point getPoint();
 	}
 
-	public interface Text extends Value {
+	public interface Text extends Value
+	{
 	}
 
-	public interface Result extends Value {
+	public interface Result extends Value
+	{
 	}
 
-	public interface Number extends Value {
+	public interface Number extends Value
+	{
 		int intValue();
 	}
 
-	public interface ValueList extends Value, java.util.List<Value> {
+	public interface ValueList extends Value, java.util.List<Value>
+	{
 	}
 
 	public Value clone();

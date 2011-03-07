@@ -35,7 +35,8 @@ import de.cgawron.go.sgf.Value;
  * 
  * @author Christian Gawron
  */
-public class GobanRenderer {
+public class GobanRenderer
+{
 	private static String TAG = "GobanRenderer";
 
 	private static float STONE_RADIUS = 0.47f;
@@ -55,18 +56,22 @@ public class GobanRenderer {
 
 	private final GobanView view;
 
-	public abstract class Markup {
+	public abstract class Markup
+	{
 		public abstract void draw(Canvas canvas, Goban goban);
 	}
 
-	public class VariationMark extends Markup {
+	public class VariationMark extends Markup
+	{
 		private Point point;
 
-		public VariationMark(Point point) {
+		public VariationMark(Point point)
+		{
 			this.point = point;
 		}
 
-		public void draw(Canvas canvas, Goban goban) {
+		public void draw(Canvas canvas, Goban goban)
+		{
 			Log.d(TAG, "VariationMark: draw@" + point);
 			short x = point.getX();
 			short y = point.getY();
@@ -79,14 +84,17 @@ public class GobanRenderer {
 		}
 	}
 
-	public class LastMoveMark extends Markup {
+	public class LastMoveMark extends Markup
+	{
 		private Point point;
 
-		public LastMoveMark(Point point) {
+		public LastMoveMark(Point point)
+		{
 			this.point = point;
 		}
 
-		public void draw(Canvas canvas, Goban goban) {
+		public void draw(Canvas canvas, Goban goban)
+		{
 			BoardType stone = goban.getStone(point);
 			Log.d(TAG, "LastMoveMark: draw@" + point);
 			short x = point.getX();
@@ -112,18 +120,21 @@ public class GobanRenderer {
 		}
 	}
 
-	public class SGFMarkup extends Markup {
+	public class SGFMarkup extends Markup
+	{
 		private Point point;
 		private BoardType stone;
 		private MarkupModel.Type type;
 
-		public SGFMarkup(Point point, BoardType stone, MarkupModel.Type type) {
+		public SGFMarkup(Point point, BoardType stone, MarkupModel.Type type)
+		{
 			this.point = point;
 			this.stone = stone;
 			this.type = type;
 		}
 
-		public void draw(Canvas canvas, Goban goban) {
+		public void draw(Canvas canvas, Goban goban)
+		{
 			Path path = null;
 			short x = point.getX();
 			short y = point.getY();
@@ -209,16 +220,19 @@ public class GobanRenderer {
 		}
 	}
 
-	public class Label extends Markup {
+	public class Label extends Markup
+	{
 		private Point point;
 		private String text;
 
-		public Label(Point point, String text) {
+		public Label(Point point, String text)
+		{
 			this.point = point;
 			this.text = text;
 		}
 
-		public void draw(Canvas canvas, Goban goban) {
+		public void draw(Canvas canvas, Goban goban)
+		{
 			Log.d(TAG, "VariationMark: draw@" + point);
 			short x = point.getX();
 			short y = point.getY();
@@ -260,11 +274,13 @@ public class GobanRenderer {
 		}
 	}
 
-	public GobanRenderer(GobanView view) {
+	public GobanRenderer(GobanView view)
+	{
 		this.view = view;
 	}
 
-	public void render(Goban goban, Canvas canvas) {
+	public void render(Goban goban, Canvas canvas)
+	{
 		Paint paint = new Paint();
 		int size = goban.getBoardSize();
 
@@ -306,7 +322,8 @@ public class GobanRenderer {
 
 	Paint paint = new Paint();
 
-	void drawStone(int i, int j, BoardType stone, Canvas canvas) {
+	void drawStone(int i, int j, BoardType stone, Canvas canvas)
+	{
 		paint.setAntiAlias(true);
 		paint.setStrokeWidth(STONE_STROKEWIDTH);
 
@@ -329,7 +346,8 @@ public class GobanRenderer {
 		}
 	}
 
-	void drawHoshi(int boardSize, Canvas canvas, Paint paint) {
+	void drawHoshi(int boardSize, Canvas canvas, Paint paint)
+	{
 		int m = boardSize >> 1;
 		int h = boardSize > 9 ? 3 : 2;
 

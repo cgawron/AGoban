@@ -23,17 +23,21 @@ import android.content.Context;
 import android.preference.ListPreference;
 import android.util.AttributeSet;
 
-public class AccountPreference extends ListPreference {
-	public AccountPreference(Context context, AttributeSet attrs) {
+public class AccountPreference extends ListPreference
+{
+	public AccountPreference(Context context, AttributeSet attrs)
+	{
 		super(context, attrs);
 	}
 
-	public AccountPreference(Context context) {
+	public AccountPreference(Context context)
+	{
 		super(context);
 	}
 
 	@Override
-	protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
+	protected void onPrepareDialogBuilder(AlertDialog.Builder builder)
+	{
 		final AccountManager manager = AccountManager.get(getContext());
 		final Account[] accounts = manager.getAccountsByType("com.google");
 		final int size = accounts.length;

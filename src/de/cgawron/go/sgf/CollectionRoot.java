@@ -32,16 +32,19 @@ import de.cgawron.go.Point;
  * 
  * @author Christian Gawron
  */
-public class CollectionRoot extends RootNode {
+public class CollectionRoot extends RootNode
+{
 	private static Logger logger = Logger.getLogger(CollectionRoot.class
 			.getName());
 
-	public CollectionRoot(GameTree gameTree) {
+	public CollectionRoot(GameTree gameTree)
+	{
 		super(gameTree);
 		add(gameTree.getRoot());
 	}
 
-	public void write(PrintWriter out) {
+	public void write(PrintWriter out)
+	{
 		logger.info("CollectionRoot.write: " + this);
 		for (Node node : getChildren()) {
 			logger.info("CollectionRoot.write:" + node);

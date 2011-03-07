@@ -1,6 +1,6 @@
 /*
  *
- * $Id$
+ * $Id: GobanModelEvent.java 97 2004-08-21 18:35:50Z  $
  *
  * (c) 2001 Christian Gawron. All rights reserved.
  *
@@ -23,27 +23,31 @@ import de.cgawron.go.Point;
 import java.util.EventObject;
 import java.util.Vector;
 
-public class GobanEvent extends EventObject {
+public class GobanEvent extends EventObject
+{
 	private static final long serialVersionUID = -3305394382897241209L;
 
 	protected Vector<Point> points;
 	protected BoardType color;
 
 	/** GobanEvent constructor comment. */
-	public GobanEvent(Goban source) {
+	public GobanEvent(Goban source)
+	{
 		super(source);
 		points = new Vector<Point>();
 	}
 
 	/** GobanEvent constructor comment. */
-	public GobanEvent(Goban source, Point point) {
+	public GobanEvent(Goban source, Point point)
+	{
 		super(source);
 		points = new Vector<Point>();
 		addPoint(point);
 	}
 
 	/** GobanEvent constructor comment. */
-	public GobanEvent(Goban source, Vector<Point> points) {
+	public GobanEvent(Goban source, Vector<Point> points)
+	{
 		super(source);
 		this.points = points;
 	}
@@ -54,7 +58,8 @@ public class GobanEvent extends EventObject {
 	 * @param point
 	 *            goban.Point
 	 */
-	public void addPoint(Point point) {
+	public void addPoint(Point point)
+	{
 		points.addElement(point);
 	}
 
@@ -63,7 +68,8 @@ public class GobanEvent extends EventObject {
 	 * 
 	 * @return goban.BoardType
 	 */
-	public BoardType getColor() {
+	public BoardType getColor()
+	{
 		return color;
 	}
 
@@ -72,7 +78,8 @@ public class GobanEvent extends EventObject {
 	 * 
 	 * @return gawron.go.goban.Goban
 	 */
-	public Goban getModel() {
+	public Goban getModel()
+	{
 		return (Goban) source;
 	}
 
@@ -81,7 +88,8 @@ public class GobanEvent extends EventObject {
 	 * 
 	 * @return java.util.Vector
 	 */
-	public Vector<Point> getPoints() {
+	public Vector<Point> getPoints()
+	{
 		return points;
 	}
 
@@ -91,7 +99,8 @@ public class GobanEvent extends EventObject {
 	 * @param newColor
 	 *            goban.BoardType
 	 */
-	public void setColor(BoardType newColor) {
+	public void setColor(BoardType newColor)
+	{
 		color = newColor;
 	}
 
@@ -106,7 +115,8 @@ public class GobanEvent extends EventObject {
 	 */
 
 	/** GobanEvent constructor comment. */
-	public GobanEvent(Goban source, int x, int y, BoardType c) {
+	public GobanEvent(Goban source, int x, int y, BoardType c)
+	{
 		super(source);
 		points = new Vector<Point>();
 		addPoint(new Point(x, y));

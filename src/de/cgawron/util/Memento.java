@@ -18,5 +18,6 @@
 
 package de.cgawron.util;
 
-public interface Memento {
+public interface Memento
+{
 }

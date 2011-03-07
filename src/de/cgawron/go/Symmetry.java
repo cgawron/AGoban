@@ -1,6 +1,6 @@
 /*
  *
- * $Id$
+ * $Id: Symmetry.java 38 2003-09-12 19:22:24Z cgawron $
  *
  * (c) 2001 Christian Gawron. All rights reserved.
  *
@@ -17,7 +17,8 @@ import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
 import de.cgawron.go.MutablePoint;
 
-public class Symmetry {
+public class Symmetry
+{
 	/**
 	 * The symmetry is stored as follows: bit 0: exchange x and y bit 1:
 	 * reflection (x-axis) bit 2: reflection (y-axis) bit 3: color exchange
@@ -42,55 +43,68 @@ public class Symmetry {
 	 * (i=0; i<16; i++) cache[i] = new Symmetry(i); }
 	 */
 
-	public static class Iterator implements java.util.Iterator {
+	public static class Iterator implements java.util.Iterator
+	{
 		private int i = -1;
 
-		public boolean hasNext() {
+		public boolean hasNext()
+		{
 			return i < 7;
 		}
 
-		public Object next() {
+		public Object next()
+		{
 			return new Symmetry(++i);
 		}
 
-		public void remove() {
+		public void remove()
+		{
 			throw new UnsupportedOperationException("remove not supported");
 		}
 	}
 
-	public static class SpatialIterator implements java.util.Iterator {
+	public static class SpatialIterator implements java.util.Iterator
+	{
 		private int i = -1;
 
-		public boolean hasNext() {
+		public boolean hasNext()
+		{
 			return i < 7;
 		}
 
-		public Object next() {
+		public Object next()
+		{
 			return new Symmetry(++i);
 		}
 
-		public void remove() {
+		public void remove()
+		{
 			throw new UnsupportedOperationException("remove not supported");
 		}
 	}
 
-	public Symmetry() {
+	public Symmetry()
+	{
 		this(0);
 	}
 
-	public Symmetry(Symmetry s) {
+	public Symmetry(Symmetry s)
+	{
 		this(s.symmetry);
 	}
 
-	Symmetry(int symmetry) {
+	Symmetry(int symmetry)
+	{
 		this.symmetry = symmetry;
 	}
 
-	public int toInt() {
+	public int toInt()
+	{
 		return symmetry;
 	}
 
-	final public void transform(MutablePoint p, int boardSize) {
+	final public void transform(MutablePoint p, int boardSize)
+	{
 		int x = -1;
 		int y = -1;
 
@@ -112,19 +126,22 @@ public class Symmetry {
 		p.setY(y);
 	}
 
-	final public Point transform(Point p, int boardSize) {
+	final public Point transform(Point p, int boardSize)
+	{
 		MutablePoint mp = new MutablePoint(p);
 		transform(mp, boardSize);
 		return mp;
 	}
 
-	final public Point transform(int x, int y, int boardSize) {
+	final public Point transform(int x, int y, int boardSize)
+	{
 		MutablePoint mp = new MutablePoint(x, y);
 		transform(mp, boardSize);
 		return mp;
 	}
 
-	final public BoardType transform(BoardType c) {
+	final public BoardType transform(BoardType c)
+	{
 		if (c == BoardType.EMPTY || (symmetry & 8) == 0)
 			return c;
 		else if (c == BoardType.WHITE)
@@ -133,11 +150,13 @@ public class Symmetry {
 			return BoardType.WHITE;
 	}
 
-	public Symmetry inverse() {
+	public Symmetry inverse()
+	{
 		return new Symmetry(_inverse[symmetry]);
 	}
 
-	public String toString() {
+	public String toString()
+	{
 		StringBuffer buffer = new StringBuffer();
 		if ((symmetry & 1) != 0)
 			buffer.append('X');
@@ -153,11 +172,13 @@ public class Symmetry {
 			return buffer.toString();
 	}
 
-	public int zobristHash(Goban g) {
+	public int zobristHash(Goban g)
+	{
 		return zobristHash(g, SymmetryGroup.allSymmetries);
 	}
 
-	public int zobristHash(Goban g, SymmetryGroup group) {
+	public int zobristHash(Goban g, SymmetryGroup group)
+	{
 		Symmetry.Iterator it = group.iterator();
 		int h = Integer.MIN_VALUE;
 

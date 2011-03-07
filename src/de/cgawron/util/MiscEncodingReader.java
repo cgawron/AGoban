@@ -25,21 +25,24 @@ import java.nio.charset.CharsetDecoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class MiscEncodingReader extends Reader {
+public class MiscEncodingReader extends Reader
+{
 	private static Logger logger = Logger.getLogger(MiscEncodingReader.class
 			.getName());
 	private InputStream stream;
 	private InputStreamReader reader;
 	private Charset currentCharset;
 
-	public MiscEncodingReader(InputStream stream) {
+	public MiscEncodingReader(InputStream stream)
+	{
 		this.stream = new BufferedInputStream(stream, 16384);
 		this.stream.mark(4096);
 		reader = new InputStreamReader(this.stream);
 	}
 
 	public void setCharset(String charSetName, int charsUsed)
-			throws IOException {
+			throws IOException
+	{
 		Charset charset = Charset.forName(charSetName);
 		logger.info("Setting charset from " + currentCharset + " to " + charset
 				+ ": " + reader.getEncoding());
@@ -54,19 +57,22 @@ public class MiscEncodingReader extends Reader {
 		logger.info("Charset is now: " + reader.getEncoding());
 	}
 
-	public void close() throws IOException {
+	public void close() throws IOException
+	{
 		logger.info("close()");
 		reader.close();
 	}
 
-	public int read(char[] cbuf, int off, int len) throws IOException {
+	public int read(char[] cbuf, int off, int len) throws IOException
+	{
 		int r = reader.read(cbuf, off, len);
 		if (logger.isLoggable(Level.FINE))
 			logger.fine("Read: " + (new String(cbuf)) + ", " + off + ", " + len);
 		return r;
 	}
 
-	public static void main(String args[]) {
+	public static void main(String args[])
+	{
 		try {
 			Writer writer = new PrintWriter(System.out);
 

@@ -1,6 +1,6 @@
 /*
  *
- * $Id$
+ * $Id: NeighborhoodEnumeration.java 15 2003-03-15 23:25:52Z cgawron $
  *
  * (c) 2010 Christian Gawron. All rights reserved.
  *
@@ -20,14 +20,16 @@ package de.cgawron.go;
 import de.cgawron.go.Point;
 import java.util.Enumeration;
 
-public class NeighborhoodEnumeration implements Enumeration<Point> {
+public class NeighborhoodEnumeration implements Enumeration<Point>
+{
 	protected int direction;
 	protected int size;
 	protected Point point;
 	private Point nextPoint;
 
 	/** NeighborhoodEnumeration constructor comment. */
-	public NeighborhoodEnumeration(Goban goban, Point p) {
+	public NeighborhoodEnumeration(Goban goban, Point p)
+	{
 		super();
 		point = p;
 		size = (int) goban.getBoardSize();
@@ -36,7 +38,8 @@ public class NeighborhoodEnumeration implements Enumeration<Point> {
 	}
 
 	/** Insert the method's description here. Creation date: (03/25/00 19:05:28) */
-	private void calcNext() {
+	private void calcNext()
+	{
 		nextPoint = null;
 		while (nextPoint == null && direction < 4) {
 			switch (direction) {
@@ -66,12 +69,14 @@ public class NeighborhoodEnumeration implements Enumeration<Point> {
 	}
 
 	/** hasMoreElements method comment. */
-	public boolean hasMoreElements() {
+	public boolean hasMoreElements()
+	{
 		return nextPoint != null;
 	}
 
 	/** nextElement method comment. */
-	public Point nextElement() {
+	public Point nextElement()
+	{
 		Point p = nextPoint;
 		calcNext();
 		return p;

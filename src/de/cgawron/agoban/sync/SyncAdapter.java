@@ -40,68 +40,68 @@ import de.cgawron.agoban.sync.GoogleUtility.GDocEntry;
  * SyncAdapter implementation for syncing sample SyncAdapter contacts to the
  * platform ContactOperations provider.
  */
-public class SyncAdapter extends AbstractThreadedSyncAdapter 
+public class SyncAdapter extends AbstractThreadedSyncAdapter
 {
-    private static final String TAG = "SyncAdapter";
+	private static final String TAG = "SyncAdapter";
 	private static final String ACCOUNT_TYPE = "com.google";
 	private static final String AUTH_TOKEN_TYPE = "writely";
 
-    private final AccountManager accountManager;
-    private final Context context;
+	private final AccountManager accountManager;
+	private final Context context;
 	private final GoogleUtility googleUtility;
-    private Date lastUpdated;
+	private Date lastUpdated;
 
-    public SyncAdapter(Context context, boolean autoInitialize) {
-        super(context, autoInitialize);
-        this.context = context;
-        this.accountManager = AccountManager.get(context);
+	public SyncAdapter(Context context, boolean autoInitialize)
+	{
+		super(context, autoInitialize);
+		this.context = context;
+		this.accountManager = AccountManager.get(context);
 		this.googleUtility = new GoogleUtility();
-    }
+	}
 
-    @Override
-    public void onPerformSync(Account account, Bundle extras, String authority,
-							  ContentProviderClient provider, SyncResult syncResult) 
-    {
-    	Log.d(TAG, String.format("onPerformSync: %s %s", account, authority));
+	@Override
+	public void onPerformSync(Account account, Bundle extras, String authority,
+			ContentProviderClient provider, SyncResult syncResult)
+	{
+		Log.d(TAG, String.format("onPerformSync: %s %s", account, authority));
 
-        String authtoken = null;
+		String authtoken = null;
 		try {
 			// use the account manager to request the credentials
-			authtoken = accountManager.blockingGetAuthToken(account, AUTH_TOKEN_TYPE, true);
+			authtoken = accountManager.blockingGetAuthToken(account,
+					AUTH_TOKEN_TYPE, true);
 
 			googleUtility.setAuthToken(authtoken);
-            Log.d(TAG, "Retrieving modified games");
-			List<GDocEntry> docs = googleUtility.getDocumentList(lastUpdated); 
-            Log.d(TAG, "Modified games: " + docs);
-			
+			Log.d(TAG, "Retrieving modified games");
+			List<GDocEntry> docs = googleUtility.getDocumentList(lastUpdated);
+			Log.d(TAG, "Modified games: " + docs);
 
-            // update the last synced date.
-            lastUpdated = new Date();
+			// update the last synced date.
+			lastUpdated = new Date();
 
-        } catch (final AuthenticatorException e) {
-            syncResult.stats.numParseExceptions++;
-            Log.e(TAG, "AuthenticatorException", e);
-        } catch (final OperationCanceledException e) {
-            Log.e(TAG, "OperationCanceledExcetpion", e);
-        } catch (final HttpResponseException e) {
-            Log.e(TAG, "HttpResponseException", e);
+		} catch (final AuthenticatorException e) {
+			syncResult.stats.numParseExceptions++;
+			Log.e(TAG, "AuthenticatorException", e);
+		} catch (final OperationCanceledException e) {
+			Log.e(TAG, "OperationCanceledExcetpion", e);
+		} catch (final HttpResponseException e) {
+			Log.e(TAG, "HttpResponseException", e);
 			int statusCode = e.response.statusCode;
 			if (statusCode == 401 || statusCode == 403) {
 				accountManager.invalidateAuthToken(ACCOUNT_TYPE, authtoken);
 				syncResult.stats.numAuthExceptions++;
-			}
-			else {
+			} else {
 				syncResult.stats.numIoExceptions++;
 			}
 		} catch (final IOException e) {
-            Log.e(TAG, "IOException", e);
-            syncResult.stats.numIoExceptions++;
-		/*			
-        } catch (final AuthenticationException e) {
-            accountManager.invalidateAuthToken(Constants.ACCOUNT_TYPE, authtoken);
-            syncResult.stats.numAuthExceptions++;
-            Log.e(TAG, "AuthenticationException", e);
-		*/
+			Log.e(TAG, "IOException", e);
+			syncResult.stats.numIoExceptions++;
+			/*
+			 * } catch (final AuthenticationException e) {
+			 * accountManager.invalidateAuthToken(Constants.ACCOUNT_TYPE,
+			 * authtoken); syncResult.stats.numAuthExceptions++; Log.e(TAG,
+			 * "AuthenticationException", e);
+			 */
 		}
 	}
 }

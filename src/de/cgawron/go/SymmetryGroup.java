@@ -1,6 +1,6 @@
 /*
  *
- * $Id$
+ * $Id: SymmetryGroup.java 38 2003-09-12 19:22:24Z cgawron $
  *
  * (c) 2001 Christian Gawron. All rights reserved.
  *
@@ -24,18 +24,21 @@ import de.cgawron.go.MutablePoint;
  * symmetry group of a goban with a single stone on one of the hoshi contains
  * only the identity and the reflection along the diagonal through the hoshi.
  */
-public class SymmetryGroup {
+public class SymmetryGroup
+{
 	private static Logger logger = Logger.getLogger(SymmetryGroup.class
 			.getName());
 	private int symmetries;
 
-	private SymmetryGroup(int symmetries) {
+	private SymmetryGroup(int symmetries)
+	{
 		this.symmetries = symmetries;
 	}
 
 	public final static SymmetryGroup allSymmetries = new SymmetryGroup(0xffff);
 
-	public SymmetryGroup(Goban model) {
+	public SymmetryGroup(Goban model)
+	{
 		symmetries = 1;
 		// logger.info("SymmetryGroup for \n" + model);
 
@@ -51,14 +54,17 @@ public class SymmetryGroup {
 		}
 	}
 
-	public class Iterator extends Symmetry.Iterator {
+	public class Iterator extends Symmetry.Iterator
+	{
 		private int i = 0;
 
-		public boolean hasNext() {
+		public boolean hasNext()
+		{
 			return i < 8;
 		}
 
-		public Object next() {
+		public Object next()
+		{
 			Symmetry s = new Symmetry(i);
 			for (i++; i < 16 && (symmetries & (1 << i)) == 0; i++)
 				;
@@ -67,12 +73,14 @@ public class SymmetryGroup {
 			return s;
 		}
 
-		public void remove() {
+		public void remove()
+		{
 			throw new UnsupportedOperationException("remove not supported");
 		}
 	}
 
-	public Iterator iterator() {
+	public Iterator iterator()
+	{
 		return new Iterator();
 	}
 

@@ -27,7 +27,8 @@ import java.beans.PropertyChangeSupport;
  * @version $Id: AbstractGoban.java 155 2005-01-04 10:47:49Z cgawron $
  * @see PropetrtyChangeSupport
  */
-public abstract class AbstractGoban implements Goban {
+public abstract class AbstractGoban implements Goban
+{
 	private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
 	/**
@@ -37,7 +38,8 @@ public abstract class AbstractGoban implements Goban {
 	 * @param listener
 	 *            The PropertyChangeListener to be added
 	 */
-	public void addPropertyChangeListener(PropertyChangeListener listener) {
+	public void addPropertyChangeListener(PropertyChangeListener listener)
+	{
 		pcs.addPropertyChangeListener(listener);
 	}
 
@@ -48,7 +50,8 @@ public abstract class AbstractGoban implements Goban {
 	 * @param listener
 	 *            The PropertyChangeListener to be removed
 	 */
-	public void removePropertyChangeListener(PropertyChangeListener listener) {
+	public void removePropertyChangeListener(PropertyChangeListener listener)
+	{
 		pcs.removePropertyChangeListener(listener);
 	}
 
@@ -63,7 +66,8 @@ public abstract class AbstractGoban implements Goban {
 	 *            The PropertyChangeListener to be added
 	 */
 	public void addPropertyChangeListener(String propertyName,
-			PropertyChangeListener listener) {
+			PropertyChangeListener listener)
+	{
 		pcs.addPropertyChangeListener(propertyName, listener);
 	}
 
@@ -76,7 +80,8 @@ public abstract class AbstractGoban implements Goban {
 	 *            The PropertyChangeListener to be removed
 	 */
 	public void removePropertyChangeListener(String propertyName,
-			PropertyChangeListener listener) {
+			PropertyChangeListener listener)
+	{
 		pcs.removePropertyChangeListener(propertyName, listener);
 	}
 
@@ -92,7 +97,8 @@ public abstract class AbstractGoban implements Goban {
 	 *            The new value of the property.
 	 */
 	public void firePropertyChange(String propertyName, Object oldValue,
-			Object newValue) {
+			Object newValue)
+	{
 		pcs.firePropertyChange(propertyName, oldValue, newValue);
 	}
 
@@ -110,7 +116,8 @@ public abstract class AbstractGoban implements Goban {
 	 *            The new value of the property.
 	 */
 	public void firePropertyChange(String propertyName, int oldValue,
-			int newValue) {
+			int newValue)
+	{
 		pcs.firePropertyChange(propertyName, oldValue, newValue);
 	}
 
@@ -128,7 +135,8 @@ public abstract class AbstractGoban implements Goban {
 	 *            The new value of the property.
 	 */
 	public void firePropertyChange(String propertyName, boolean oldValue,
-			boolean newValue) {
+			boolean newValue)
+	{
 		pcs.firePropertyChange(propertyName, oldValue, newValue);
 	}
 
@@ -140,7 +148,8 @@ public abstract class AbstractGoban implements Goban {
 	 * @param evt
 	 *            The PropertyChangeEvent object.
 	 */
-	public void firePropertyChange(PropertyChangeEvent evt) {
+	public void firePropertyChange(PropertyChangeEvent evt)
+	{
 		pcs.firePropertyChange(evt);
 	}
 
@@ -152,7 +161,8 @@ public abstract class AbstractGoban implements Goban {
 	 * @return <code>true</code>if there are one or more listeners for the given
 	 *         property
 	 */
-	public boolean hasListeners(String propertyName) {
+	public boolean hasListeners(String propertyName)
+	{
 		return pcs.hasListeners(propertyName);
 	}
 

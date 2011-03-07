@@ -76,7 +76,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * This Comparator is <strong>not</strong> compatible with
 	 * {@link Node#compareTo} or {@link Node#equals}.
 	 */
-	static class BoardComparator implements Comparator<Goban> {
+	static class BoardComparator implements Comparator<Goban>
+	{
 		/**
 		 * Compare two Nodes by comparing the values of the Zobrist hash of
 		 * their Gobans.
@@ -84,7 +85,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		 * @see de.cgawron.go.goban.Goban#zobristHash
 		 * @see "Comparator in the Java API documentation."
 		 */
-		public int compare(Goban o1, Goban o2) {
+		public int compare(Goban o1, Goban o2)
+		{
 			Goban m1;
 			Goban m2;
 			if (o1 instanceof Node)
@@ -107,20 +109,24 @@ public class Node extends PropertyList implements MarkupModelListener,
 		}
 	}
 
-	public class SiblingsIterator implements Iterator<Node> {
+	public class SiblingsIterator implements Iterator<Node>
+	{
 		private int i = 0;
 
-		public SiblingsIterator() {
+		public SiblingsIterator()
+		{
 			while (i < parent.children.size()
 					&& parent.children.get(i) == Node.this)
 				i++;
 		}
 
-		public boolean hasNext() {
+		public boolean hasNext()
+		{
 			return i < parent.children.size();
 		}
 
-		public Node next() {
+		public Node next()
+		{
 			Node node = parent.children.get(i++);
 			while (i < parent.children.size()
 					&& parent.children.get(i) == Node.this)
@@ -128,21 +134,26 @@ public class Node extends PropertyList implements MarkupModelListener,
 			return node;
 		}
 
-		public void remove() {
+		public void remove()
+		{
 			throw new UnsupportedOperationException();
 		}
 	}
 
-	public class SiblingsList extends AbstractList<Node> {
-		public Iterator<Node> iterator() {
+	public class SiblingsList extends AbstractList<Node>
+	{
+		public Iterator<Node> iterator()
+		{
 			return new SiblingsIterator();
 		}
 
-		public int size() {
+		public int size()
+		{
 			return parent.children.size() - 1;
 		}
 
-		public Node get(int index) {
+		public Node get(int index)
+		{
 			Iterator<Node> it = iterator();
 			Node n = it.next();
 
@@ -157,8 +168,10 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * The VariationPath of a Node consists of all nodes of the TreePath of a
 	 * node which are not the first child of their parent.
 	 */
-	public static class VariationPath extends LinkedList<Node> {
-		VariationPath(Node node) {
+	public static class VariationPath extends LinkedList<Node>
+	{
+		VariationPath(Node node)
+		{
 			super();
 			Node parent = node.getParent();
 			while (parent != null) {
@@ -170,7 +183,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		}
 
 		@Override
-		public String toString() {
+		public String toString()
+		{
 			StringBuffer sb = new StringBuffer();
 			for (Node n : this) {
 				if (sb.length() != 0)
@@ -181,7 +195,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		}
 	}
 
-	public VariationPath getVariationPath() {
+	public VariationPath getVariationPath()
+	{
 		return new VariationPath(this);
 	}
 
@@ -189,7 +204,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * This method is called if the {@link Goban} of this node is changed. The
 	 * change is signalled to all registered <code>PropertyChangeListener</code>
 	 */
-	public void modelChanged(GobanEvent e) {
+	public void modelChanged(GobanEvent e)
+	{
 		firePropertyChange(null, null, null);
 	}
 
@@ -199,7 +215,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * @param event
 	 *            The {@link GobanEvent}.
 	 */
-	public void stoneAdded(GobanEvent event) {
+	public void stoneAdded(GobanEvent event)
+	{
 		// throw new
 		// RuntimeException("Hey, someone just added a stone! This should not happen this way");
 	}
@@ -210,7 +227,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * @param event
 	 *            The {@link GobanEvent}.
 	 */
-	public void stonesRemoved(GobanEvent event) {
+	public void stonesRemoved(GobanEvent event)
+	{
 		// throw new
 		// RuntimeException("Hey, someone just removed a stone! This should not happen this way");
 	}
@@ -222,7 +240,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * @param event
 	 *            The {@link GobanEvent}.
 	 */
-	public void regionChanged(GobanEvent event) {
+	public void regionChanged(GobanEvent event)
+	{
 		if (logger.isLoggable(Level.FINE))
 			logger.fine("Node.regionChanged: " + id);
 		Property oldView = get(Property.VIEW);
@@ -248,7 +267,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * @param listener
 	 *            The PropertyChangeListener to be added
 	 */
-	public void addPropertyChangeListener(PropertyChangeListener listener) {
+	public void addPropertyChangeListener(PropertyChangeListener listener)
+	{
 		assert listener != this;
 		logger.fine("Node.addPropertyChangeListener: " + listener);
 		pcs.addPropertyChangeListener(listener);
@@ -261,7 +281,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * @param listener
 	 *            The PropertyChangeListener to be removed
 	 */
-	public void removePropertyChangeListener(PropertyChangeListener listener) {
+	public void removePropertyChangeListener(PropertyChangeListener listener)
+	{
 		logger.fine("Node.removePropertyChangeListener: " + listener);
 		pcs.removePropertyChangeListener(listener);
 	}
@@ -277,7 +298,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 *            The PropertyChangeListener to be added
 	 */
 	public void addPropertyChangeListener(String propertyName,
-			PropertyChangeListener listener) {
+			PropertyChangeListener listener)
+	{
 		logger.fine("Node.addPropertyChangeListener: " + listener + ", "
 				+ propertyName);
 		pcs.addPropertyChangeListener(propertyName, listener);
@@ -292,7 +314,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 *            The PropertyChangeListener to be removed
 	 */
 	public void removePropertyChangeListener(String propertyName,
-			PropertyChangeListener listener) {
+			PropertyChangeListener listener)
+	{
 		logger.fine("Node.removePropertyChangeListener: " + listener + ", "
 				+ propertyName);
 		pcs.removePropertyChangeListener(propertyName, listener);
@@ -310,7 +333,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 *            The new value of the property.
 	 */
 	public void firePropertyChange(String propertyName, Object oldValue,
-			Object newValue) {
+			Object newValue)
+	{
 		pcs.firePropertyChange(propertyName, oldValue, newValue);
 	}
 
@@ -326,7 +350,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 *            The new value of the property.
 	 */
 	public void firePropertyChange(String propertyName, boolean oldValue,
-			boolean newValue) {
+			boolean newValue)
+	{
 		pcs.firePropertyChange(propertyName, oldValue, newValue);
 	}
 
@@ -338,7 +363,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * @param evt
 	 *            The PropertyChangeEvent object.
 	 */
-	public void firePropertyChange(PropertyChangeEvent evt) {
+	public void firePropertyChange(PropertyChangeEvent evt)
+	{
 		pcs.firePropertyChange(evt);
 	}
 
@@ -350,7 +376,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * @return <code>true</code>if there are one or more listeners for the given
 	 *         property
 	 */
-	public boolean hasListeners(String propertyName) {
+	public boolean hasListeners(String propertyName)
+	{
 		return pcs.hasListeners(propertyName);
 	}
 
@@ -359,7 +386,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * 
 	 * @return the TreePath of this Node.
 	 */
-	TreePath getPath() {
+	TreePath getPath()
+	{
 		TreeNode n = this;
 		List<TreeNode> l = new LinkedList<TreeNode>();
 		for (; n != null; n = n.getParent()) {
@@ -368,7 +396,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		return new TreePath(l.toArray());
 	}
 
-	public int compareTo(Node node) {
+	public int compareTo(Node node)
+	{
 		// logger.info("Comparing " + this + " and " + o);
 		if (node == null)
 			return -1;
@@ -410,7 +439,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	/**
 	 * Create a node without any properties.
 	 */
-	public Node(GameTree gameTree) {
+	public Node(GameTree gameTree)
+	{
 		super();
 		this.gameTree = gameTree;
 		id = ++lastId;
@@ -423,7 +453,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * @param n
 	 *            A node from which the properties are copied.
 	 */
-	protected Node(Node n) {
+	protected Node(Node n)
+	{
 		super(n);
 		initInheritedProperties(n);
 		this.gameTree = n.gameTree;
@@ -431,7 +462,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		pcs = new PropertyChangeSupport(this);
 	}
 
-	Node(PropertyList pl) {
+	Node(PropertyList pl)
+	{
 		super(pl);
 		initInheritedProperties(pl);
 		id = ++lastId;
@@ -445,7 +477,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * @param gameTree
 	 *            The new GameTree.
 	 */
-	public void setGameTree(GameTree gameTree) {
+	public void setGameTree(GameTree gameTree)
+	{
 		this.gameTree = gameTree;
 		// This initialization seems to be quite inefficient as it creates a lot
 		// of new Objects.
@@ -462,7 +495,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * 
 	 * @returns the GameTree associated with this Node.
 	 */
-	public GameTree getGameTree() {
+	public GameTree getGameTree()
+	{
 		Node node = this;
 		while (node.gameTree == null) {
 			if (node instanceof Sequence) {
@@ -482,7 +516,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * 
 	 * @return The size of the board.
 	 */
-	public short getBoardSize() {
+	public short getBoardSize()
+	{
 		short boardsize = 19;
 		if (contains(Property.SIZE)) {
 			Value.Number size = (Value.Number) (get(Property.SIZE)).getValue();
@@ -493,12 +528,14 @@ public class Node extends PropertyList implements MarkupModelListener,
 		return boardsize;
 	}
 
-	public Node getParent() {
+	public Node getParent()
+	{
 		assert this != parent;
 		return parent;
 	}
 
-	public RootNode getRoot() {
+	public RootNode getRoot()
+	{
 		if (gameTree == null)
 			if (parent == null)
 				return (RootNode) this;
@@ -508,19 +545,23 @@ public class Node extends PropertyList implements MarkupModelListener,
 			return gameTree.getRoot();
 	}
 
-	public List<Node> getChildren() {
+	public List<Node> getChildren()
+	{
 		return children;
 	}
 
-	public Enumeration children() {
+	public Enumeration children()
+	{
 		return Collections.enumeration(children);
 	}
 
-	public boolean getAllowsChildren() {
+	public boolean getAllowsChildren()
+	{
 		return true;
 	}
 
-	public Node getChildAt(int i) {
+	public Node getChildAt(int i)
+	{
 		try {
 			return children.get(i);
 		} catch (IndexOutOfBoundsException ex) {
@@ -528,11 +569,13 @@ public class Node extends PropertyList implements MarkupModelListener,
 		}
 	}
 
-	public int getChildCount() {
+	public int getChildCount()
+	{
 		return children.size();
 	}
 
-	public Node getChild(Point p) {
+	public Node getChild(Point p)
+	{
 		Property.Key key = Property.BLACK;
 		if (this.contains(Property.BLACK))
 			key = Property.WHITE;
@@ -543,18 +586,21 @@ public class Node extends PropertyList implements MarkupModelListener,
 		return null;
 	}
 
-	public List<Node> getSiblings() {
+	public List<Node> getSiblings()
+	{
 		return new SiblingsList();
 	}
 
-	public int getSiblingCount() {
+	public int getSiblingCount()
+	{
 		if (parent != null) {
 			return parent.children.size() - 1;
 		} else
 			return 0;
 	}
 
-	public boolean isFirstChild() {
+	public boolean isFirstChild()
+	{
 		if (parent == null)
 			return false;
 
@@ -564,7 +610,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 			return false;
 	}
 
-	public boolean isLastChild() {
+	public boolean isLastChild()
+	{
 		if (parent == null)
 			return false;
 
@@ -579,35 +626,42 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * parent.getIndex(this) + 1); }
 	 */
 
-	public int getIndex(Node n) {
+	public int getIndex(Node n)
+	{
 		return children.indexOf(n);
 	}
 
-	public int getIndex(TreeNode n) {
+	public int getIndex(TreeNode n)
+	{
 		if (n instanceof Node)
 			return getIndex((Node) n);
 		else
 			return -1;
 	}
 
-	public boolean isLeaf() {
+	public boolean isLeaf()
+	{
 		return children.size() == 0;
 	}
 
-	public boolean isMove() {
+	public boolean isMove()
+	{
 		return contains(Property.BLACK) || contains(Property.WHITE);
 	}
 
-	public boolean isBoardSetup() {
+	public boolean isBoardSetup()
+	{
 		return contains(Property.ADD_BLACK) || contains(Property.ADD_WHITE)
 				|| contains(Property.ADD_EMPTY);
 	}
 
-	public boolean isRoot() {
+	public boolean isRoot()
+	{
 		return this == getRoot();
 	}
 
-	public boolean isDiagram() {
+	public boolean isDiagram()
+	{
 		// The root node should not be a figure if the board is empty
 		// SmartGo marks the root node as the start of a new diagram
 		if (isRoot() && !isBoardSetup() && !isMove())
@@ -618,7 +672,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		return contains(Property.FIGURE);
 	}
 
-	public void setDiagram(boolean newValue) {
+	public void setDiagram(boolean newValue)
+	{
 		// it makes no sense to set the diagram property on an empty root node
 		if (isRoot() && !isMove() && !isBoardSetup())
 			return;
@@ -631,7 +686,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 				TreeVisitor<GameTree, Node> visitor = new TreeVisitor<GameTree, Node>(
 						getRoot().getGameTree(), this) {
 					@Override
-					protected void visitNode(Node n) {
+					protected void visitNode(Node n)
+					{
 						Node p = n.getParent();
 						Goban goban;
 						if (p == null) {
@@ -678,7 +734,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		firePropertyChange("diagram", oldValue, newValue);
 	}
 
-	public String getComment() {
+	public String getComment()
+	{
 		Property p = get(Property.COMMENT);
 		if (p == null)
 			return "";
@@ -689,7 +746,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 			return "";
 	}
 
-	public void setComment(String c) {
+	public void setComment(String c)
+	{
 		Object oldValue = get(Property.COMMENT).getValue();
 		Object newValue = c;
 		logger.info("Setting comment to " + c);
@@ -706,7 +764,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		}
 	}
 
-	public void setValue(Property.Key key, String value) {
+	public void setValue(Property.Key key, String value)
+	{
 		Property oldValue = get(key);
 		Property newValue = oldValue;
 		if (oldValue != null)
@@ -726,7 +785,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		}
 	}
 
-	public Goban getGoban() {
+	public Goban getGoban()
+	{
 		if (goban == null) {
 			Node node = this;
 			Stack<Node> nodes = new Stack<Node>();
@@ -741,11 +801,13 @@ public class Node extends PropertyList implements MarkupModelListener,
 		return goban;
 	}
 
-	public int getId() {
+	public int getId()
+	{
 		return id;
 	}
 
-	public void initGoban() {
+	public void initGoban()
+	{
 		if (gameTree == null)
 			gameTree = parent.getGameTree();
 
@@ -783,7 +845,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		}
 	}
 
-	private void doMarkup() {
+	private void doMarkup()
+	{
 		if (logger.isLoggable(Level.FINE))
 			logger.fine("doMarkup: enter");
 		if (contains(Property.SIZE)) {
@@ -955,11 +1018,13 @@ public class Node extends PropertyList implements MarkupModelListener,
 			logger.fine("doMarkup: leave");
 	}
 
-	public void setGoban(Goban newGoban) {
+	public void setGoban(Goban newGoban)
+	{
 		setGoban(newGoban, true);
 	}
 
-	public void setGoban(Goban newGoban, boolean doMarkup) {
+	public void setGoban(Goban newGoban, boolean doMarkup)
+	{
 		Goban oldGoban = goban;
 		goban = newGoban;
 
@@ -975,7 +1040,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	}
 
 	@Override
-	public void add(Property p) {
+	public void add(Property p)
+	{
 		super.add(p);
 		if (p instanceof Property.Inheritable) {
 			logger.info("inherited: " + p);
@@ -990,7 +1056,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		}
 	}
 
-	public boolean add(Node n) {
+	public boolean add(Node n)
+	{
 		n.setParent(this);
 		if (n.depth < 0) {
 			Node p = n;
@@ -1008,7 +1075,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		return children.add(n);
 	}
 
-	public void setParent(Node n) {
+	public void setParent(Node n)
+	{
 		assert n != this;
 		if (logger.isLoggable(Level.FINE))
 			logger.fine("Node " + this + ": setting parent to " + n);
@@ -1022,7 +1090,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		}
 	}
 
-	public BoardType getColor() {
+	public BoardType getColor()
+	{
 		if (contains(Property.WHITE))
 			return BoardType.WHITE;
 		else if (contains(Property.BLACK))
@@ -1032,7 +1101,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	}
 
 	@Override
-	public boolean contains(Object o) {
+	public boolean contains(Object o)
+	{
 		assert o instanceof Property.Key;
 		if (super.containsKey(o))
 			return true;
@@ -1043,7 +1113,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	}
 
 	@Override
-	public Property get(Object key) {
+	public Property get(Object key)
+	{
 		Property p;
 		p = super.get(key);
 		if (p == null && inheritedProperties != null)
@@ -1052,11 +1123,13 @@ public class Node extends PropertyList implements MarkupModelListener,
 	}
 
 	@Override
-	public Value getValue(Property.Key k) {
+	public Value getValue(Property.Key k)
+	{
 		return super.getValue(k);
 	}
 
-	public String getString(Property.Key k) {
+	public String getString(Property.Key k)
+	{
 		Value value = super.getValue(k);
 		if (value != null)
 			return value.getString();
@@ -1064,7 +1137,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 			return "";
 	}
 
-	public Point getPoint() {
+	public Point getPoint()
+	{
 		if (contains(Property.BLACK))
 			return getPoint(Property.BLACK);
 		else if (contains(Property.WHITE))
@@ -1074,11 +1148,13 @@ public class Node extends PropertyList implements MarkupModelListener,
 	}
 
 	@Override
-	public Point getPoint(Property.Key k) {
+	public Point getPoint(Property.Key k)
+	{
 		return super.getPoint(k);
 	}
 
-	public String getGameName() {
+	public String getGameName()
+	{
 		assert getRoot() != null;
 
 		if (this != getRoot())
@@ -1096,7 +1172,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 			return "";
 	}
 
-	public String getName() {
+	public String getName()
+	{
 		if (contains(Property.NAME)) {
 			return getValue(Property.NAME).toString();
 		} else if (contains(Property.BLACK))
@@ -1110,7 +1187,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	}
 
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		StringBuffer buffer = new StringBuffer(16).append("Node ").append(
 				getId());
 		if (contains(Property.NAME))
@@ -1119,7 +1197,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		return buffer.toString();
 	}
 
-	public int getMoveNo() {
+	public int getMoveNo()
+	{
 		Node n = this;
 		while (n != null && n.getParent() != null && !n.isMove()) {
 			if (logger.isLoggable(Level.FINE))
@@ -1137,7 +1216,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * @param Point
 	 *            p the point where to add a stone
 	 */
-	public void move(Point p) throws UnsupportedOperationException {
+	public void move(Point p) throws UnsupportedOperationException
+	{
 		if (isMove() || isBoardSetup() || this instanceof RootNode)
 			throw new UnsupportedOperationException();
 		if (contains(Property.MOVE_NO)) {
@@ -1173,7 +1253,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 *            c the color of the stone
 	 */
 	public void addStone(Point p, BoardType c)
-			throws UnsupportedOperationException {
+			throws UnsupportedOperationException
+	{
 		if (isMove())
 			throw new UnsupportedOperationException();
 		Iterator it = Property.addStoneProperties.iterator();
@@ -1219,7 +1300,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(Object o)
+	{
 		if (o instanceof Node)
 			return id == ((Node) o).id;
 		else
@@ -1227,11 +1309,13 @@ public class Node extends PropertyList implements MarkupModelListener,
 	}
 
 	@Override
-	public int hashCode() {
+	public int hashCode()
+	{
 		return id;
 	}
 
-	public boolean isMainVariation() {
+	public boolean isMainVariation()
+	{
 		Node n = this;
 		while (n.parent != null && !(n instanceof RootNode)) {
 			if (n.parent.children.indexOf(n) != 0)
@@ -1242,7 +1326,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		return true;
 	}
 
-	public boolean isBeginOfVariation() {
+	public boolean isBeginOfVariation()
+	{
 		Node n = this;
 		if (parent == null)
 			return true;
@@ -1250,19 +1335,22 @@ public class Node extends PropertyList implements MarkupModelListener,
 			return n.parent.children.indexOf(n) != 0;
 	}
 
-	public Node getBeginOfVariation() {
+	public Node getBeginOfVariation()
+	{
 		Node n = this;
 		while (n != null && !n.isBeginOfVariation())
 			n = n.getParent();
 		return n;
 	}
 
-	public Iterator iterator() {
+	public Iterator iterator()
+	{
 		return children.iterator();
 	}
 
 	@Override
-	public void write(PrintWriter out) {
+	public void write(PrintWriter out)
+	{
 		super.write(out);
 		/*
 		 * if (getChildCount() > 1) { Iterator it = getChildren().iterator();
@@ -1272,7 +1360,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		 */
 	}
 
-	public void setProperty(Property.Key key, Object newValue) {
+	public void setProperty(Property.Key key, Object newValue)
+	{
 		assert newValue != null;
 		if (!contains(key))
 			put(Property.createProperty(key, newValue));
@@ -1284,11 +1373,13 @@ public class Node extends PropertyList implements MarkupModelListener,
 		}
 	}
 
-	public void setFileFormat(int fileFormat) {
+	public void setFileFormat(int fileFormat)
+	{
 		setProperty(Property.FILE_FORMAT, new Integer(fileFormat));
 	}
 
-	public void setGame(int game) {
+	public void setGame(int game)
+	{
 		setProperty(Property.GAME, new Integer(game));
 	}
 
@@ -1298,17 +1389,20 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * @param moveNo
 	 *            The move number to set.
 	 */
-	public void setMoveNo(int moveNo) {
+	public void setMoveNo(int moveNo)
+	{
 		if (logger.isLoggable(Level.FINE))
 			logger.fine("Node " + this + ": Setting moveNo to " + moveNo);
 		this.moveNo = moveNo;
 	}
 
-	public Memento createMemento() {
+	public Memento createMemento()
+	{
 		return new NodeMemento(this);
 	}
 
-	public void setMemento(Memento memento) {
+	public void setMemento(Memento memento)
+	{
 		NodeMemento nm = (NodeMemento) memento;
 		logger.info("Node: setMemento: " + nm);
 		parent = nm.getParent();
@@ -1325,7 +1419,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		firePropertyChange(null, null, null);
 	}
 
-	public void join(Node n) {
+	public void join(Node n)
+	{
 		SortedMap<Goban, Node> childMap = new TreeMap<Goban, Node>(
 				new BoardComparator());
 		Iterator it;
@@ -1351,7 +1446,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 	 * 
 	 * @returns the depth of the sub-tree rooted at this node.
 	 */
-	public int getDepth() {
+	public int getDepth()
+	{
 		if (depth < 0) {
 			Queue<Node> subRoots = new LinkedList<Node>();
 			Node n = this;
@@ -1376,7 +1472,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		return depth;
 	}
 
-	void initInheritedProperties(PropertyList p) {
+	void initInheritedProperties(PropertyList p)
+	{
 		Map<Property.Key, Property> inheritable = null;
 
 		for (Property.Key k : p.keySet()) {
@@ -1396,7 +1493,8 @@ public class Node extends PropertyList implements MarkupModelListener,
 		propagateInheritedProperties();
 	}
 
-	void propagateInheritedProperties() {
+	void propagateInheritedProperties()
+	{
 		for (Node n : children) {
 			if (n.inheritedProperties != inheritedProperties) {
 				if (n.inheritedProperties == null) {

@@ -23,12 +23,14 @@ import de.cgawron.util.Memento;
 import java.util.*;
 import java.util.logging.Logger;
 
-class GameTreeMemento implements Memento {
+class GameTreeMemento implements Memento
+{
 	private static Logger logger = Logger
 			.getLogger(NodeMemento.class.getName());
 	private Map<Node, Memento> nodeMementos = new HashMap<Node, Memento>();
 
-	public GameTreeMemento(GameTree gameTree) {
+	public GameTreeMemento(GameTree gameTree)
+	{
 		Iterator it = new TreeIterator(gameTree);
 		while (it.hasNext()) {
 			Node n = (Node) it.next();
@@ -36,7 +38,8 @@ class GameTreeMemento implements Memento {
 		}
 	}
 
-	void setMemento(Node n) {
+	void setMemento(Node n)
+	{
 		logger.info("GameTreeMement: setMemento: " + n);
 		Memento m = (Memento) nodeMementos.get(n);
 		if (m != null)
@@ -49,7 +52,8 @@ class GameTreeMemento implements Memento {
 		}
 	}
 
-	public String toString() {
+	public String toString()
+	{
 		return "[GameTreeMemento nodeMementos=" + nodeMementos + "]";
 	}
 }

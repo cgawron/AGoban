@@ -26,7 +26,8 @@ import de.cgawron.go.GobanListener;
  * A MarkupModelListener gets informed when the model changes, i.e. when a
  * region is set or a letter is added.
  */
-public interface MarkupModelListener extends GobanListener {
+public interface MarkupModelListener extends GobanListener
+{
 	/**
 	 * The region (or VieW in SGF speak) of the model has changed.
 	 * 

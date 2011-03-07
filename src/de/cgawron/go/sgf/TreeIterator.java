@@ -22,39 +22,48 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TreeIterator<N extends TreeNode> implements Iterator<N> {
+public class TreeIterator<N extends TreeNode> implements Iterator<N>
+{
 	private static Logger logger = Logger.getLogger(TreeIterator.class
 			.getName());
 	private Iterator<N> iterator;
 
-	private TreeIterator() {
+	private TreeIterator()
+	{
 	}
 
-	public TreeIterator(N node) {
+	public TreeIterator(N node)
+	{
 		iterator = new PreorderIterator<N>(node);
 	}
 
-	public TreeIterator(TreeModel model) {
+	public TreeIterator(TreeModel model)
+	{
 		this((N) model.getRoot());
 	}
 
-	public boolean hasNext() {
+	public boolean hasNext()
+	{
 		return iterator.hasNext();
 	}
 
-	public N next() {
+	public N next()
+	{
 		return iterator.next();
 	}
 
-	public void remove() {
+	public void remove()
+	{
 		iterator.remove();
 	}
 
 	static class BreadthFirstIterator<N extends TreeNode> extends
-			TreeIterator<N> {
+			TreeIterator<N>
+	{
 		protected Queue<Iterator<N>> queue;
 
-		public BreadthFirstIterator(N node) {
+		public BreadthFirstIterator(N node)
+		{
 			queue = new LinkedList<Iterator<N>>();
 			/* queue.enqueue(new EnumIterator(node.children())); */
 			Collection<N> c = new ArrayList<N>();
@@ -62,11 +71,13 @@ public class TreeIterator<N extends TreeNode> implements Iterator<N> {
 			queue.add(c.iterator());
 		}
 
-		public boolean hasNext() {
+		public boolean hasNext()
+		{
 			return (!queue.isEmpty() && queue.peek().hasNext());
 		}
 
-		public N next() {
+		public N next()
+		{
 			Iterator<N> iter = queue.peek();
 			N node = iter.next();
 
@@ -89,7 +100,8 @@ public class TreeIterator<N extends TreeNode> implements Iterator<N> {
 			return node;
 		}
 
-		public void remove() {
+		public void remove()
+		{
 			throw new UnsupportedOperationException();
 		}
 	}
@@ -104,12 +116,15 @@ public class TreeIterator<N extends TreeNode> implements Iterator<N> {
 	 * node has been visited.
 	 */
 	public static class PreorderIterator<N extends TreeNode> extends
-			TreeIterator<N> {
-		private class Pair<N> {
+			TreeIterator<N>
+	{
+		private class Pair<N>
+		{
 			N node;
 			Iterator<N> iterator;
 
-			public Pair(N node, Iterator<N> iterator) {
+			public Pair(N node, Iterator<N> iterator)
+			{
 				this.node = node;
 				this.iterator = iterator;
 			}
@@ -118,7 +133,8 @@ public class TreeIterator<N extends TreeNode> implements Iterator<N> {
 
 		protected Stack<Pair<N>> stack;
 
-		public PreorderIterator(N node) {
+		public PreorderIterator(N node)
+		{
 			stack = new Stack<Pair<N>>();
 			Collection<N> c = new ArrayList<N>();
 			if (node != null)
@@ -127,7 +143,8 @@ public class TreeIterator<N extends TreeNode> implements Iterator<N> {
 			stack.push(pair);
 		}
 
-		public boolean hasNext() {
+		public boolean hasNext()
+		{
 			if (stack.empty())
 				return false;
 
@@ -144,7 +161,8 @@ public class TreeIterator<N extends TreeNode> implements Iterator<N> {
 			return true;
 		}
 
-		public N next() {
+		public N next()
+		{
 			N current = stack.peek().node;
 			Iterator<N> it = stack.peek().iterator;
 			N node = it.next();
@@ -160,32 +178,38 @@ public class TreeIterator<N extends TreeNode> implements Iterator<N> {
 			return node;
 		}
 
-		public void endNode(N parent) {
+		public void endNode(N parent)
+		{
 		}
 
-		public void remove() {
+		public void remove()
+		{
 			throw new UnsupportedOperationException();
 		}
 	}
 
 	public static class PostorderIterator<N extends TreeNode> extends
-			TreeIterator<N> {
+			TreeIterator<N>
+	{
 		protected N root;
 		protected Iterator<N> children;
 		protected Iterator<N> subtree;
 
-		public PostorderIterator(N rootNode) {
+		public PostorderIterator(N rootNode)
+		{
 			root = rootNode;
 			children = new EnumIterator(root.children());
 			List<N> empty = Collections.emptyList();
 			subtree = empty.iterator();
 		}
 
-		public boolean hasNext() {
+		public boolean hasNext()
+		{
 			return root != null;
 		}
 
-		public N next() {
+		public N next()
+		{
 			N retval;
 
 			if (subtree.hasNext()) {
@@ -200,27 +224,33 @@ public class TreeIterator<N extends TreeNode> implements Iterator<N> {
 			return retval;
 		}
 
-		public void remove() {
+		public void remove()
+		{
 			throw new UnsupportedOperationException();
 		}
 	}
 
-	static class EnumIterator<N extends TreeNode> implements Iterator<N> {
+	static class EnumIterator<N extends TreeNode> implements Iterator<N>
+	{
 		Enumeration<N> e;
 
-		EnumIterator(Enumeration<N> e) {
+		EnumIterator(Enumeration<N> e)
+		{
 			this.e = e;
 		}
 
-		public boolean hasNext() {
+		public boolean hasNext()
+		{
 			return e.hasMoreElements();
 		}
 
-		public N next() {
+		public N next()
+		{
 			return e.nextElement();
 		}
 
-		public void remove() {
+		public void remove()
+		{
 			throw new UnsupportedOperationException();
 		}
 	}

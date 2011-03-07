@@ -57,7 +57,8 @@ import de.cgawron.go.sgf.Property;
  * Provides an sgf editor.
  */
 public class EditSGF extends Activity implements GobanEventListener,
-		GameTreeNavigationListener, SGFApplication.ExceptionHandler {
+		GameTreeNavigationListener, SGFApplication.ExceptionHandler
+{
 	private static final String TAG = "EditSGF";
 	private static final String KEY_URI = "de.cgawron.agoban:URI";
 
@@ -75,7 +76,8 @@ public class EditSGF extends Activity implements GobanEventListener,
 
 	/** Called when the activity is first created. */
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState)
+	{
 		super.onCreate(savedInstanceState);
 		Log.d(TAG, "oncreate: " + savedInstanceState);
 		application = (SGFApplication) getApplication();
@@ -113,7 +115,8 @@ public class EditSGF extends Activity implements GobanEventListener,
 	}
 
 	@Override
-	public File getFileStreamPath(String name) {
+	public File getFileStreamPath(String name)
+	{
 		File directory = Environment.getExternalStorageDirectory();
 		directory = new File(directory, "sgf");
 
@@ -124,7 +127,8 @@ public class EditSGF extends Activity implements GobanEventListener,
 	}
 
 	@Override
-	public void onStart() {
+	public void onStart()
+	{
 		super.onStart();
 		Log.d(TAG, "OnStart");
 
@@ -144,7 +148,8 @@ public class EditSGF extends Activity implements GobanEventListener,
 			Log.d(TAG, "onStart: EDIT");
 			application.setData(intent.getData());
 			final Runnable afterLoaded = new Runnable() {
-				public void run() {
+				public void run()
+				{
 					gameTree = application.getGameTree();
 					if (gameTree != null) {
 						setGameTree(gameTree);
@@ -157,7 +162,8 @@ public class EditSGF extends Activity implements GobanEventListener,
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.options_menu, menu);
 
@@ -169,7 +175,8 @@ public class EditSGF extends Activity implements GobanEventListener,
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
 		switch (item.getItemId()) {
 		case R.id.save:
 			save();
@@ -204,52 +211,60 @@ public class EditSGF extends Activity implements GobanEventListener,
 		return super.onOptionsItemSelected(item);
 	}
 
-	public void onGobanEvent(GobanEvent gobanEvent) {
+	public void onGobanEvent(GobanEvent gobanEvent)
+	{
 		Log.d(TAG, "onGobanEvent: " + gobanEvent);
 	}
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View view,
-			ContextMenuInfo menuInfo) {
+			ContextMenuInfo menuInfo)
+	{
 		Log.d(TAG, "onCreateContextMenu");
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.stone_context_menu, menu);
 	}
 
 	@Override
-	public boolean onContextItemSelected(MenuItem item) {
+	public boolean onContextItemSelected(MenuItem item)
+	{
 		GobanContextMenuInfo info = (GobanContextMenuInfo) item.getMenuInfo();
 		Log.d(TAG, item.toString() + " " + info);
 		return true;
 	}
 
 	@Override
-	protected void onSaveInstanceState(Bundle outState) {
+	protected void onSaveInstanceState(Bundle outState)
+	{
 		super.onSaveInstanceState(outState);
 		outState.putParcelable(KEY_URI, application.getData());
 		Log.d(TAG, "onSaveInstanceState: " + outState);
 	}
 
 	@Override
-	protected void onRestoreInstanceState(Bundle savedState) {
+	protected void onRestoreInstanceState(Bundle savedState)
+	{
 		Log.d(TAG, "onRestoreInstanceState: " + savedState);
 		super.onRestoreInstanceState(savedState);
 	}
 
 	@Override
-	protected void onResume() {
+	protected void onResume()
+	{
 		super.onResume();
 		Log.i(TAG, "onResume");
 	}
 
 	@Override
-	protected void onRestart() {
+	protected void onRestart()
+	{
 		super.onRestart();
 		Log.i(TAG, "onRestart");
 	}
 
 	@Override
-	protected void onPause() {
+	protected void onPause()
+	{
 		super.onPause();
 		Log.i(TAG, "onPause");
 
@@ -258,7 +273,8 @@ public class EditSGF extends Activity implements GobanEventListener,
 	}
 
 	@Override
-	protected void onStop() {
+	protected void onStop()
+	{
 		super.onStop();
 		Log.i(TAG, "onStop");
 
@@ -266,11 +282,13 @@ public class EditSGF extends Activity implements GobanEventListener,
 			save();
 	}
 
-	public Node getCurrentNode() {
+	public Node getCurrentNode()
+	{
 		return currentNode;
 	}
 
-	public void setCurrentNode(Node node) {
+	public void setCurrentNode(Node node)
+	{
 		Log.d(TAG, "setCurrentNode: new=" + node + ", old=" + currentNode);
 		if (!node.equals(currentNode)) {
 			currentNode = node;
@@ -298,7 +316,8 @@ public class EditSGF extends Activity implements GobanEventListener,
 		}
 	}
 
-	private void doMarkup(GobanView view, Node node) {
+	private void doMarkup(GobanView view, Node node)
+	{
 		Goban goban = node.getGoban();
 		for (Property property : node.values()) {
 			if (property instanceof Property.Markup) {
@@ -307,7 +326,8 @@ public class EditSGF extends Activity implements GobanEventListener,
 		}
 	}
 
-	private void markVariation(GobanView view, Node node) {
+	private void markVariation(GobanView view, Node node)
+	{
 		Point point = null;
 		if (node.contains(Property.BLACK)) {
 			point = node.getPoint(Property.BLACK);
@@ -321,29 +341,35 @@ public class EditSGF extends Activity implements GobanEventListener,
 		}
 	}
 
-	public Map<Point, Node> getVariations() {
+	public Map<Point, Node> getVariations()
+	{
 		return variations;
 	}
 
-	public boolean checkNotReadOnly() {
+	public boolean checkNotReadOnly()
+	{
 		return application.checkNotReadOnly(this);
 	}
 
-	public void save() {
+	public void save()
+	{
 		application.save();
 	}
 
-	public void editPreferences() {
+	public void editPreferences()
+	{
 		Intent intent = new Intent(this, SGFApplication.EditPreferences.class);
 		Log.d(TAG, "Starting " + intent);
 		startActivity(intent);
 	}
 
-	public void open(View view) {
+	public void open(View view)
+	{
 		open();
 	}
 
-	public void open() {
+	public void open()
+	{
 		Log.d(TAG, "open()");
 		Intent intent = new Intent(Intent.ACTION_SEARCH,
 				SGFProvider.CONTENT_URI, this, ChooseSGF.class);
@@ -351,18 +377,21 @@ public class EditSGF extends Activity implements GobanEventListener,
 		finish();
 	}
 
-	public void newGame() {
+	public void newGame()
+	{
 		Intent sgfIntent = new Intent(Intent.ACTION_INSERT,
 				application.getNewGameUri());
 		startActivity(sgfIntent);
 		finish();
 	}
 
-	public GameTree getGameTree() {
+	public GameTree getGameTree()
+	{
 		return gameTree;
 	}
 
-	private void setGameTree(GameTree gameTree) {
+	private void setGameTree(GameTree gameTree)
+	{
 		this.gameTree = gameTree;
 		application.setGameTree(gameTree);
 		gameTreeControls.setGameTree(gameTree);
@@ -379,11 +408,13 @@ public class EditSGF extends Activity implements GobanEventListener,
 
 	}
 
-	public void showGameInfo(View view) {
+	public void showGameInfo(View view)
+	{
 		showGameInfo();
 	}
 
-	public void showGameInfo() {
+	public void showGameInfo()
+	{
 		Log.d(TAG, "Show game info");
 		Intent viewGameInfo = new Intent(Intent.ACTION_VIEW,
 				application.getData());
@@ -395,9 +426,11 @@ public class EditSGF extends Activity implements GobanEventListener,
 		startActivity(viewGameInfo);
 	}
 
-	public void handleException(final String message, Throwable ex) {
+	public void handleException(final String message, Throwable ex)
+	{
 		Runnable runnable = new Runnable() {
-			public void run() {
+			public void run()
+			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(
 						EditSGF.this);
 				builder.setMessage(message)
@@ -405,7 +438,8 @@ public class EditSGF extends Activity implements GobanEventListener,
 						.setPositiveButton("Ok",
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog,
-											int id) {
+											int id)
+									{
 										EditSGF.this.finish();
 									}
 								});

@@ -24,8 +24,10 @@ import java.util.SortedSet;
  * @see Goban
  * @version $Id: MarkupModel.java 369 2006-04-14 17:04:02Z cgawron $
  */
-public interface MarkupModel extends Goban {
-	public enum Type {
+public interface MarkupModel extends Goban
+{
+	public enum Type
+	{
 		TRIANGLE, SQUARE, CIRCLE, MARK, LABEL, TERRITORY_WHITE, TERRITORY_BLACK, UNKNOWN
 	}
 
@@ -33,19 +35,24 @@ public interface MarkupModel extends Goban {
 	 * A marker interface for all classes which represent a certain type of
 	 * markups
 	 */
-	public interface Markup extends Comparable<Markup> {
+	public interface Markup extends Comparable<Markup>
+	{
 	}
 
-	public abstract class AbstractMarkup implements Markup {
-		public int compareTo(Markup m) {
+	public abstract class AbstractMarkup implements Markup
+	{
+		public int compareTo(Markup m)
+		{
 			return toString().compareTo(m.toString());
 		}
 	}
 
-	abstract static class IntegerMarkup extends AbstractMarkup {
+	abstract static class IntegerMarkup extends AbstractMarkup
+	{
 		public abstract Integer toInteger();
 
-		public int compareTo(Markup o) {
+		public int compareTo(Markup o)
+		{
 			if (o instanceof IntegerMarkup)
 				return toInteger().compareTo(((IntegerMarkup) o).toInteger());
 			else
@@ -54,32 +61,39 @@ public interface MarkupModel extends Goban {
 	}
 
 	/** A markup for move numbers. */
-	public static class Move extends IntegerMarkup {
+	public static class Move extends IntegerMarkup
+	{
 		private int moveNo;
 		private BoardType color;
 
-		public Move(BoardType c, int moveNo) {
+		public Move(BoardType c, int moveNo)
+		{
 			this.moveNo = moveNo;
 			this.color = c;
 		}
 
-		public int getMoveNo() {
+		public int getMoveNo()
+		{
 			return moveNo;
 		}
 
-		public BoardType getColor() {
+		public BoardType getColor()
+		{
 			return color;
 		}
 
-		public Integer toInteger() {
+		public Integer toInteger()
+		{
 			return new Integer(moveNo);
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			return Integer.toString(moveNo);
 		}
 
-		public boolean equals(Object o) {
+		public boolean equals(Object o)
+		{
 			if (o == this)
 				return true;
 			else if (o instanceof Move) {
@@ -93,26 +107,32 @@ public interface MarkupModel extends Goban {
 	 * A markup for stones which are not really present on the board. This is
 	 * used for diagrams and figures when captured stones are to be shown.
 	 */
-	public static class Stone extends AbstractMarkup {
+	public static class Stone extends AbstractMarkup
+	{
 		private BoardType color;
 
-		public Stone(BoardType c) {
+		public Stone(BoardType c)
+		{
 			this.color = c;
 		}
 
-		public Stone(Stone s) {
+		public Stone(Stone s)
+		{
 			this.color = s.color;
 		}
 
-		public BoardType getColor() {
+		public BoardType getColor()
+		{
 			return color;
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			return color.toString();
 		}
 
-		public boolean equals(Object o) {
+		public boolean equals(Object o)
+		{
 			if (o == this)
 				return true;
 			else if (o instanceof Stone) {
@@ -124,26 +144,31 @@ public interface MarkupModel extends Goban {
 
 	}
 
-	public static class ConflictMark extends Stone {
+	public static class ConflictMark extends Stone
+	{
 		private String text;
 
-		public ConflictMark(Stone s, char c) {
+		public ConflictMark(Stone s, char c)
+		{
 			super(s);
 			char[] b = new char[1];
 			b[0] = c;
 			this.text = new String(b);
 		}
 
-		public ConflictMark(Stone s, String text) {
+		public ConflictMark(Stone s, String text)
+		{
 			super(s);
 			this.text = text;
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			return text;
 		}
 
-		public boolean equals(Object o) {
+		public boolean equals(Object o)
+		{
 			if (o == this)
 				return true;
 			else if (o instanceof ConflictMark) {
@@ -160,18 +185,22 @@ public interface MarkupModel extends Goban {
 	 * 
 	 * @see de.cgawron.go.goban.MarkupModel.Move
 	 */
-	public static class Text extends AbstractMarkup {
+	public static class Text extends AbstractMarkup
+	{
 		private String text;
 
-		public Text(String text) {
+		public Text(String text)
+		{
 			this.text = text;
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			return text;
 		}
 
-		public boolean equals(Object o) {
+		public boolean equals(Object o)
+		{
 			if (o == this)
 				return true;
 			else
@@ -182,12 +211,15 @@ public interface MarkupModel extends Goban {
 	/**
 	 * A triangle mark.
 	 */
-	public static class Triangle extends AbstractMarkup {
+	public static class Triangle extends AbstractMarkup
+	{
 
-		public Triangle() {
+		public Triangle()
+		{
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			return "triangle";
 		}
 	}
@@ -195,12 +227,15 @@ public interface MarkupModel extends Goban {
 	/**
 	 * A square mark.
 	 */
-	public static class Square extends AbstractMarkup {
+	public static class Square extends AbstractMarkup
+	{
 
-		public Square() {
+		public Square()
+		{
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			return "square";
 		}
 	}
@@ -208,12 +243,15 @@ public interface MarkupModel extends Goban {
 	/**
 	 * A circle mark.
 	 */
-	public static class Circle extends AbstractMarkup {
+	public static class Circle extends AbstractMarkup
+	{
 
-		public Circle() {
+		public Circle()
+		{
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			return "circle";
 		}
 	}
@@ -221,12 +259,15 @@ public interface MarkupModel extends Goban {
 	/**
 	 * A mark ('X').
 	 */
-	public static class Mark extends AbstractMarkup {
+	public static class Mark extends AbstractMarkup
+	{
 
-		public Mark() {
+		public Mark()
+		{
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			return "mark";
 		}
 	}
@@ -234,12 +275,15 @@ public interface MarkupModel extends Goban {
 	/**
 	 * White territory.
 	 */
-	public static class WhiteTerritory extends AbstractMarkup {
+	public static class WhiteTerritory extends AbstractMarkup
+	{
 
-		public WhiteTerritory() {
+		public WhiteTerritory()
+		{
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			return "white territory";
 		}
 	}
@@ -247,26 +291,32 @@ public interface MarkupModel extends Goban {
 	/**
 	 * Black territory.
 	 */
-	public static class BlackTerritory extends AbstractMarkup {
+	public static class BlackTerritory extends AbstractMarkup
+	{
 
-		public BlackTerritory() {
+		public BlackTerritory()
+		{
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			return "black territory";
 		}
 	}
 
-	public static class Conflict implements Comparable<Conflict> {
+	public static class Conflict implements Comparable<Conflict>
+	{
 		public Markup first;
 		public Markup second;
 
-		public Conflict(Markup first, Markup second) {
+		public Conflict(Markup first, Markup second)
+		{
 			this.first = first;
 			this.second = second;
 		}
 
-		public int compareTo(Conflict c) throws ClassCastException {
+		public int compareTo(Conflict c) throws ClassCastException
+		{
 			int i1 = first.compareTo(c.first);
 			if (i1 == 0)
 				return second.compareTo(c.second);
@@ -274,7 +324,8 @@ public interface MarkupModel extends Goban {
 				return i1;
 		}
 
-		public String toString() {
+		public String toString()
+		{
 			return second.toString() + " on " + first.toString();
 		}
 	}

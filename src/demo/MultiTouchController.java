@@ -20,7 +20,8 @@ import android.view.MotionEvent;
  * 
  * @author Luke Hutchison
  */
-public class MultiTouchController<T> {
+public class MultiTouchController<T>
+{
 
 	/**
 	 * Time in ms required after a change in event status (e.g. putting down or
@@ -85,13 +86,15 @@ public class MultiTouchController<T> {
 
 	/** Constructor that sets handleSingleTouchEvents to true */
 	public MultiTouchController(MultiTouchObjectCanvas<T> objectCanvas,
-			Resources res) {
+			Resources res)
+	{
 		this(objectCanvas, res, true);
 	}
 
 	/** Full constructor */
 	public MultiTouchController(MultiTouchObjectCanvas<T> objectCanvas,
-			Resources res, boolean handleSingleTouchEvents) {
+			Resources res, boolean handleSingleTouchEvents)
+	{
 		this.currPt = new PointInfo(res);
 		this.prevPt = new PointInfo(res);
 		this.handleSingleTouchEvents = handleSingleTouchEvents;
@@ -104,7 +107,8 @@ public class MultiTouchController<T> {
 	 * Whether to handle single-touch events/drags before multi-touch is
 	 * initiated or not; if not, they are handled by subclasses. Default: true
 	 */
-	protected void setHandleSingleTouchEvents(boolean handleSingleTouchEvents) {
+	protected void setHandleSingleTouchEvents(boolean handleSingleTouchEvents)
+	{
 		this.handleSingleTouchEvents = handleSingleTouchEvents;
 	}
 
@@ -112,14 +116,16 @@ public class MultiTouchController<T> {
 	 * Whether to handle single-touch events/drags before multi-touch is
 	 * initiated or not; if not, they are handled by subclasses. Default: true
 	 */
-	protected boolean getHandleSingleTouchEvents() {
+	protected boolean getHandleSingleTouchEvents()
+	{
 		return handleSingleTouchEvents;
 	}
 
 	// ------------------------------------------------------------------------------------
 
 	/** Process incoming touch events */
-	public boolean onTouchEvent(MotionEvent event) {
+	public boolean onTouchEvent(MotionEvent event)
+	{
 		if (dragMode == MODE_NOTHING && !handleSingleTouchEvents
 				&& event.getPointerCount() == 1)
 			// Not handling initial single touch events, just pass them on
@@ -184,7 +190,8 @@ public class MultiTouchController<T> {
 
 	private void decodeTouchEvent(float x, float y, float pressure,
 			int pointerCount, float x2, float y2, float pressure2, int action,
-			boolean down, long eventTime) {
+			boolean down, long eventTime)
+	{
 
 		prevPt.set(currPt);
 		currPt.set(x, y, pressure, pointerCount, x2, y2, pressure2, action,
@@ -198,7 +205,8 @@ public class MultiTouchController<T> {
 	 * Start dragging/stretching, or reset drag/stretch to current point if
 	 * something goes out of range
 	 */
-	private void resetDrag() {
+	private void resetDrag()
+	{
 		if (draggedObject == null)
 			return;
 
@@ -222,7 +230,8 @@ public class MultiTouchController<T> {
 	 * Drag/stretch the dragged object to the current touch position and
 	 * diameter
 	 */
-	private void performDrag() {
+	private void performDrag()
+	{
 		// Don't do anything if we're not dragging anything
 		if (draggedObject == null)
 			return;
@@ -256,7 +265,8 @@ public class MultiTouchController<T> {
 	}
 
 	/** The main single-touch and multi-touch logic */
-	private void multiTouchController() {
+	private void multiTouchController()
+	{
 
 		switch (dragMode) {
 		case MODE_NOTHING:
@@ -363,7 +373,8 @@ public class MultiTouchController<T> {
 	 * A class that packages up all MotionEvent information with all derived
 	 * multitouch information (if available)
 	 */
-	public static class PointInfo {
+	public static class PointInfo
+	{
 		private float x, y, dx, dy, size, diameter, diameterSq, angle,
 				pressure, pressure2;
 
@@ -380,7 +391,8 @@ public class MultiTouchController<T> {
 
 		// --
 
-		public PointInfo(Resources res) {
+		public PointInfo(Resources res)
+		{
 			DisplayMetrics metrics = res.getDisplayMetrics();
 			this.displayWidth = metrics.widthPixels;
 			this.displayHeight = metrics.heightPixels;
@@ -388,12 +400,14 @@ public class MultiTouchController<T> {
 
 		// --
 
-		public PointInfo(PointInfo other) {
+		public PointInfo(PointInfo other)
+		{
 			this.set(other);
 		}
 
 		/** Copy all fields */
-		public void set(PointInfo other) {
+		public void set(PointInfo other)
+		{
 			this.displayWidth = other.displayWidth;
 			this.displayHeight = other.displayHeight;
 			this.x = other.x;
@@ -417,7 +431,8 @@ public class MultiTouchController<T> {
 
 		private void set(float x, float y, float pressure, int pointerCount,
 				float x2, float y2, float pressure2, int action, boolean down,
-				long eventTime) {
+				long eventTime)
+		{
 
 			// Log.i("Multitouch", "x: " + x + " y: " + y + " pointerCount: " +
 			// pointerCount +
@@ -450,7 +465,8 @@ public class MultiTouchController<T> {
 		}
 
 		// Fast integer sqrt, by Jim Ulery. Should be faster than Math.sqrt()
-		private int julery_isqrt(int val) {
+		private int julery_isqrt(int val)
+		{
 			int temp, g = 0, b = 0x8000, bshft = 15;
 			do {
 				if (val >= (temp = (((g << 1) + b) << bshft--))) {
@@ -465,7 +481,8 @@ public class MultiTouchController<T> {
 		 * Calculate the squared diameter of the multitouch event, and cache it.
 		 * Use this if you don't need to perform the sqrt.
 		 */
-		public float getMultiTouchDiameterSq() {
+		public float getMultiTouchDiameterSq()
+		{
 			if (!diameterSqIsCalculated) {
 				diameterSq = (isMultiTouch ? dx * dx + dy * dy : 0.0f);
 				diameterSqIsCalculated = true;
@@ -477,7 +494,8 @@ public class MultiTouchController<T> {
 		 * Calculate the diameter of the multitouch event, and cache it. Uses
 		 * fast int sqrt but gives accuracy to 1/16px.
 		 */
-		public float getMultiTouchDiameter() {
+		public float getMultiTouchDiameter()
+		{
 			if (!diameterIsCalculated) {
 				// Get 1/16 pixel's worth of subpixel accuracy, works on screens
 				// up to 2048x2048
@@ -504,7 +522,8 @@ public class MultiTouchController<T> {
 		 * between the two touchpoints, so range is [0,Math.PI/2]. Uses
 		 * Math.atan2().
 		 */
-		public float getMultiTouchAngle() {
+		public float getMultiTouchAngle()
+		{
 			if (!angleIsCalculated) {
 				angle = (float) Math.atan2(dy, dx);
 				angleIsCalculated = true;
@@ -512,43 +531,53 @@ public class MultiTouchController<T> {
 			return angle;
 		}
 
-		public float getX() {
+		public float getX()
+		{
 			return x;
 		}
 
-		public float getY() {
+		public float getY()
+		{
 			return y;
 		}
 
-		public float getMultiTouchWidth() {
+		public float getMultiTouchWidth()
+		{
 			return dx;
 		}
 
-		public float getMultiTouchHeight() {
+		public float getMultiTouchHeight()
+		{
 			return dy;
 		}
 
-		public float getPressure() {
+		public float getPressure()
+		{
 			return pressure;
 		}
 
-		public float getPressure2() {
+		public float getPressure2()
+		{
 			return pressure2;
 		}
 
-		public boolean isDown() {
+		public boolean isDown()
+		{
 			return down;
 		}
 
-		public int getAction() {
+		public int getAction()
+		{
 			return action;
 		}
 
-		public boolean isMultiTouch() {
+		public boolean isMultiTouch()
+		{
 			return isMultiTouch;
 		}
 
-		public long getEventTime() {
+		public long getEventTime()
+		{
 			return eventTime;
 		}
 	}
@@ -559,34 +588,41 @@ public class MultiTouchController<T> {
 	 * A class that is used to store scroll offsets and scale information for
 	 * objects that are managed by the multitouch controller
 	 */
-	public static class PositionAndScale {
+	public static class PositionAndScale
+	{
 		private float xOff, yOff, scale;
 
-		public PositionAndScale() {
+		public PositionAndScale()
+		{
 		}
 
-		public void set(float xOff, float yOff, float scale) {
+		public void set(float xOff, float yOff, float scale)
+		{
 			this.xOff = xOff;
 			this.yOff = yOff;
 			this.scale = scale;
 		}
 
-		public float getXOff() {
+		public float getXOff()
+		{
 			return xOff;
 		}
 
-		public float getYOff() {
+		public float getYOff()
+		{
 			return yOff;
 		}
 
-		public float getScale() {
+		public float getScale()
+		{
 			return scale;
 		}
 	}
 
 	// ------------------------------------------------------------------------------------
 
-	public static interface MultiTouchObjectCanvas<T> {
+	public static interface MultiTouchObjectCanvas<T>
+	{
 
 		/**
 		 * See if there is a draggable object at the current point. Returns the

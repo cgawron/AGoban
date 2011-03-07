@@ -41,13 +41,15 @@ import de.cgawron.go.sgf.Node;
 /**
  * Provides an sgf editor.
  */
-public class MoveTool extends Drawable implements GobanView.Tool {
+public class MoveTool extends Drawable implements GobanView.Tool
+{
 	private static final String TAG = "MoveTool";
 	private final EditSGF editor;
 	private final Drawable whiteCursor;
 	private final Drawable blackCursor;
 
-	public MoveTool(EditSGF editor) {
+	public MoveTool(EditSGF editor)
+	{
 		this.editor = editor;
 
 		Shape oval = new OvalShape();
@@ -60,12 +62,14 @@ public class MoveTool extends Drawable implements GobanView.Tool {
 		// whiteCursor = resources.getDrawable(R.drawable.white_stone_cursor);
 	}
 
-	public Drawable getCursor() {
+	public Drawable getCursor()
+	{
 		return this;
 	}
 
 	@Override
-	public void draw(Canvas canvas) {
+	public void draw(Canvas canvas)
+	{
 		Node currentNode = editor.getCurrentNode();
 		Drawable drawable;
 		if (currentNode != null) {
@@ -94,7 +98,8 @@ public class MoveTool extends Drawable implements GobanView.Tool {
 		canvas.restore();
 	}
 
-	public void onGobanEvent(GobanEvent gobanEvent) {
+	public void onGobanEvent(GobanEvent gobanEvent)
+	{
 		Node currentNode = editor.getCurrentNode();
 		Map<Point, Node> variations = editor.getVariations();
 
@@ -128,7 +133,8 @@ public class MoveTool extends Drawable implements GobanView.Tool {
 		}
 	}
 
-	private void move(Node parent, Point point, boolean replaceChild) {
+	private void move(Node parent, Point point, boolean replaceChild)
+	{
 		if (replaceChild) {
 			Log.i(TAG, "Removing old child node");
 			parent.getChildren().remove(0);
@@ -151,12 +157,14 @@ public class MoveTool extends Drawable implements GobanView.Tool {
 
 	boolean replace;
 
-	public boolean askReplaceMove(final Node currentNode, final Point point) {
+	public boolean askReplaceMove(final Node currentNode, final Point point)
+	{
 		Context context = editor;
 		Dialog dialog;
 		replace = true;
 		OnClickListener listener = new OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
+			public void onClick(DialogInterface dialog, int which)
+			{
 				if (which == DialogInterface.BUTTON_POSITIVE)
 					move(currentNode, point, false);
 				else
@@ -176,15 +184,18 @@ public class MoveTool extends Drawable implements GobanView.Tool {
 	}
 
 	@Override
-	public int getOpacity() {
+	public int getOpacity()
+	{
 		return 255;
 	}
 
 	@Override
-	public void setAlpha(int alpha) {
+	public void setAlpha(int alpha)
+	{
 	}
 
 	@Override
-	public void setColorFilter(ColorFilter cf) {
+	public void setColorFilter(ColorFilter cf)
+	{
 	}
 }

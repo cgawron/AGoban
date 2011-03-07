@@ -18,7 +18,8 @@
 
 package de.cgawron.go.sgf;
 
-public interface InputPosition {
+public interface InputPosition
+{
 	int getLine();
 
 	int getColumn();

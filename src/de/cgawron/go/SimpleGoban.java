@@ -27,7 +27,8 @@ import java.util.logging.Logger;
  * A simple implementation of a GobanModel, using a two-dimensional array to
  * represent the board. Creation date: (03/23/00 21:36:30)
  */
-public class SimpleGoban extends AbstractGoban implements Serializable {
+public class SimpleGoban extends AbstractGoban implements Serializable
+{
 	protected int size = 0;
 	protected BoardType[][] boardRep;
 	private int[][] tmpBoard;
@@ -45,12 +46,14 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 			.getLogger(SimpleGoban.class.getName());
 
 	/** Create a SimpleGoban with default board size of 19x19. */
-	public SimpleGoban() {
+	public SimpleGoban()
+	{
 		this(19);
 	}
 
 	/** Create a SimpleGoban with a given board size. */
-	public SimpleGoban(int size) {
+	public SimpleGoban(int size)
+	{
 		super();
 		numStones = 0;
 		setBoardSize((int) size);
@@ -62,7 +65,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 	 * @param m
 	 *            gawron.go.goban.Goban
 	 */
-	public SimpleGoban(Goban m) {
+	public SimpleGoban(Goban m)
+	{
 		super();
 		numStones = 0;
 		if (m != null)
@@ -72,7 +76,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 	}
 
 	/** addGobanListener method comment. */
-	public void addGobanListener(GobanListener l) {
+	public void addGobanListener(GobanListener l)
+	{
 		listeners.add(l);
 	}
 
@@ -82,7 +87,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 	 * @param m
 	 *            gawron.go.goban.Goban
 	 */
-	public void copy(Goban m) {
+	public void copy(Goban m)
+	{
 		int i;
 		int j;
 		if (m instanceof SimpleGoban) {
@@ -108,7 +114,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 		fireModelChanged();
 	}
 
-	public void clear() {
+	public void clear()
+	{
 		int i;
 		int j;
 		for (i = 0; i < size; i++)
@@ -125,7 +132,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 	 * @param p
 	 *            goban.Point
 	 */
-	public int countLiberties(Point p) {
+	public int countLiberties(Point p)
+	{
 		tmpBoard[p.getX()][p.getY()] = visited;
 		int liberties = (int) 0;
 
@@ -153,7 +161,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 	 * @param c
 	 *            goban.BoardType
 	 */
-	protected void fireStonesRemoved(Vector<Point> removed) {
+	protected void fireStonesRemoved(Vector<Point> removed)
+	{
 		// Guaranteed to return a non-null array
 		GobanEvent e = null;
 		// Process the listeners last to first, notifying
@@ -171,12 +180,14 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 	 * 
 	 * @return int
 	 */
-	public int getBlackCaptured() {
+	public int getBlackCaptured()
+	{
 		return blackCaptured;
 	}
 
 	/** getStone method comment. */
-	public BoardType getStone(Point p) {
+	public BoardType getStone(Point p)
+	{
 		return boardRep[p.getX()][p.getY()];
 	}
 
@@ -185,16 +196,19 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 	 * 
 	 * @return int
 	 */
-	public int getWhiteCaptured() {
+	public int getWhiteCaptured()
+	{
 		return whiteCaptured;
 	}
 
 	/** move method comment. */
-	public void move(Point p, BoardType color) {
+	public void move(Point p, BoardType color)
+	{
 		move(p.getX(), p.getY(), color);
 	}
 
-	public void move(Point p, BoardType color, int moveNo) {
+	public void move(Point p, BoardType color, int moveNo)
+	{
 		move(p.getX(), p.getY(), color, moveNo);
 	}
 
@@ -203,7 +217,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 	 * 
 	 * @return int
 	 */
-	public int removeChain(Point p, Vector<Point> removed) {
+	public int removeChain(Point p, Vector<Point> removed)
+	{
 		removed.addElement(p);
 		BoardType c = getStone(p);
 		setStone(p, BoardType.EMPTY);
@@ -225,7 +240,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 	}
 
 	/** addGobanListener method comment. */
-	public void removeGobanListener(GobanListener l) {
+	public void removeGobanListener(GobanListener l)
+	{
 		listeners.remove(l);
 	}
 
@@ -235,7 +251,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 	 * @param newBlackCaptured
 	 *            int
 	 */
-	protected void setBlackCaptured(int newBlackCaptured) {
+	protected void setBlackCaptured(int newBlackCaptured)
+	{
 		blackCaptured = newBlackCaptured;
 	}
 
@@ -245,11 +262,13 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 	 * @param newWhiteCaptured
 	 *            int
 	 */
-	protected void setWhiteCaptured(int newWhiteCaptured) {
+	protected void setWhiteCaptured(int newWhiteCaptured)
+	{
 		whiteCaptured = newWhiteCaptured;
 	}
 
-	public String toString() {
+	public String toString()
+	{
 		StringBuffer s = new StringBuffer(512);
 		int i, j;
 		BoardType p;
@@ -278,7 +297,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 	 * @param c
 	 *            goban.BoardType
 	 */
-	protected void fireStoneAdded(int x, int y, BoardType c) {
+	protected void fireStoneAdded(int x, int y, BoardType c)
+	{
 		GobanEvent e = null;
 		// Process the listeners last to first, notifying
 		// those that are interested in this event
@@ -302,7 +322,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 	 * @param c
 	 *            goban.BoardType
 	 */
-	protected void fireModelChanged() {
+	protected void fireModelChanged()
+	{
 		GobanEvent e = null;
 		// Process the listeners last to first, notifying
 		// those that are interested in this event
@@ -317,21 +338,25 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 	}
 
 	/** getBoardSize method comment. */
-	final public int getBoardSize() {
+	final public int getBoardSize()
+	{
 		return size;
 	}
 
 	/** getStone method comment. */
-	public final BoardType getStone(int x, int y) {
+	public final BoardType getStone(int x, int y)
+	{
 		return boardRep[x][y];
 	}
 
 	/** move method comment. */
-	public void move(int x, int y, BoardType color, int moveNo) {
+	public void move(int x, int y, BoardType color, int moveNo)
+	{
 		move(x, y, color);
 	}
 
-	public void move(int x, int y, BoardType color) {
+	public void move(int x, int y, BoardType color)
+	{
 		if (x < 0 || y < 0 || x >= getBoardSize() || y >= getBoardSize())
 			return;
 
@@ -363,23 +388,27 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 		fireStoneAdded(x, y, color);
 	}
 
-	public Point getLastMove() {
+	public Point getLastMove()
+	{
 		return lastMove;
 	}
 
 	/** putStone method comment. */
-	public void putStone(int x, int y, BoardType color) {
+	public void putStone(int x, int y, BoardType color)
+	{
 		setStone(x, y, color);
 		fireStoneAdded(x, y, color);
 	}
 
 	/** putStone method comment. */
-	public void putStone(Point p, BoardType color) {
+	public void putStone(Point p, BoardType color)
+	{
 		putStone(p.getX(), p.getY(), color);
 	}
 
 	/** setBoardSize method comment. */
-	public void setBoardSize(int s) {
+	public void setBoardSize(int s)
+	{
 		if (size != s) {
 			if (logger.isLoggable(Level.FINE))
 				logger.fine("setBoardSize: " + s);
@@ -402,7 +431,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 	}
 
 	/** setBoardSize method comment. */
-	protected void setBoardSizeNoInit(int s) {
+	protected void setBoardSizeNoInit(int s)
+	{
 		if (size != s) {
 			if (logger.isLoggable(Level.FINE))
 				logger.fine("setBoardSize: " + s);
@@ -428,7 +458,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 	 * @param c
 	 *            goban.BoardType
 	 */
-	protected void setStone(Point p, BoardType c) {
+	protected void setStone(Point p, BoardType c)
+	{
 		setStone(p.getX(), p.getY(), c);
 	}
 
@@ -442,7 +473,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 	 * @param c
 	 *            goban.BoardType
 	 */
-	protected void setStone(int x, int y, BoardType c) {
+	protected void setStone(int x, int y, BoardType c)
+	{
 		BoardType oc = boardRep[x][y];
 		if (oc != c) {
 			boardRep[x][y] = c;
@@ -473,7 +505,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 		}
 	}
 
-	public int _hash(Symmetry s) {
+	public int _hash(Symmetry s)
+	{
 		// int h = (_hash[s.toInt()] & 0x01ffffff) | ((numStones & 0xfe) <<
 		// (32-7));
 		// assert h == __hash(s) : "hashes differ: " + this + ": " + numStones +
@@ -482,7 +515,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 		return __hash(s);
 	}
 
-	public int __hash(Symmetry s) {
+	public int __hash(Symmetry s)
+	{
 		Point.BoardIterator it = new Point.BoardIterator(size);
 		int h = 0;
 		int n = 0;
@@ -507,7 +541,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 		return h;
 	}
 
-	public int hashCode() {
+	public int hashCode()
+	{
 		Symmetry.Iterator it = new Symmetry.Iterator();
 		int h = 0;
 
@@ -522,11 +557,13 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 		return h;
 	}
 
-	public int zobristHash() {
+	public int zobristHash()
+	{
 		return hashCode();
 	}
 
-	public boolean equals(Object o, Symmetry s) {
+	public boolean equals(Object o, Symmetry s)
+	{
 		if (o instanceof Goban) {
 			Goban goban = (Goban) o;
 			Point.BoardIterator it = new Point.BoardIterator(size);
@@ -543,7 +580,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 		return false;
 	}
 
-	public boolean equals(Object o) {
+	public boolean equals(Object o)
+	{
 		if (o == this)
 			return true;
 		else if (o instanceof SimpleGoban) {
@@ -572,7 +610,8 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 		return false;
 	}
 
-	public Goban transform(Symmetry s) {
+	public Goban transform(Symmetry s)
+	{
 		int size = getBoardSize();
 		Goban m = newInstance();
 
@@ -589,13 +628,15 @@ public class SimpleGoban extends AbstractGoban implements Serializable {
 		return m;
 	}
 
-	public Goban clone() throws CloneNotSupportedException {
+	public Goban clone() throws CloneNotSupportedException
+	{
 		Goban model = new SimpleGoban();
 		model.copy(this);
 		return model;
 	}
 
-	public Goban newInstance() {
+	public Goban newInstance()
+	{
 		return new SimpleGoban(getBoardSize());
 	}
 }

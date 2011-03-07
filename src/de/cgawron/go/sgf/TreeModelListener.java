@@ -36,7 +36,8 @@ import java.util.EventListener;
  * @author Rob Davis
  * @author Ray Ryan
  */
-public interface TreeModelListener extends EventListener {
+public interface TreeModelListener extends EventListener
+{
 
 	/**
 	 * <p>

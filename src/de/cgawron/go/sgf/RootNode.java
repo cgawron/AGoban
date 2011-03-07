@@ -33,14 +33,17 @@ import de.cgawron.go.Point;
  * 
  * @author Christian Gawron
  */
-public class RootNode extends Node implements PropertyChangeListener {
+public class RootNode extends Node implements PropertyChangeListener
+{
 	private static Logger logger = Logger.getLogger(RootNode.class.getName());
 
-	RootNode(GameTree gameTree) {
+	RootNode(GameTree gameTree)
+	{
 		super(gameTree);
 	}
 
-	protected RootNode(Node n /* , GameTree gameTree */) {
+	protected RootNode(Node n /* , GameTree gameTree */)
+	{
 		super(n);
 		Iterator it = n.getChildren().iterator();
 		while (it.hasNext())
@@ -55,7 +58,8 @@ public class RootNode extends Node implements PropertyChangeListener {
 	 * @param e
 	 *            Describes the change.
 	 */
-	public void propertyChange(PropertyChangeEvent e) {
+	public void propertyChange(PropertyChangeEvent e)
+	{
 		Object name = e.getPropertyName();
 		if (logger.isLoggable(Level.FINE))
 			logger.fine("property changed: "
@@ -74,7 +78,8 @@ public class RootNode extends Node implements PropertyChangeListener {
 	 * 
 	 * @return true if this tree represents a game
 	 */
-	public boolean isGame() {
+	public boolean isGame()
+	{
 		Node node = this;
 		while (!node.isBoardSetup() && !node.isMove()) {
 			if (node.getChildCount() == 0)
@@ -116,7 +121,8 @@ public class RootNode extends Node implements PropertyChangeListener {
 	 * 
 	 * @return game id
 	 */
-	public String getSignature() {
+	public String getSignature()
+	{
 		Node node = this;
 		while (!node.isBoardSetup() && !node.isMove()) {
 			if (node.getChildCount() == 0)

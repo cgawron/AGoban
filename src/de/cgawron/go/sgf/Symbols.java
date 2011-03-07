@@ -6,7 +6,8 @@
 package de.cgawron.go.sgf;
 
 /** CUP generated interface containing symbol constants. */
-public interface Symbols {
+public interface Symbols
+{
 	/* terminals */
 	public static final int Open = 2;
 	public static final int Value = 6;

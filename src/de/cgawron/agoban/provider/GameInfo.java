@@ -42,7 +42,8 @@ import de.cgawron.go.sgf.Property.Key;
  * 
  * @author Christian Gawron
  */
-public class GameInfo {
+public class GameInfo
+{
 	@Retention(value = RUNTIME)
 	@Target(value = ElementType.FIELD)
 	public @interface Column {
@@ -83,9 +84,8 @@ public class GameInfo {
 	String KEY_BLACK_RANK = "BR";
 
 	private static Key[] sgfKeys;
-	private static String[] displayColumns = { KEY_ID, 
-											   KEY_FILENAME,
-											   KEY_LOCAL_MODIFIED_DATE };
+	private static String[] displayColumns = { KEY_ID, KEY_FILENAME,
+			KEY_LOCAL_MODIFIED_DATE };
 	private File file;
 	private ContentValues values;
 
@@ -95,7 +95,8 @@ public class GameInfo {
 	 * @todo This should be optimized - it's not necessary to create the whole
 	 *       GameTree structure to build the GameInfo.
 	 */
-	public GameInfo(File file) throws Exception {
+	public GameInfo(File file) throws Exception
+	{
 		this.file = file;
 		GameTree gameTree = null;
 		// The cup parser (or my code around it?) seems to have a multithreading
@@ -112,13 +113,13 @@ public class GameInfo {
 	 * @todo This should be optimized - it's not necessary to create the whole
 	 *       GameTree structure to build the GameInfo.
 	 */
-	public GameInfo(File file, Cursor cursor) throws Exception 
+	public GameInfo(File file, Cursor cursor) throws Exception
 	{
 		this.file = file;
 		init(cursor);
 	}
 
-	private void init(Cursor cursor) 
+	private void init(Cursor cursor)
 	{
 		if (sgfKeys == null)
 			initSGFKeys();
@@ -130,7 +131,7 @@ public class GameInfo {
 		}
 	}
 
-	private void init(GameTree gameTree) 
+	private void init(GameTree gameTree)
 	{
 		if (sgfKeys == null)
 			initSGFKeys();
@@ -147,7 +148,7 @@ public class GameInfo {
 		}
 	}
 
-	private void initSGFKeys() 
+	private void initSGFKeys()
 	{
 		ArrayList<Key> keys = new ArrayList<Key>();
 		Field[] fields = GameInfo.class.getFields();
@@ -163,11 +164,13 @@ public class GameInfo {
 		sgfKeys = keys.toArray(new Key[0]);
 	}
 
-	public ContentValues getContentValues() {
+	public ContentValues getContentValues()
+	{
 		return values;
 	}
 
-	public File getFile() {
+	public File getFile()
+	{
 		return file;
 	}
 }

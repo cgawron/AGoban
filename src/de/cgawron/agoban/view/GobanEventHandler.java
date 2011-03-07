@@ -28,19 +28,22 @@ import de.cgawron.agoban.GobanEvent;
 import demo.MultiTouchController;
 
 public class GobanEventHandler extends MultiTouchController<Object> implements
-		View.OnLongClickListener, View.OnTouchListener {
+		View.OnLongClickListener, View.OnTouchListener
+{
 	private static int MIN_STILL_TIME = 10;
 
 	private GobanView gobanView;
 	private long time;
 	private boolean armed;
 
-	public GobanEventHandler(GobanView gobanView, Resources res) {
+	public GobanEventHandler(GobanView gobanView, Resources res)
+	{
 		super(gobanView, res, false);
 		this.gobanView = gobanView;
 	}
 
-	public boolean onTouch(View view, MotionEvent event) {
+	public boolean onTouch(View view, MotionEvent event)
+	{
 		if (!super.onTouchEvent(event)) {
 			Log.d("GobanEventHandler",
 					String.format("onTouchEvent: %s %d", event,
@@ -76,7 +79,8 @@ public class GobanEventHandler extends MultiTouchController<Object> implements
 			return true;
 	}
 
-	public boolean onTrackballEvent(MotionEvent event) {
+	public boolean onTrackballEvent(MotionEvent event)
+	{
 		Log.d("GobanEventHandler", "onTrackballEvent: " + event);
 		PointF pF = gobanView.getCursorPosition();
 		Point p;
@@ -123,7 +127,8 @@ public class GobanEventHandler extends MultiTouchController<Object> implements
 		return true;
 	}
 
-	public boolean onLongClick(View view) {
+	public boolean onLongClick(View view)
+	{
 		Log.d("GobanEventHandler", "onLongClick");
 		armed = false;
 		boolean shown = gobanView.showContextMenu();

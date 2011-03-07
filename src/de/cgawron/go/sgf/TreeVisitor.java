@@ -23,14 +23,16 @@ import java.util.Iterator;
 /**
  * Visits all nodes of a TreeModel.
  */
-public abstract class TreeVisitor<T extends TreeModel, N extends TreeNode> {
+public abstract class TreeVisitor<T extends TreeModel, N extends TreeNode>
+{
 	protected T model = null;
 	protected Iterator<N> iterator = null;
 
 	/**
 	 * This default constructor does not set a TreeModel.
 	 */
-	public TreeVisitor() {
+	public TreeVisitor()
+	{
 	}
 
 	/**
@@ -39,7 +41,8 @@ public abstract class TreeVisitor<T extends TreeModel, N extends TreeNode> {
 	 * @param model
 	 *            - the TreeModel to visit
 	 */
-	public TreeVisitor(T model) {
+	public TreeVisitor(T model)
+	{
 		setModel(model);
 	}
 
@@ -52,7 +55,8 @@ public abstract class TreeVisitor<T extends TreeModel, N extends TreeNode> {
 	 * @param subRoot
 	 *            - root node of the subtree to visit
 	 */
-	public TreeVisitor(T model, N subRoot) {
+	public TreeVisitor(T model, N subRoot)
+	{
 		this.model = model;
 		iterator = new TreeIterator.BreadthFirstIterator<N>(subRoot);
 	}
@@ -64,12 +68,14 @@ public abstract class TreeVisitor<T extends TreeModel, N extends TreeNode> {
 	 * @param model
 	 *            the new TreeModel
 	 */
-	public void setModel(T model) {
+	public void setModel(T model)
+	{
 		this.model = model;
 		iterator = getIterator();
 	}
 
-	protected TreeIterator<N> getIterator() {
+	protected TreeIterator<N> getIterator()
+	{
 		return new TreeIterator.PreorderIterator<N>((N) model.getRoot());
 	}
 
@@ -81,13 +87,15 @@ public abstract class TreeVisitor<T extends TreeModel, N extends TreeNode> {
 	 */
 	protected abstract void visitNode(N o) throws Exception;
 
-	protected void initialize() {
+	protected void initialize()
+	{
 	}
 
 	/**
 	 * Visit the nodes of the {@link #model}.
 	 */
-	public void visit() {
+	public void visit()
+	{
 		initialize();
 		while (iterator.hasNext()) {
 			try {

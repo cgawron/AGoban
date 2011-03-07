@@ -21,12 +21,15 @@ package de.cgawron.go.sgf;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public class Variations extends LinkedList {
-	public Variations() {
+public class Variations extends LinkedList
+{
+	public Variations()
+	{
 		super();
 	}
 
-	public String toString() {
+	public String toString()
+	{
 		String s = "\nVariations (" + size() + " ):\n";
 		Iterator i = iterator();
 		while (i.hasNext()) {

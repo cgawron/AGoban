@@ -33,24 +33,28 @@ import de.cgawron.go.Point;
 import de.cgawron.agoban.R;
 import de.cgawron.agoban.view.GobanView;
 
-public class GobanEvent {
+public class GobanEvent
+{
 	private GobanView gobanView;
 	private PointF pointF;
 	private Point point;
 	private MotionEvent motionEvent;
 
-	public GobanEvent(GobanView gobanView, MotionEvent motionEvent) {
+	public GobanEvent(GobanView gobanView, MotionEvent motionEvent)
+	{
 		this.gobanView = gobanView;
 		this.motionEvent = motionEvent;
 		initialize(motionEvent);
 	}
 
-	public GobanEvent(GobanView gobanView, Point point) {
+	public GobanEvent(GobanView gobanView, Point point)
+	{
 		this.gobanView = gobanView;
 		initialize(point);
 	}
 
-	public void initialize(MotionEvent motionEvent) {
+	public void initialize(MotionEvent motionEvent)
+	{
 		int width = gobanView.getWidth();
 		int height = gobanView.getHeight();
 		float size = gobanView.getBoardSize();
@@ -67,25 +71,30 @@ public class GobanEvent {
 		Log.d("GobanEvent", String.format("initialize: (%f, %f)", bx, by));
 	}
 
-	public void initialize(Point point) {
+	public void initialize(Point point)
+	{
 		this.point = point;
 		Log.d("GobanEvent", String.format("initialize: (%s)", point));
 	}
 
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		return "GobanEvent p=" + point;
 	}
 
-	public MotionEvent getBaseEvent() {
+	public MotionEvent getBaseEvent()
+	{
 		return motionEvent;
 	}
 
-	public Point getPoint() {
+	public Point getPoint()
+	{
 		return point;
 	}
 
-	public PointF getPointF() {
+	public PointF getPointF()
+	{
 		return pointF;
 	}
 }

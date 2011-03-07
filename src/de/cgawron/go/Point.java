@@ -17,7 +17,8 @@ package de.cgawron.go;
  * 
  * @author Christian Gawron
  */
-public class Point implements Comparable<Point> {
+public class Point implements Comparable<Point>
+{
 	/** The x coordinate of the point. */
 	protected short x;
 
@@ -28,7 +29,8 @@ public class Point implements Comparable<Point> {
 	 * Default constructor. The constructed point is initialized with 0 as x and
 	 * y coordinates.
 	 */
-	protected Point() {
+	protected Point()
+	{
 		x = 0;
 		y = 0;
 	}
@@ -39,7 +41,8 @@ public class Point implements Comparable<Point> {
 	 * @param s
 	 *            - the String representing the Point.
 	 */
-	public Point(String s) {
+	public Point(String s)
+	{
 		x = (short) (s.charAt(0) - 'a');
 		y = (short) (s.charAt(1) - 'a');
 	}
@@ -50,7 +53,8 @@ public class Point implements Comparable<Point> {
 	 * @param p
 	 *            - the Point to copy.
 	 */
-	public Point(Point p) {
+	public Point(Point p)
+	{
 		x = p.x;
 		y = p.y;
 	}
@@ -63,7 +67,8 @@ public class Point implements Comparable<Point> {
 	 * @param y
 	 *            - the y coordinate
 	 */
-	public Point(int x, int y) {
+	public Point(int x, int y)
+	{
 		this.x = (short) x;
 		this.y = (short) y;
 	}
@@ -76,7 +81,8 @@ public class Point implements Comparable<Point> {
 	 * @param _y
 	 *            - the y coordinate
 	 */
-	public Point(short _x, short _y) {
+	public Point(short _x, short _y)
+	{
 		super();
 		x = _x;
 		y = _y;
@@ -93,7 +99,8 @@ public class Point implements Comparable<Point> {
 	 * @return -1 if o is smaller (i.e. left or below) this point, 0 if o and
 	 *         this point are equal and +1 if o is bigger.
 	 */
-	public int compareTo(Point p) throws ClassCastException {
+	public int compareTo(Point p) throws ClassCastException
+	{
 		if (p.x > x)
 			return -1;
 		else if (p.x < x)
@@ -114,7 +121,8 @@ public class Point implements Comparable<Point> {
 	 * @return true if o represents the same point on a goban.
 	 */
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(Object o)
+	{
 		if (!(o instanceof Point))
 			return false;
 		else {
@@ -132,12 +140,14 @@ public class Point implements Comparable<Point> {
 	 *            - the y coordinate
 	 * @return true if (x, y) represents the same point on a goban.
 	 */
-	public boolean equals(int x, int y) {
+	public boolean equals(int x, int y)
+	{
 		return (x == this.x) && (y == this.y);
 	}
 
 	@Override
-	public int hashCode() {
+	public int hashCode()
+	{
 		return 19 * x + y;
 	}
 
@@ -153,7 +163,8 @@ public class Point implements Comparable<Point> {
 	 * 
 	 * @return a String containing the SGF representation of this point.
 	 */
-	public java.lang.String sgfString() {
+	public java.lang.String sgfString()
+	{
 		StringBuffer sgf = new StringBuffer(2);
 		sgf.append((char) ('a' + x)).append((char) ('a' + y));
 		return sgf.toString();
@@ -165,7 +176,8 @@ public class Point implements Comparable<Point> {
 	 * @return a string representation of this point.
 	 */
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		return "[" + x + ", " + y + "]";
 	}
 
@@ -174,7 +186,8 @@ public class Point implements Comparable<Point> {
 	 * 
 	 * @return the x coordinate.
 	 */
-	public final short getX() {
+	public final short getX()
+	{
 		return x;
 	}
 
@@ -183,7 +196,8 @@ public class Point implements Comparable<Point> {
 	 * 
 	 * @return the y coordinate.
 	 */
-	public final short getY() {
+	public final short getY()
+	{
 		return y;
 	}
 
@@ -196,14 +210,16 @@ public class Point implements Comparable<Point> {
 	 *            - the point to append.
 	 * @return the StringBuffer b.
 	 */
-	public static StringBuffer append(StringBuffer b, Point p) {
+	public static StringBuffer append(StringBuffer b, Point p)
+	{
 		return b.append(p.x).append(' ').append(p.y);
 	}
 
 	/**
 	 * An Iterator traversing all points on a goban.
 	 */
-	public static class BoardIterator implements java.util.Iterator<Point> {
+	public static class BoardIterator implements java.util.Iterator<Point>
+	{
 		private final Point p = new Point();
 		private final int boardSize;
 
@@ -213,18 +229,21 @@ public class Point implements Comparable<Point> {
 		 * @param boardSize
 		 *            - the size of the board.
 		 */
-		public BoardIterator(int boardSize) {
+		public BoardIterator(int boardSize)
+		{
 			this.boardSize = boardSize;
 			p.x = -1;
 			p.y = 0;
 		}
 
-		public boolean hasNext() {
+		public boolean hasNext()
+		{
 			return (p.y < boardSize - 1)
 					|| (p.y == boardSize - 1 && p.x < boardSize - 1);
 		}
 
-		public Point next() {
+		public Point next()
+		{
 			p.x++;
 			if (p.x == boardSize) {
 				p.x = 0;
@@ -234,7 +253,8 @@ public class Point implements Comparable<Point> {
 			return p;
 		}
 
-		public void remove() {
+		public void remove()
+		{
 			throw new UnsupportedOperationException("remove not supported");
 		}
 

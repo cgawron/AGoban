@@ -1,6 +1,6 @@
 /*
  *
- * $Id$
+ * $Id: GobanModelListener.java 15 2003-03-15 23:25:52Z cgawron $
  *
  * (c) 2001 Christian Gawron. All rights reserved.
  *
@@ -19,7 +19,8 @@ import java.util.EventListener;
  * A GobanListener gets informed when the model changes, i.e. when a stone is
  * added or removed.
  */
-public interface GobanListener extends EventListener {
+public interface GobanListener extends EventListener
+{
 	/**
 	 * Insert the method's description here. Creation date: (04/11/00 10:18:51)
 	 * 

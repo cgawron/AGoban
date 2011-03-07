@@ -53,7 +53,8 @@ import java.util.UUID;
  * Application class for EditSGF. Used to hold instances of @class{GameTree} and
  * to pass them between activities.
  */
-public class SGFApplication extends Application {
+public class SGFApplication extends Application
+{
 	private static final String TAG = "SGFApplication";
 	public static final String PREF = "AGoban";
 	public static String KEY_DEFAULT = "default";
@@ -64,25 +65,30 @@ public class SGFApplication extends Application {
 	private Map<Uri, GameTree> gameMap = new WeakHashMap<Uri, GameTree>();
 	String gitId;
 
-	public interface ExceptionHandler {
+	public interface ExceptionHandler
+	{
 		public void handleException(String message, Throwable t);
 	}
 
-	public static class EditPreferences extends PreferenceActivity {
+	public static class EditPreferences extends PreferenceActivity
+	{
 		@Override
-		protected void onCreate(Bundle savedInstanceState) {
+		protected void onCreate(Bundle savedInstanceState)
+		{
 			super.onCreate(savedInstanceState);
 			getPreferenceManager().setSharedPreferencesName(PREF);
 			addPreferencesFromResource(R.xml.prefs);
 		}
 	}
 
-	public SGFApplication() {
+	public SGFApplication()
+	{
 		super();
 	}
 
 	@Override
-	public void onCreate() {
+	public void onCreate()
+	{
 		super.onCreate();
 		try {
 			PackageItemInfo info = getPackageManager().getActivityInfo(
@@ -101,7 +107,8 @@ public class SGFApplication extends Application {
 	 * thread.
 	 */
 	public void loadSGF(Context context, final Runnable loadedCB,
-			final ExceptionHandler exceptionHandler) {
+			final ExceptionHandler exceptionHandler)
+	{
 		if (data != null) {
 			gameTree = gameMap.get(data);
 			if (gameTree == null) {
@@ -109,7 +116,8 @@ public class SGFApplication extends Application {
 						context, "", "Loading " + data, false, false);
 
 				final Handler handler = new Handler() {
-					public void handleMessage(Message msg) {
+					public void handleMessage(Message msg)
+					{
 						progressDialog.dismiss();
 						if (loadedCB != null)
 							loadedCB.run();
@@ -117,7 +125,8 @@ public class SGFApplication extends Application {
 				};
 
 				Runnable runnable = new Runnable() {
-					public void run() {
+					public void run()
+					{
 						try {
 							InputStream is = getContentResolver()
 									.openInputStream(data);
@@ -165,7 +174,8 @@ public class SGFApplication extends Application {
 	 * <li>FileFormat
 	 * </ul>
 	 */
-	public void initProperties(GameTree gameTree) {
+	public void initProperties(GameTree gameTree)
+	{
 		Log.d(TAG, "initProperties");
 		Node root = gameTree.getRoot();
 
@@ -182,37 +192,44 @@ public class SGFApplication extends Application {
 				String.format("%1$tY-%1$tm-%1$td", Calendar.getInstance()));
 	}
 
-	public GameTree getGameTree() {
+	public GameTree getGameTree()
+	{
 		return gameTree;
 	}
 
-	public void setGameTree(GameTree gameTree) {
+	public void setGameTree(GameTree gameTree)
+	{
 		this.gameTree = gameTree;
 		gameMap.put(data, gameTree);
 	}
 
-	public Uri getNewGameUri() {
+	public Uri getNewGameUri()
+	{
 		Uri uri = getContentResolver().insert(SGFProvider.CONTENT_URI, null);
 		Log.d(TAG, "getNewGameUri: uri=" + uri);
 		return uri;
 	}
 
-	public void setData(Uri data) {
+	public void setData(Uri data)
+	{
 		if (data == null) {
 			data = getNewGameUri();
 		}
 		this.data = data;
 	}
 
-	public Uri getData() {
+	public Uri getData()
+	{
 		return data;
 	}
 
-	public File getNewFile() {
+	public File getNewFile()
+	{
 		return getFileStreamPath(UUID.randomUUID().toString() + ".sgf");
 	}
 
-	public void save() {
+	public void save()
+	{
 		if (gameTree == null)
 			return;
 		if (false && !gameTree.isModified()) {
@@ -234,17 +251,20 @@ public class SGFApplication extends Application {
 		}
 	}
 
-	public void setReadOnly(boolean readOnly) {
+	public void setReadOnly(boolean readOnly)
+	{
 		this.readOnly = readOnly;
 	}
 
-	public boolean checkNotReadOnly(Context context) {
+	public boolean checkNotReadOnly(Context context)
+	{
 		if (!readOnly)
 			return true;
 		else {
 			Dialog dialog;
 			OnClickListener listener = new OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
+				public void onClick(DialogInterface dialog, int which)
+				{
 					if (which == DialogInterface.BUTTON_POSITIVE)
 						readOnly = false;
 					dialog.dismiss();
