@@ -44,8 +44,7 @@ public class SGFProvider extends ContentProvider
 {
 	private static String TAG = "SGFProvider";
 	final public static String AUTHORITY = "de.cgawron.agoban";
-	final public static Uri CONTENT_URI = new Uri.Builder().scheme("content")
-			.authority(AUTHORITY).build();
+	final public static Uri CONTENT_URI = new Uri.Builder().scheme("content").authority(AUTHORITY).build();
 	final public static String SGF_TYPE = "application/x-go-sgf";
 
 	public final static String QUERY_STRING = "_id=?";
@@ -54,8 +53,7 @@ public class SGFProvider extends ContentProvider
 	public final static File SGF_DIRECTORY;
 	static {
 		// TODO: Handle exceptions here
-		SGF_DIRECTORY = new File(Environment.getExternalStorageDirectory(),
-				"sgf");
+		SGF_DIRECTORY = new File(Environment.getExternalStorageDirectory(), "sgf");
 		if (!SGF_DIRECTORY.exists())
 			SGF_DIRECTORY.mkdir();
 	}
@@ -157,9 +155,8 @@ public class SGFProvider extends ContentProvider
 					cursor.moveToFirst();
 					Log.d(TAG, "getCount(): " + cursor.getCount());
 
-					if (cursor.getCount() > 0
-							&& cursor.getLong(cursor
-									.getColumnIndex(KEY_LOCAL_MODIFIED_DATE)) == lastModified) {
+					if (cursor.getCount() > 0 && 
+						cursor.getLong(cursor.getColumnIndex(KEY_LOCAL_MODIFIED_DATE)) == lastModified) {
 						Log.d(TAG, "found entry");
 					} else {
 						Log.d(TAG, "parsing " + file);
@@ -203,11 +200,11 @@ public class SGFProvider extends ContentProvider
 
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
-			String[] selectionArgs, String sortOrder)
+						String[] selectionArgs, String sortOrder)
 	{
 		Log.d(TAG, String.format("query(uri=%s, projection=%s, selection=%s)",
 				uri, projection, selection));
-		updateDatabase();
+		//updateDatabase();
 
 		String path = uri.getPath();
 		Log.d(TAG, String.format("path=%s", path));
@@ -232,16 +229,17 @@ public class SGFProvider extends ContentProvider
 		uri = new Uri.Builder().scheme("content")
 				.authority("de.cgawron.agoban").path(path).build();
 		Log.d(TAG, String.format("insert: returning %s", uri));
+		getContext().getContentResolver().notifyChange(uri, null);
 
 		return uri;
 	}
 
 	@Override
-	public int update(Uri uri, ContentValues values, String selection,
-			String[] selectionArgs)
+	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs)
 	{
 		Log.d(TAG, String.format("update(uri=%s, values=%s, selection=%s)",
 				uri, values, selection));
+		getContext().getContentResolver().notifyChange(uri, null);
 		return 0;
 	}
 

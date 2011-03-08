@@ -21,11 +21,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import android.database.Cursor;
 import android.util.Log;
@@ -68,22 +67,30 @@ public final class GoogleUtility
 	private static final int DIALOG_ACCOUNTS = 0;
 
 	private static HttpTransport transport;
-	private String authToken;
-	private String sgfFolder;
+	private static DateFormat utcFormatter = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+	static {
+		utcFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+	}
 
-	private static final String[] PROJECTION = new String[] { GameInfo.KEY_ID,
-			GameInfo.KEY_FILENAME, GameInfo.KEY_LOCAL_MODIFIED_DATE,
-			GameInfo.KEY_REMOTE_MODIFIED_DATE };
+	private static final String[] PROJECTION = new String[] { 
+		GameInfo.KEY_ID,
+		GameInfo.KEY_FILENAME, 
+		GameInfo.KEY_LOCAL_MODIFIED_DATE,
+		GameInfo.KEY_REMOTE_MODIFIED_DATE 
+	};
 
 	private static final XmlNamespaceDictionary DICTIONARY = new XmlNamespaceDictionary()
-			.set("", "http://www.w3.org/2005/Atom")
-			.set("app", "http://www.w3.org/2007/app")
-			.set("batch", "http://schemas.google.com/gdata/batch")
-			.set("docs", "http://schemas.google.com/docs/2007")
-			.set("gAcl", "http://schemas.google.com/acl/2007")
-			.set("gd", "http://schemas.google.com/g/2005")
-			.set("openSearch", "http://a9.com/-/spec/opensearch/1.1/")
-			.set("xml", "http://www.w3.org/XML/1998/namespace");
+		.set("", "http://www.w3.org/2005/Atom")
+		.set("app", "http://www.w3.org/2007/app")
+		.set("batch", "http://schemas.google.com/gdata/batch")
+		.set("docs", "http://schemas.google.com/docs/2007")
+		.set("gAcl", "http://schemas.google.com/acl/2007")
+		.set("gd", "http://schemas.google.com/g/2005")
+		.set("openSearch", "http://a9.com/-/spec/opensearch/1.1/")
+		.set("xml", "http://www.w3.org/XML/1998/namespace");
+
+	private String authToken;
+	private String sgfFolder;
 
 	public static class GDocFeed
 	{
@@ -159,7 +166,9 @@ public final class GoogleUtility
 		public InputStream getStream(String type) throws IOException
 		{
 			HttpRequest request = transport.buildGetRequest();
-			request.setUrl(getDownloadLink(type));
+			String url = getDownloadLink(type);
+			Log.d(TAG, "getStream: " + url);
+			request.setUrl(url);
 			return request.execute().getContent();
 		}
 	}
@@ -242,6 +251,7 @@ public final class GoogleUtility
 	{
 		@Key("updated-min")
 		String updatedMin;
+
 		@Key("max-results")
 		Integer maxResults;
 
@@ -284,21 +294,19 @@ public final class GoogleUtility
 		 */
 	}
 
-	private GenericUrl getDocUrl()
+	private GDocUrl getDocUrl()
 	{
-		GenericUrl url = new GenericUrl(
-				"https://docs.google.com/feeds/default/private/full");
+		GDocUrl url = new GDocUrl("https://docs.google.com/feeds/default/private/full");
 
 		return url;
 	}
 
-	private GenericUrl getFolderUrl()
+	private GDocUrl getFolderUrl()
 	{
-		// GenericUrl url = new GenericUrl(sgfFolder);
-		GenericUrl url = new GenericUrl(
-				"https://docs.google.com/feeds/default/private/full");
+		GDocUrl url = new GDocUrl("https://docs.google.com/feeds/default/private/full/");
 		url.appendRawPath("folder%3A0B2zBOoPdAGqnN2RiMzQ5YjQtMjE0ZS00OGIyLTg3ZjktZWZjMTgwNTk3NTQ2");
-		url.appendRawPath("contents");
+		//folder.0.0B2zBOoPdAGqnN2RiMzQ5YjQtMjE0ZS00OGIyLTg3ZjktZWZjMTgwNTk3NTQ2
+		url.appendRawPath("/contents");
 
 		return url;
 	}
@@ -326,170 +334,19 @@ public final class GoogleUtility
 
 	public List<GDocEntry> getDocumentList(Date updateMin) throws IOException
 	{
-		String query = null;
-		String date = "<null>";
-		if (updateMin != null) {
-			DateFormat df = new java.text.SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-			date = df.format(updateMin);
-			// query = "?updated-min=" + date;
-		}
-		Log.d(TAG, String.format("getDocumentList(%s)", date));
 		List<GDocEntry> entries;
+		GDocUrl url = getFolderUrl();
 		HttpRequest request = transport.buildGetRequest();
-		request.url = getFolderUrl();
+		if (updateMin != null) {
+		    url.updatedMin = utcFormatter.format(updateMin);
+		}
+		request.url = url;
+		Log.d(TAG, "retrieving " + url);
 
-		Log.d(TAG, "url: " + request.url);
-		Log.d(TAG, "headers: " + request.headers);
 		HttpResponse response = request.execute();
 		GDocFeed feed = response.parseAs(GDocFeed.class);
-		Log.d(TAG, String.format("feed: totalresults=%d", feed.totalResults));
-		Log.d(TAG, String.format("feed: %s", feed));
 		entries = feed.entries;
 		return entries;
 	}
 
-	/*
-	 * public InputStream retrieve(GDocEntry entry) { Log.d(TAG, "retrieving " +
-	 * entry.title);
-	 * 
-	 * try { InputStream is = entry.getStream(); File file = new
-	 * File(SGFProvider.getSGFDirectory(), entry.title); OutputStream os = new
-	 * FileOutputStream(file); Log.d(TAG, "saving " + entry.title + " to " +
-	 * file); byte buf[] = new byte[1024]; int count; while ((count =
-	 * is.read(buf)) > 0) os.write(buf, 0, count); os.close(); is.close();
-	 * Log.d(TAG, "succesfully saved " + entry.title); //
-	 * SGFProvider.doUpdateDatabase(); } catch (IOException ex) { Log.e(TAG,
-	 * "retrieveDocuments: caught " + ex); } }
-	 */
-
-	/*
-	 * public void sync() { Log.d(TAG, "authenticated");
-	 * 
-	 * Map<String, GDocEntry> docMap = retrieveDocuments();
-	 * sendDocuments(docMap); }
-	 * 
-	 * public Map<String, GDocEntry> retrieveDocuments() { Map<String,
-	 * GDocEntry> docMap = new HashMap<String, GDocEntry>(); ContentResolver
-	 * resolver = getContentResolver(); List<GDocEntry> entries =
-	 * getDocumentList(); for (GDocEntry entry : entries) { String parent =
-	 * null; String parentFolder = null; for (Link link : entry.links) { if
-	 * (link.rel.equals(LINK_PARENT)) { parent = link.title; parentFolder =
-	 * link.href; Log.d(TAG, "parent: " + parent); } } if (parent == null ||
-	 * !parent.equals(FOLDER_SGF)) continue; sgfFolder = parentFolder;
-	 * 
-	 * Log.d(TAG, "doc: '" + entry.title + "'"); Log.d(TAG, "content: " +
-	 * entry.content); for (Category category : entry.categories) { Log.d(TAG,
-	 * "category: " + category); }
-	 * 
-	 * Log.d(TAG, String.format("file %s updated on %s", entry.title,
-	 * entry.getUpdated().toString())); docMap.put(entry.title, entry); Cursor
-	 * cursor = resolver.query(SGFProvider.CONTENT_URI, PROJECTION,
-	 * String.format("%s = '%s'", GameInfo.KEY_ID, entry.title), null, null);
-	 * 
-	 * if (cursor.getCount() > 0) { cursor.moveToFirst(); Date localModification
-	 * = new Date(cursor.getLong(1)); Date remoteModification =
-	 * entry.getUpdated(); Log.d(TAG, "local  modification: " +
-	 * localModification); Log.d(TAG, "remote modification: " +
-	 * remoteModification);
-	 * 
-	 * if (localModification.before(remoteModification)) { retrieve(entry,
-	 * false); } else { Log.d(TAG, "not retrieving " + entry.title); } } else {
-	 * Log.d(TAG, entry.title + " not found locally"); retrieve(entry, true); }
-	 * cursor.close(); } return docMap; }
-	 * 
-	 * 
-	 * private void sendDocuments(Map<String, GDocEntry> docMap) { // Perform a
-	 * managed query. The Activity will handle closing and // requerying the
-	 * cursor // when needed. setLogging(true); Cursor cursor =
-	 * managedQuery(SGFProvider.CONTENT_URI, PROJECTION, null, null, null);
-	 * 
-	 * while (cursor.moveToNext()) { String title = cursor.getString(1); Date
-	 * localModification = new Date(cursor.getLong(2)); Log.d(TAG,
-	 * "sendDocuments: '" + title + "'"); Log.d(TAG, "local date: " +
-	 * localModification);
-	 * 
-	 * GDocEntry entry = docMap.get(title); SendData data = new
-	 * SendData(cursor); Date newModification = null; if (entry == null) {
-	 * newModification = createGoogleDoc(getFolderUrl(), data); } else if
-	 * (entry.getUpdated().before(localModification)) { newModification =
-	 * updateGoogleDoc(entry.getUpdateUrl(), entry.etag, data); } if
-	 * (newModification != null) { updateModificationDate(title,
-	 * newModification); } } cursor.close(); Log.d(TAG, "sendDocuments - end");
-	 * }
-	 * 
-	 * private Date createGoogleDoc(GenericUrl targetUrl, SendData sendData) {
-	 * Date newModification = null; Log.d(TAG, "createGoogleDoc: url=" +
-	 * targetUrl + ", data=" + sendData); InputStreamContent content = new
-	 * InputStreamContent(); AtomContent atom = new AtomContent(); GDocEntry
-	 * entry = new GDocEntry(); atom.namespaceDictionary = DICTIONARY;
-	 * atom.entry = entry; entry.categories = new ArrayList<Category>();
-	 * Category category = new Category(CATEGORY_KIND, CATEGORY_DOCUMENT,
-	 * "document"); entry.categories.add(category); entry.convert = false;
-	 * Log.d(TAG, "category: " + category);
-	 * 
-	 * try { HttpRequest request = transport.buildPostRequest(); request.url =
-	 * targetUrl; ((GoogleHeaders) request.headers)
-	 * .setSlugFromFileName(sendData.fileName); MultipartRelatedContent
-	 * mpContent = MultipartRelatedContent .forRequest(request);
-	 * content.inputStream = sendData.getInputStream(); content.type =
-	 * "text/plain"; // content.length = sendData.contentLength;
-	 * mpContent.parts.add(content); mpContent.parts.add(atom); request.content
-	 * = mpContent;
-	 * 
-	 * Log.d(TAG, "content: " + content); Log.d(TAG, "request: " + request);
-	 * HttpResponse response = request.execute(); Log.d(TAG, "status was " +
-	 * response.statusMessage); entry = response.parseAs(GDocEntry.class);
-	 * Log.d(TAG, "new entry: " + entry); newModification = entry.getUpdated();
-	 * Log.d(TAG, "newModification: " + newModification); } catch (Exception e)
-	 * { Log.e(TAG, "exception in createDoc: " + e); e.printStackTrace(); }
-	 * finally { try { content.inputStream.close(); } catch (Exception e) {
-	 * Log.e(TAG, "exception in createDoc: " + e); } } return newModification; }
-	 * 
-	 * private Date updateGoogleDoc(GenericUrl targetUrl, String etag, SendData
-	 * sendData) { Date newModification = null; Log.d(TAG,
-	 * "updateGoogleDoc: url=" + targetUrl + ", etag=" + etag + ", data=" +
-	 * sendData); InputStreamContent content = new InputStreamContent();
-	 * AtomContent atom = new AtomContent(); GDocEntry entry = new GDocEntry();
-	 * atom.namespaceDictionary = DICTIONARY; atom.entry = entry;
-	 * entry.categories = new ArrayList<Category>(); Category category = new
-	 * Category(CATEGORY_KIND, CATEGORY_DOCUMENT, "document");
-	 * entry.categories.add(category); entry.convert = false; entry.etag = etag;
-	 * atom.entry = entry;
-	 * 
-	 * try { HttpRequest request = transport.buildPutRequest(); request.url =
-	 * targetUrl; ((GoogleHeaders) request.headers)
-	 * .setSlugFromFileName(sendData.fileName); MultipartRelatedContent
-	 * mpContent = MultipartRelatedContent .forRequest(request);
-	 * content.inputStream = sendData.getInputStream(); content.type =
-	 * "text/plain"; // content.length = sendData.contentLength;
-	 * mpContent.parts.add(content); mpContent.parts.add(atom); request.content
-	 * = mpContent;
-	 * 
-	 * Log.d(TAG, "content: " + content); Log.d(TAG, "request: " + request);
-	 * HttpResponse response = request.execute(); Log.d(TAG, "status was " +
-	 * response.statusMessage); entry = response.parseAs(GDocEntry.class);
-	 * Log.d(TAG, "new entry: " + entry); newModification = entry.getUpdated();
-	 * Log.d(TAG, "newModification: " + newModification); } catch (Exception e)
-	 * { Log.e(TAG, "exception in createDoc: " + e); e.printStackTrace(); }
-	 * finally { try { content.inputStream.close(); } catch (Exception e) {
-	 * Log.e(TAG, "exception in createDoc: " + e); } } return newModification; }
-	 * 
-	 * private void setLogging(boolean logging) {
-	 * Logger.getLogger("com.google.api.client").setLevel( logging ?
-	 * Level.FINEST : Level.OFF); SharedPreferences settings =
-	 * getSharedPreferences(PREFS, 0); boolean currentSetting =
-	 * settings.getBoolean("logging", false); if (currentSetting != logging) {
-	 * SharedPreferences.Editor editor = settings.edit();
-	 * editor.putBoolean("logging", logging); editor.commit(); } }
-	 * 
-	 * private void updateModificationDate(String title, Date modificationDate)
-	 * { ContentResolver resolver = getContentResolver(); ContentValues values =
-	 * new ContentValues(); String[] args = { title };
-	 * 
-	 * values.put(GameInfo.KEY_MODIFIED_DATE, modificationDate.getTime());
-	 * 
-	 * Log.d(TAG, "values: " + values); resolver.update(SGFProvider.CONTENT_URI,
-	 * values, SGFProvider.QUERY_STRING, args); }
-	 */
 }
