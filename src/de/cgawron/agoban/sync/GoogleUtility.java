@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -34,10 +35,13 @@ import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.InputStreamContent;
+import com.google.api.client.http.MultipartRelatedContent;
 import com.google.api.client.http.apache.ApacheHttpTransport;
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Key;
 import com.google.api.client.xml.XmlNamespaceDictionary;
+import com.google.api.client.xml.atom.AtomContent;
 import com.google.api.client.xml.atom.AtomParser;
 
 import de.cgawron.agoban.provider.GameInfo;
@@ -263,35 +267,31 @@ public final class GoogleUtility
 
 	static class SendData
 	{
-		String fileName;
+		File file;
 		String contentType;
 		long contentLength;
 
 		SendData(Cursor cursor)
 		{
 			Log.d(TAG, "SendData: " + cursor.getString(1));
-			this.fileName = cursor.getString(cursor
-					.getColumnIndexOrThrow(GameInfo.KEY_FILENAME));
+			String fileName = cursor.getString(cursor.getColumnIndexOrThrow(GameInfo.KEY_FILENAME));
+			file = new File(SGFProvider.SGF_DIRECTORY, fileName);
+		}
+
+		public SendData(File file)
+		{
+			this.file = file;
 		}
 
 		public InputStream getInputStream() throws FileNotFoundException
 		{
-			return new FileInputStream(new File(SGFProvider.SGF_DIRECTORY,
-					fileName));
+			return new FileInputStream(file);
 		}
-		/*
-		 * SendData(Intent intent, ContentResolver contentResolver) { Bundle
-		 * extras = intent.getExtras(); Log.d(TAG, "SendData: " + intent + ", "
-		 * + extras); if (extras.containsKey(Intent.EXTRA_STREAM)) { Uri uri =
-		 * this.uri = (Uri) extras .getParcelable(Intent.EXTRA_STREAM); String
-		 * scheme = uri.getScheme(); Log.d(TAG, "SendData: uri=" + this.uri);
-		 * this.contentType = SGFProvider.SGF_TYPE; if
-		 * (scheme.equals("content")) { Cursor cursor =
-		 * contentResolver.query(uri, null, null, null, null);
-		 * cursor.moveToFirst(); this.fileName = cursor.getString(cursor
-		 * .getColumnIndexOrThrow(GameInfo.KEY_FILENAME)); this.contentLength =
-		 * 100; cursor.close(); } } }
-		 */
+
+		public String getTitle()
+		{
+			return file.getName();
+		}
 	}
 
 	private GDocUrl getDocUrl()
@@ -305,7 +305,6 @@ public final class GoogleUtility
 	{
 		GDocUrl url = new GDocUrl("https://docs.google.com/feeds/default/private/full/");
 		url.appendRawPath("folder%3A0B2zBOoPdAGqnN2RiMzQ5YjQtMjE0ZS00OGIyLTg3ZjktZWZjMTgwNTk3NTQ2");
-		//folder.0.0B2zBOoPdAGqnN2RiMzQ5YjQtMjE0ZS00OGIyLTg3ZjktZWZjMTgwNTk3NTQ2
 		url.appendRawPath("/contents");
 
 		return url;
@@ -347,6 +346,108 @@ public final class GoogleUtility
 		GDocFeed feed = response.parseAs(GDocFeed.class);
 		entries = feed.entries;
 		return entries;
+	}
+
+	public GDocEntry createGoogleDoc(File file) 
+	{
+		GenericUrl targetUrl = getFolderUrl();
+		Date newModification = null;
+		SendData sendData = new SendData(file);
+		
+		Log.d(TAG, "createGoogleDoc: url=" + targetUrl + ", data=" + sendData);
+		InputStreamContent content = new InputStreamContent();
+		AtomContent atom = new AtomContent();
+		GDocEntry entry = new GDocEntry();
+		atom.namespaceDictionary = DICTIONARY;
+		atom.entry = entry;
+		entry.categories = new ArrayList<Category>();
+		Category category = new Category(CATEGORY_KIND, CATEGORY_DOCUMENT, "document");
+		entry.categories.add(category);
+		entry.convert = false;
+		Log.d(TAG, "category: " + category);
+
+		try {
+			HttpRequest request = transport.buildPostRequest();
+			request.url = targetUrl;
+			((GoogleHeaders) request.headers).setSlugFromFileName(sendData.getTitle());
+			MultipartRelatedContent mpContent = MultipartRelatedContent.forRequest(request);
+			content.inputStream = sendData.getInputStream();
+			content.type = "text/plain";
+			// content.length = sendData.contentLength;
+			mpContent.parts.add(content);
+			mpContent.parts.add(atom);
+			request.content = mpContent;
+
+			Log.d(TAG, "content: " + content);
+			Log.d(TAG, "request: " + request);
+			HttpResponse response = request.execute();
+			Log.d(TAG, "status was " + response.statusMessage);
+			entry = response.parseAs(GDocEntry.class);
+			Log.d(TAG, "new entry: " + entry);
+			newModification = entry.getUpdated();
+			Log.d(TAG, "newModification: " + newModification);
+		} catch (Exception e) {
+			Log.e(TAG, "exception in createDoc: " + e);
+			e.printStackTrace();
+		} finally {
+			try {
+				content.inputStream.close();
+			} catch (Exception e) {
+				Log.e(TAG, "exception in createDoc: " + e);
+			}
+		}
+		return entry;
+	}
+
+	public GDocEntry updateGoogleDoc(GDocEntry doc, File file) 
+	{
+		Date newModification = null;
+		SendData sendData = new SendData(file);
+		GenericUrl targetUrl = doc.getUpdateUrl();
+		Log.d(TAG, "updateGoogleDoc: url=" + targetUrl + ", etag=" + doc.etag + ", data=" + sendData);
+		InputStreamContent content = new InputStreamContent();
+		AtomContent atom = new AtomContent();
+		GDocEntry entry = new GDocEntry();
+		atom.namespaceDictionary = DICTIONARY;
+		atom.entry = entry;
+		entry.categories = new ArrayList<Category>();
+		Category category = new Category(CATEGORY_KIND, CATEGORY_DOCUMENT, "document");
+		entry.categories.add(category);
+		entry.convert = false;
+		entry.etag = doc.etag;
+		atom.entry = entry;
+
+		try {
+			HttpRequest request = transport.buildPutRequest();
+			request.url = targetUrl;
+			((GoogleHeaders) request.headers).setSlugFromFileName(sendData.getTitle());
+			MultipartRelatedContent mpContent = MultipartRelatedContent.forRequest(request);
+			content.inputStream = sendData.getInputStream();
+			//content.type = "text/plain";
+			// content.length = sendData.contentLength;
+			mpContent.parts.add(content);
+			mpContent.parts.add(atom);
+			request.content = mpContent;
+
+			Log.d(TAG, "content: " + content);
+			Log.d(TAG, "request: " + request);
+			HttpResponse response = request.execute();
+			Log.d(TAG, "status was " + response.statusMessage);
+			entry = response.parseAs(GDocEntry.class);
+			Log.d(TAG, "new entry: " + entry);
+			newModification = entry.getUpdated();
+			Log.d(TAG, "newModification: " + newModification);
+		} catch (Exception e) {
+			Log.e(TAG, "exception in createDoc: " + e);
+			e.printStackTrace();
+		} finally {
+			try {
+				content.inputStream.close();
+			} catch (Exception e) {
+				Log.e(TAG, "exception in createDoc: " + e);
+			}
+		}
+		return entry;
 	}
 
 }

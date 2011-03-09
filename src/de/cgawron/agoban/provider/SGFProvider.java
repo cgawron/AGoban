@@ -220,14 +220,20 @@ public class SGFProvider extends ContentProvider
 	public Uri insert(Uri uri, ContentValues values)
 	{
 		Log.d(TAG, String.format("insert(uri=%s, values=%s)", uri, values));
-		String path = uri.getPath();
+		String path;
+		if (values != null && values.containsKey(KEY_FILENAME)) {
+			path = values.getAsString(KEY_FILENAME);
+			db.insert(SGFDBOpenHelper.SGF_TABLE_NAME, "", values);
+		}
+		else {
+			path = uri.getPath();
+		}
 		Log.d(TAG, String.format("path=%s", path));
 		if (path.equals("")) {
 			path = UUID.randomUUID().toString() + ".sgf";
 		}
 
-		uri = new Uri.Builder().scheme("content")
-				.authority("de.cgawron.agoban").path(path).build();
+		uri = new Uri.Builder().scheme("content").authority("de.cgawron.agoban").path(path).build();
 		Log.d(TAG, String.format("insert: returning %s", uri));
 		getContext().getContentResolver().notifyChange(uri, null);
 
@@ -237,10 +243,10 @@ public class SGFProvider extends ContentProvider
 	@Override
 	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs)
 	{
-		Log.d(TAG, String.format("update(uri=%s, values=%s, selection=%s)",
-				uri, values, selection));
+		Log.d(TAG, String.format("update(uri=%s, values=%s, selection=%s)", uri, values, selection));
+		db.update(SGFDBOpenHelper.SGF_TABLE_NAME, values, selection, selectionArgs);
 		getContext().getContentResolver().notifyChange(uri, null);
-		return 0;
+		return 1;
 	}
 
 	@Override

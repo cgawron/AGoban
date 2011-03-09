@@ -106,7 +106,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 			if (docs != null) {
 				for (GDocEntry doc : docs) {
 					long id = getId(provider, doc);
-					Date remoteModification = doc.getUpdated();
+					Date cloudModification = doc.getUpdated();
+					Date remoteModification = getRemoteModification(provider, doc);
 					Date localModification = getLocalModification(provider, doc);
 					gdocMap.put(id, doc);
 	
@@ -114,7 +115,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 						createLocal(provider, doc);
 						syncResult.stats.numInserts++;
 					}
-					else if (localModification.before(remoteModification)) {
+					else if (remoteModification == null) {
+						// File exists locally, but is not from cloud - conflict!
+						syncResult.stats.numConflictDetectedExceptions++;
+					}
+					else if (remoteModification.before(cloudModification)) {
 						updateLocal(provider, doc);
 						syncResult.stats.numUpdates++;
 					}
@@ -140,15 +145,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 					}
 					else {
 						// not yet present in cloud
-						createRemote(provider, fileName);
+						createRemote(provider, id, fileName);
 					}
 				}
 				else if (localModification.after(remoteModification)) {
-					updateRemote(provider, fileName, doc);
+					updateRemote(provider, id, doc);
 				}
 			}
-
-			
 		} catch (final AuthenticatorException e) {
 			syncResult.stats.numParseExceptions++;
 			Log.e(TAG, "AuthenticatorException", e);
@@ -172,18 +175,37 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 		}
 	}
 
-	private void updateRemote(ContentProviderClient provider, String fileName, GDocEntry doc)
+	private void updateRemote(ContentProviderClient provider, long id, GDocEntry doc) throws RemoteException
 	{
-		Log.d(TAG, "updateRemote " + fileName);
-		// TODO Auto-generated method stub
-		
+		Log.d(TAG, "updateRemote " + doc.title);
+
+		File sgfFile = new File(SGFProvider.SGF_DIRECTORY, doc.title);
+		doc = googleUtility.updateGoogleDoc(doc, sgfFile);
+
+		ContentValues values = new ContentValues();
+		values.put(GameInfo.KEY_REMOTE_MODIFIED_DATE, doc.getUpdated().getTime());
+
+		Log.d(TAG, "values: " + values);
+		provider.update(SGFProvider.CONTENT_URI, values,  
+						GameInfo.KEY_ID + "=?", new String[] { Long.toString(id) });
+
+		gdocMap.put(id, doc);
 	}
 
-	private void createRemote(ContentProviderClient provider, String fileName)
+	private void createRemote(ContentProviderClient provider, long id, String fileName) throws RemoteException
 	{
 		Log.d(TAG, "createRemote " + fileName);
-		// TODO Auto-generated method stub
-		
+		File sgfFile = new File(SGFProvider.SGF_DIRECTORY, fileName);
+		GDocEntry doc = googleUtility.createGoogleDoc(sgfFile);
+
+		ContentValues values = new ContentValues();
+		values.put(GameInfo.KEY_REMOTE_MODIFIED_DATE, doc.getUpdated().getTime());
+
+		Log.d(TAG, "values: " + values);
+		provider.update(SGFProvider.CONTENT_URI, values,  
+						GameInfo.KEY_ID + "=?", new String[] { Long.toString(id) });
+
+		gdocMap.put(id, doc);
 	}
 
 	private void createLocal(ContentProviderClient provider, GDocEntry doc) throws Exception
@@ -224,12 +246,30 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 						GameInfo.KEY_FILENAME + "=?", 
 						new String[] { doc.title });
 	}
+
 	private Date getLocalModification(ContentProviderClient provider, GDocEntry doc) throws RemoteException
 	{
 		Log.d(TAG, "getLocalModification: " + doc.title);
 		Date date = null;
 		
 		final String[] PROJECTION = { GameInfo.KEY_LOCAL_MODIFIED_DATE };
+		Cursor cursor = provider.query(SGFProvider.CONTENT_URI, PROJECTION, 
+									   GameInfo.KEY_FILENAME + "=?", 
+									   new String[] { doc.title }, null);
+
+		if (cursor.getCount() > 0) {
+			cursor.moveToFirst();
+			date = new Date(cursor.getInt(0));
+		}
+		cursor.close();
+		return date;
+	}
+	private Date getRemoteModification(ContentProviderClient provider, GDocEntry doc) throws RemoteException
+	{
+		Log.d(TAG, "getRemoteModification: " + doc.title);
+		Date date = null;
+		
+		final String[] PROJECTION = { GameInfo.KEY_REMOTE_MODIFIED_DATE };
 		Cursor cursor = provider.query(SGFProvider.CONTENT_URI, PROJECTION, 
 									   GameInfo.KEY_FILENAME + "=?", 
 									   new String[] { doc.title }, null);
