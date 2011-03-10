@@ -50,8 +50,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.cgawron.go.Goban;
-import de.cgawron.go.SimpleGoban;
 import de.cgawron.go.Goban.BoardType;
+import de.cgawron.go.SimpleGoban;
 import de.cgawron.go.Symmetry;
 import de.cgawron.go.sgf.TreeIterator.PreorderIterator;
 import de.cgawron.util.Memento;
@@ -333,7 +333,11 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	{
 		return file;
 	}
-
+	
+	public void setFile(File file)
+	{
+		this.file = file;
+	}
 	public void save() throws IOException
 	{
 		save(getFile());
@@ -707,7 +711,7 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 		childIndices[0] = newIndex;
 		newChildren[0] = newNode;
 		TreeModelEvent ev = new TreeModelEvent(this, new TreePath(currentNode),
-				childIndices, newChildren);
+											   childIndices, newChildren);
 		fireTreeNodesInserted(ev);
 		return newNode;
 	}
@@ -720,7 +724,7 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 			if (node.isMove())
 				moves++;
 			if (node.getChildCount() > 0)
-				node = (Node) node.getChildAt(0);
+				node = node.getChildAt(0);
 			else
 				node = null;
 		}
@@ -808,7 +812,7 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 			if (node.isMove()) {
 				currentMoveNo++;
 			}
-			node = (Node) node.getChildAt(0);
+			node = node.getChildAt(0);
 		}
 		return node;
 	}
@@ -1064,9 +1068,9 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 	{
 		Node mySetup = getRoot();
 		while (mySetup != null && !mySetup.isBoardSetup())
-			mySetup = (Node) mySetup.getChildAt(0);
+			mySetup = mySetup.getChildAt(0);
 		while (theirSetup != null && !theirSetup.isBoardSetup())
-			theirSetup = (Node) theirSetup.getChildAt(0);
+			theirSetup = theirSetup.getChildAt(0);
 
 		Goban myModel = mySetup.getGoban();
 		Goban theirModel = theirSetup.getGoban();

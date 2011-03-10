@@ -140,16 +140,7 @@ public class MoveTool extends Drawable implements GobanView.Tool
 			parent.getChildren().remove(0);
 		}
 
-		Node newNode;
-		newNode = new Node(editor.getGameTree());
-		Log.d(TAG, "Adding new node " + newNode);
-		try {
-			newNode.setGoban(parent.getGoban().clone());
-		} catch (CloneNotSupportedException ex) {
-			Log.e(TAG, "onGobanEvent", ex);
-		}
-		parent.add(newNode);
-
+		Node newNode = editor.getGameTree().appendNode(parent);
 		newNode.move(point);
 		Log.d(TAG, "addMove: " + newNode + ", " + parent);
 		editor.setCurrentNode(newNode);

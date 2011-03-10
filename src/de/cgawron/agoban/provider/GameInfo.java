@@ -16,22 +16,19 @@
 
 package de.cgawron.agoban.provider;
 
-import android.content.ContentValues;
-import android.database.Cursor;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.io.File;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.lang.ref.WeakReference;
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Map;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.net.Uri;
 import de.cgawron.go.sgf.GameTree;
-import de.cgawron.go.sgf.RootNode;
 import de.cgawron.go.sgf.Property;
 import de.cgawron.go.sgf.Property.Key;
 
@@ -54,40 +51,46 @@ public class GameInfo
 	public @interface SGFProperty {
 	}
 
-	final public static String KEY_ID = "_id";
-	final public static String KEY_LOCAL_MODIFIED_DATE = "MDATE";
-	final public static String KEY_REMOTE_MODIFIED_DATE = "RDATE";
-	final public static @Column
-	String KEY_URI = "URI";
-	final public static @Column
-	String KEY_FILENAME = "FILENAME";
-	final public static @Column
-	@SGFProperty
-	String KEY_GAMENAME = "GN";
-	final public static @Column
-	@SGFProperty
-	String KEY_DATE = "DT";
-	final public static @Column
-	@SGFProperty
-	String KEY_RESULT = "RE";
-	final public static @Column
-	@SGFProperty
-	String KEY_PLAYER_WHITE = "PW";
-	final public static @Column
-	@SGFProperty
-	String KEY_PLAYER_BLACK = "PB";
-	final public static @Column
-	@SGFProperty
-	String KEY_WHITE_RANK = "WR";
-	final public static @Column
-	@SGFProperty
-	String KEY_BLACK_RANK = "BR";
+	public static final String AUTHORITY = "de.cgawron.agoban";
+	public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.cgawron.sgf";
+	public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.cgawron.sgf";
+
+	public static final String KEY_ID = "_id";
+	public static final String KEY_LOCAL_MODIFIED_DATE = "MDATE";
+	public static final String KEY_REMOTE_MODIFIED_DATE = "RDATE";
+
+	public static final Uri     CONTENT_URI = new Uri.Builder().scheme("content").authority(GameInfo.AUTHORITY).path("games").build();
+
+	public static final @Column String KEY_URI = "URI";
+	public static final @Column String KEY_FILENAME = "FILENAME";
+	public static final @Column @SGFProperty String KEY_GAMENAME = "GN";
+	public static final @Column @SGFProperty String KEY_DATE = "DT";
+	public static final @Column @SGFProperty String KEY_RESULT = "RE";
+	public static final @Column @SGFProperty String KEY_PLAYER_WHITE = "PW";
+	public static final @Column @SGFProperty String KEY_PLAYER_BLACK = "PB";
+	public static final @Column @SGFProperty String KEY_WHITE_RANK = "WR";
+	public static final @Column @SGFProperty String KEY_BLACK_RANK = "BR";
 
 	private static Key[] sgfKeys;
-	private static String[] displayColumns = { KEY_ID, KEY_FILENAME,
-			KEY_LOCAL_MODIFIED_DATE };
-	private File file;
+	private static String[] displayColumns = { 
+		KEY_ID, KEY_FILENAME,
+		KEY_LOCAL_MODIFIED_DATE 
+	};
+	private final File file;
 	private ContentValues values;
+
+
+	/**
+	 * Create GameInfo from file.
+	 * 
+	 * @todo This should be optimized - it's not necessary to create the whole
+	 *       GameTree structure to build the GameInfo.
+	 */
+	public GameInfo(GameTree gameTree)
+	{
+		this.file = gameTree.getFile();
+		init(gameTree);
+	}
 
 	/**
 	 * Create GameInfo from file.
@@ -125,6 +128,7 @@ public class GameInfo
 			initSGFKeys();
 
 		values.put(KEY_FILENAME, file.getName());
+		values.put(KEY_LOCAL_MODIFIED_DATE, file.lastModified());
 		for (Key key : sgfKeys) {
 			String _key = key.toString();
 			values.put(_key, cursor.getString(cursor.getColumnIndex(_key)));

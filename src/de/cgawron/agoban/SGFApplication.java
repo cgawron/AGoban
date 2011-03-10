@@ -16,38 +16,37 @@
 
 package de.cgawron.agoban;
 
-import android.app.Application;
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.util.Calendar;
+import java.util.Map;
+import java.util.UUID;
+import java.util.WeakHashMap;
+
 import android.app.AlertDialog;
+import android.app.Application;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
+import android.content.ContentValues;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.content.Intent;
 import android.content.pm.PackageItemInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceActivity;
 import android.util.Log;
-import android.net.Uri;
-
+import de.cgawron.agoban.provider.GameInfo;
 import de.cgawron.go.sgf.GameTree;
 import de.cgawron.go.sgf.Node;
 import de.cgawron.go.sgf.Property;
-import de.cgawron.agoban.provider.SGFProvider;
-
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
-import java.util.Calendar;
-import java.util.Map;
-import java.util.WeakHashMap;
-import java.util.UUID;
 
 /**
  * Application class for EditSGF. Used to hold instances of @class{GameTree} and
@@ -62,7 +61,7 @@ public class SGFApplication extends Application
 	private GameTree gameTree;
 	private Uri data;
 	private boolean readOnly = true;
-	private Map<Uri, GameTree> gameMap = new WeakHashMap<Uri, GameTree>();
+	private final Map<Uri, GameTree> gameMap = new WeakHashMap<Uri, GameTree>();
 	String gitId;
 
 	public interface ExceptionHandler
@@ -116,6 +115,7 @@ public class SGFApplication extends Application
 						context, "", "Loading " + data, false, false);
 
 				final Handler handler = new Handler() {
+					@Override
 					public void handleMessage(Message msg)
 					{
 						progressDialog.dismiss();
@@ -203,18 +203,8 @@ public class SGFApplication extends Application
 		gameMap.put(data, gameTree);
 	}
 
-	public Uri getNewGameUri()
-	{
-		Uri uri = getContentResolver().insert(SGFProvider.CONTENT_URI, null);
-		Log.d(TAG, "getNewGameUri: uri=" + uri);
-		return uri;
-	}
-
 	public void setData(Uri data)
 	{
-		if (data == null) {
-			data = getNewGameUri();
-		}
 		this.data = data;
 	}
 
@@ -230,25 +220,37 @@ public class SGFApplication extends Application
 
 	public void save()
 	{
-		if (gameTree == null)
-			return;
-		if (false && !gameTree.isModified()) {
+		if (gameTree == null) return;
+
+		if (!gameTree.isModified()) {
 			Log.i(TAG, "not saving unmodified GameTree");
 			return;
 		}
 
-		if (data == null) {
-			setData(null);
+		if (gameTree.getFile() == null) {
+			gameTree.setFile(getNewFile());
+			Log.d(TAG, "save: file=" + gameTree.getFile());
 		}
 
+		
+		if (data == null) {
+            Uri uri = ContentUris.withAppendedId(GameInfo.CONTENT_URI, gameTree.getFile().hashCode());
+			setData(data);
+			Log.d(TAG, "save: data=" + data);
+		}
+		
+		GameInfo info = new GameInfo(gameTree);
+		ContentValues values = info.getContentValues();
+		getContentResolver().insert(data, values);
+
 		try {
-			OutputStream os = getContentResolver()
-					.openOutputStream(data, "rwt");
+			OutputStream os = getContentResolver().openOutputStream(data, "rwt");
 			gameTree.save(os);
 			os.close();
 		} catch (java.io.IOException ex) {
 			throw new RuntimeException("save failed", ex);
 		}
+
 	}
 
 	public void setReadOnly(boolean readOnly)

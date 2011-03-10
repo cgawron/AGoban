@@ -136,6 +136,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 				Date localModification = new Date(cursor.getLong(2));
 				Date remoteModification = new Date(cursor.getLong(3));
 				GDocEntry doc = gdocMap.get(id);
+				Log.d(TAG, String.format("sync (up): local=%s, remote=%s, cloud=%s", localModification, remoteModification, doc != null ? doc.getUpdated() : "<null>"));
 				
 				if (doc == null) {
 					if (remoteModification.after(EPOCH)) {

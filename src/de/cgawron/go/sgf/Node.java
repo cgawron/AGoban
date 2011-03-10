@@ -1056,7 +1056,7 @@ public class Node extends PropertyList implements MarkupModelListener,
 		}
 	}
 
-	public boolean add(Node n)
+    boolean add(Node n)
 	{
 		n.setParent(this);
 		if (n.depth < 0) {

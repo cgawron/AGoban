@@ -41,7 +41,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
-import de.cgawron.agoban.provider.SGFProvider;
+import de.cgawron.agoban.provider.GameInfo;
 import de.cgawron.agoban.view.GameTreeControls;
 import de.cgawron.agoban.view.GameTreeControls.GameTreeNavigationListener;
 import de.cgawron.agoban.view.GobanView;
@@ -134,13 +134,14 @@ public class EditSGF extends Activity implements GobanEventListener,
 
 		Intent intent = getIntent();
 		Log.d(TAG, "Uri: " + intent.getData());
-		if (intent.getData() == null
-				|| Intent.ACTION_INSERT.equals(intent.getAction())) {
+		if (intent.getData() == null || Intent.ACTION_INSERT.equals(intent.getAction())) {
 			Log.d(TAG, "onStart: new file");
+			application.setReadOnly(false);
+			/*
 			Uri data = application.getNewGameUri();
 			application.setData(data);
-			application.setReadOnly(false);
 			intent.setData(data);
+			*/
 			setGameTree(new GameTree());
 			application.initProperties(gameTree);
 			gameTree.setModified(false);
@@ -371,16 +372,14 @@ public class EditSGF extends Activity implements GobanEventListener,
 	public void open()
 	{
 		Log.d(TAG, "open()");
-		Intent intent = new Intent(Intent.ACTION_SEARCH,
-				SGFProvider.CONTENT_URI, this, ChooseSGF.class);
+		Intent intent = new Intent(Intent.ACTION_SEARCH, GameInfo.CONTENT_URI, this, ChooseSGF.class);
 		startActivity(intent);
 		finish();
 	}
 
 	public void newGame()
 	{
-		Intent sgfIntent = new Intent(Intent.ACTION_INSERT,
-				application.getNewGameUri());
+		Intent sgfIntent = new Intent(Intent.ACTION_INSERT, null);
 		startActivity(sgfIntent);
 		finish();
 	}

@@ -14,22 +14,23 @@
     <activity android:name="de.cgawron.agoban.EditSGF"
 	      android:label="@string/app_name">
       <intent-filter>
-	<action android:name="android.intent.action.MAIN" />
-	<category android:name="android.intent.category.LAUNCHER" />
+		<action android:name="android.intent.action.MAIN" />
+		<category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
 
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
         <action android:name="android.intent.action.INSERT" />
         <action android:name="android.intent.action.EDIT" />
-	<category android:name="android.intent.category.DEFAULT" />
+		<category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
         <data android:mimeType="application/x-go-sgf" />
+        <data android:mimeType="vnd.android.cursor.item/vnd.cgawron.sgf" />
+        <data android:mimeType="vnd.android.cursor.dir/vnd.cgawron.sgf" />
       </intent-filter>
     </activity>
 
-    <activity android:name="de.cgawron.agoban.ChooseSGF"
-	      android:label="@string/app_name">
+    <activity android:name="de.cgawron.agoban.ChooseSGF" android:label="@string/app_name">
       <intent-filter>
         <action android:name="android.intent.action.SEARCH" />
       </intent-filter>

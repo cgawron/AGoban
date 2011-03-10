@@ -27,15 +27,16 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.net.UrlQuerySanitizer;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
@@ -43,26 +44,35 @@ import android.util.Log;
 public class SGFProvider extends ContentProvider
 {
 	private static String TAG = "SGFProvider";
-	final public static String AUTHORITY = "de.cgawron.agoban";
-	final public static Uri CONTENT_URI = new Uri.Builder().scheme("content").authority(AUTHORITY).build();
 	final public static String SGF_TYPE = "application/x-go-sgf";
 
 	public final static String QUERY_STRING = "_id=?";
 	final static String[] COLUMNS_FILENAME_ONLY = { GameInfo.KEY_FILENAME };
 	final static String[] COLUMNS_ID_FILENAME = { KEY_ID, KEY_FILENAME };
 	public final static File SGF_DIRECTORY;
-	static {
-		// TODO: Handle exceptions here
-		SGF_DIRECTORY = new File(Environment.getExternalStorageDirectory(), "sgf");
-		if (!SGF_DIRECTORY.exists())
-			SGF_DIRECTORY.mkdir();
-	}
+	
+	private static final int GAMES = 1;
+	private static final int GAME_ID = 2;
+	private static final int FILE_ID = 3;
 
 	private String[] columns = null;
 	private SGFDBOpenHelper dbHelper = null;
 	private SQLiteDatabase db = null;
 	private long lastChecked = 0;
 	private static Map<Long, GameInfo> sgfMap = new HashMap<Long, GameInfo>();
+	private static UriMatcher uriMatcher;
+
+    static {
+		// TODO: Handle exceptions here
+		SGF_DIRECTORY = new File(Environment.getExternalStorageDirectory(), "sgf");
+		if (!SGF_DIRECTORY.exists())
+			SGF_DIRECTORY.mkdir();
+
+		uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+        uriMatcher.addURI(GameInfo.AUTHORITY, "games", GAMES);
+        uriMatcher.addURI(GameInfo.AUTHORITY, "games/*", GAME_ID);
+        uriMatcher.addURI(GameInfo.AUTHORITY, "files/*", FILE_ID);
+    }
 
 	private void initColumns()
 	{
@@ -168,10 +178,9 @@ public class SGFProvider extends ContentProvider
 							ex.printStackTrace();
 							continue;
 						}
-						long _id = db.insertWithOnConflict(
-								SGFDBOpenHelper.SGF_TABLE_NAME, "",
-								gameInfo.getContentValues(),
-								SQLiteDatabase.CONFLICT_REPLACE);
+						long _id = db.insertWithOnConflict(SGFDBOpenHelper.SGF_TABLE_NAME, "",
+														   gameInfo.getContentValues(),
+														   SQLiteDatabase.CONFLICT_REPLACE);
 					}
 				} catch (Exception ex) {
 					Log.d(TAG, "caught " + ex);
@@ -200,44 +209,64 @@ public class SGFProvider extends ContentProvider
 
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
-						String[] selectionArgs, String sortOrder)
+						String[] selectionArgs, String orderBy)
 	{
-		Log.d(TAG, String.format("query(uri=%s, projection=%s, selection=%s)",
-				uri, projection, selection));
+		Log.d(TAG, String.format("query(uri=%s, projection=%s, selection=%s)", uri, projection, selection));
 		//updateDatabase();
 
-		String path = uri.getPath();
-		Log.d(TAG, String.format("path=%s", path));
+        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        qb.setTables(SGFDBOpenHelper.SGF_TABLE_NAME);
 
-		Cursor cursor = queryDB(projection, selection, selectionArgs);
-		Log.d(TAG,
-				String.format("query: returning cursor with %d rows",
-						cursor.getCount()));
+        switch (uriMatcher.match(uri)) {
+		case GAMES:
+			break;
+
+		case GAME_ID:
+            qb.appendWhere(KEY_ID + "=" + uri.getPathSegments().get(1));
+            break;
+
+        default:
+            throw new IllegalArgumentException("Unknown URI " + uri);
+		}
+
+        Cursor cursor = qb.query(db, projection, selection, selectionArgs, null, null, orderBy);
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+
+		Log.d(TAG, String.format("query: returning cursor with %d rows", cursor.getCount()));
 		return cursor;
 	}
 
 	@Override
-	public Uri insert(Uri uri, ContentValues values)
+	public Uri insert(Uri uri, ContentValues initialValues)
 	{
-		Log.d(TAG, String.format("insert(uri=%s, values=%s)", uri, values));
-		String path;
-		if (values != null && values.containsKey(KEY_FILENAME)) {
-			path = values.getAsString(KEY_FILENAME);
-			db.insert(SGFDBOpenHelper.SGF_TABLE_NAME, "", values);
-		}
-		else {
-			path = uri.getPath();
-		}
-		Log.d(TAG, String.format("path=%s", path));
-		if (path.equals("")) {
-			path = UUID.randomUUID().toString() + ".sgf";
+		Log.d(TAG, String.format("insert(uri=%s, values=%s)", uri, initialValues));
+
+        ContentValues values;
+        if (initialValues != null) {
+            values = new ContentValues(initialValues);
+        } else {
+            values = new ContentValues();
+        }
+
+        switch (uriMatcher.match(uri)) {
+		case GAMES:
+		case GAME_ID:
+			break;
+
+        default:
+            throw new IllegalArgumentException("Unknown URI " + uri);
 		}
 
-		uri = new Uri.Builder().scheme("content").authority("de.cgawron.agoban").path(path).build();
-		Log.d(TAG, String.format("insert: returning %s", uri));
-		getContext().getContentResolver().notifyChange(uri, null);
+		long rowId = db.insertWithOnConflict(SGFDBOpenHelper.SGF_TABLE_NAME, "", values, SQLiteDatabase.CONFLICT_REPLACE);		
 
-		return uri;
+        if (rowId > 0) {
+            Uri newUri = ContentUris.withAppendedId(GameInfo.CONTENT_URI, rowId);
+			Log.d(TAG, String.format("insert: returning %s", newUri));
+            getContext().getContentResolver().notifyChange(newUri, null);
+            return newUri;
+        }
+
+        throw new SQLException("Failed to insert row into " + uri);
 	}
 
 	@Override
@@ -258,7 +287,28 @@ public class SGFProvider extends ContentProvider
 	@Override
 	public String getType(Uri uri)
 	{
-		return SGF_TYPE;
+		String type;
+
+        switch (uriMatcher.match(uri)) {
+        case GAMES:
+            type = GameInfo.CONTENT_TYPE;
+			break;
+
+        case GAME_ID:
+            type = GameInfo.CONTENT_ITEM_TYPE;
+			break;
+
+        case FILE_ID:
+            type = SGF_TYPE;
+			break;
+
+        default:
+			Log.e(TAG, "getType: unknown uri " + uri);
+            throw new IllegalArgumentException("Unknown URI " + uri);
+        }
+
+		Log.d(TAG, "getType: " + uri + " -> " + type);
+		return type;
 	}
 
 	@Override
@@ -285,28 +335,32 @@ public class SGFProvider extends ContentProvider
 	{
 		Log.d(TAG, String.format("openFile(uri=%s, mode=%s)", uri, mode));
 		File file;
-		String query = uri.getQuery();
-		if (query != null && query.length() > 0) {
-			UrlQuerySanitizer sanitizer = new UrlQuerySanitizer(uri.toString());
-			String id = sanitizer.getValue(KEY_ID);
-			if (id == null)
-				throw new IllegalArgumentException(
-						"Currently only _id is support for queries");
+		String id;
+        switch (uriMatcher.match(uri)) {
+        case GAME_ID:
+			id = uri.getPathSegments().get(1);
+			break;
 
-			String[] args = new String[1];
-			args[0] = id;
-			Cursor cursor = queryDB(COLUMNS_FILENAME_ONLY, QUERY_STRING, args);
-			cursor.moveToFirst();
-			String fileName = cursor.getString(0);
-			Log.d(TAG, "openFile: filename=" + fileName);
-			cursor.close();
-			file = new File(SGF_DIRECTORY, fileName);
-		} else {
-			file = new File(SGF_DIRECTORY, uri.getPath());
-		}
-		Log.d(TAG,
-				String.format("openFile: file=%s, read=%b write=%b", file,
-						file.canRead(), file.canWrite()));
+        case FILE_ID:
+			id = uri.getPathSegments().get(1);
+            break;
+
+        default:
+            throw new IllegalArgumentException("Unknown URI " + uri);
+        }
+
+		String[] args = new String[] { id };
+		Cursor cursor = queryDB(COLUMNS_FILENAME_ONLY, QUERY_STRING, args);
+		if (cursor.getCount() < 1)
+			throw new IllegalArgumentException("Unknown URI " + uri);
+		cursor.moveToFirst();
+		String fileName = cursor.getString(0);
+		Log.d(TAG, "openFile: filename=" + fileName);
+		cursor.close();
+		file = new File(SGF_DIRECTORY, fileName);
+
+		Log.d(TAG, String.format("openFile: file=%s, read=%b write=%b", file,
+								 file.canRead(), file.canWrite()));
 		int _mode = ParcelFileDescriptor.MODE_CREATE;
 		if (mode.contains("w"))
 			_mode |= ParcelFileDescriptor.MODE_READ_WRITE;

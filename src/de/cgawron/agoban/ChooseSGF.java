@@ -22,6 +22,7 @@ import java.util.Date;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.ContentUris;
 import android.content.Intent;
 import android.content.pm.PackageItemInfo;
 import android.content.pm.PackageManager;
@@ -44,7 +45,6 @@ import android.widget.SimpleCursorAdapter.ViewBinder;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.cgawron.agoban.provider.GameInfo;
-import de.cgawron.agoban.provider.SGFProvider;
 import de.cgawron.agoban.view.PropertyView;
 
 /**
@@ -115,13 +115,9 @@ public class ChooseSGF extends Activity implements ViewBinder
 		listView.setAdapter(adapter);
 
 		listView.setOnItemLongClickListener(new OnItemLongClickListener() {
-			public boolean onItemLongClick(AdapterView<?> parent, View view,
-					int position, long id)
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
 			{
-				Uri data = SGFProvider.CONTENT_URI
-						.buildUpon()
-						.appendQueryParameter(GameInfo.KEY_ID,
-								String.valueOf(id)).build();
+				Uri data = ContentUris.withAppendedId(GameInfo.CONTENT_URI, id);
 				Intent sgfIntent = new Intent(Intent.ACTION_VIEW, data);
 				startActivity(sgfIntent);
 				finish();
@@ -202,8 +198,7 @@ public class ChooseSGF extends Activity implements ViewBinder
 
 	public void newGame()
 	{
-		Intent sgfIntent = new Intent(Intent.ACTION_INSERT,
-				application.getNewGameUri());
+		Intent sgfIntent = new Intent(Intent.ACTION_INSERT, null);
 		startActivity(sgfIntent);
 		finish();
 	}
