@@ -72,9 +72,8 @@ public class ChooseSGF extends Activity implements ViewBinder
 		super.onCreate(savedInstanceState);
 		application = (SGFApplication) getApplication();
 		try {
-			PackageItemInfo info = getPackageManager().getActivityInfo(
-					new ComponentName(this, ChooseSGF.class),
-					PackageManager.GET_META_DATA);
+			PackageItemInfo info = getPackageManager().getActivityInfo(new ComponentName(this, ChooseSGF.class),
+																	   PackageManager.GET_META_DATA);
 			gitId = info.metaData.getString("git-id");
 		} catch (Exception e) {
 			throw new RuntimeException("git-id", e);
@@ -102,8 +101,9 @@ public class ChooseSGF extends Activity implements ViewBinder
 				cursor.getCount(), cursor.getPosition()));
 
 		String[] from = new String[] { GameInfo.KEY_FILENAME,
-				GameInfo.KEY_LOCAL_MODIFIED_DATE, GameInfo.KEY_PLAYER_WHITE,
-				GameInfo.KEY_PLAYER_BLACK, GameInfo.KEY_RESULT };
+									   GameInfo.KEY_LOCAL_MODIFIED_DATE, 
+									   GameInfo.KEY_PLAYER_WHITE,
+									   GameInfo.KEY_PLAYER_BLACK, GameInfo.KEY_RESULT };
 
 		int[] to = new int[] { R.id.filename, R.id.modified, R.id.player_white,
 				R.id.player_black, R.id.result };

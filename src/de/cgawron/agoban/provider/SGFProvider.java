@@ -19,6 +19,7 @@ package de.cgawron.agoban.provider;
 import static de.cgawron.agoban.provider.GameInfo.KEY_FILENAME;
 import static de.cgawron.agoban.provider.GameInfo.KEY_ID;
 import static de.cgawron.agoban.provider.GameInfo.KEY_LOCAL_MODIFIED_DATE;
+import static de.cgawron.agoban.provider.GameInfo.KEY_METADATA_DATE;
 import static de.cgawron.agoban.provider.GameInfo.KEY_REMOTE_MODIFIED_DATE;
 
 import java.io.File;
@@ -39,6 +40,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
+import android.text.TextUtils;
 import android.util.Log;
 
 public class SGFProvider extends ContentProvider
@@ -80,6 +82,7 @@ public class SGFProvider extends ContentProvider
 		_columns.add(KEY_ID);
 		_columns.add(KEY_LOCAL_MODIFIED_DATE);
 		_columns.add(KEY_REMOTE_MODIFIED_DATE);
+		_columns.add(KEY_METADATA_DATE);
 		Field[] fields = GameInfo.class.getFields();
 		for (Field field : fields) {
 			try {
@@ -125,9 +128,7 @@ public class SGFProvider extends ContentProvider
 
 		synchronized (this) {
 			if (updateThread == null) {
-				updateThread = new Thread(Thread.currentThread()
-						.getThreadGroup(), runnable, "updateDatabase",
-						64 * 1024);
+				updateThread = new Thread(runnable, "updateDatabase");
 				updateThread.start();
 			}
 		}
@@ -152,21 +153,20 @@ public class SGFProvider extends ContentProvider
 			for (File file : files) {
 				Cursor cursor = null;
 				try {
-					int id = file.hashCode();
+					long id = GameInfo.getId(file);
 					long lastModified = file.lastModified();
 					if (lastModified <= lastChecked)
 						continue;
 
 					String[] args = new String[1];
-					args[0] = Integer.toString(id);
-					Log.d(TAG, "checking if information for " + file
-							+ " is available");
+					args[0] = Long.toString(id);
+					Log.d(TAG, "checking if information for " + file + " is available");
 					cursor = queryDB(getColumns(), QUERY_STRING, args);
 					cursor.moveToFirst();
 					Log.d(TAG, "getCount(): " + cursor.getCount());
 
 					if (cursor.getCount() > 0 && 
-						cursor.getLong(cursor.getColumnIndex(KEY_LOCAL_MODIFIED_DATE)) == lastModified) {
+						cursor.getLong(cursor.getColumnIndex(KEY_METADATA_DATE)) == lastModified) {
 						Log.d(TAG, "found entry");
 					} else {
 						Log.d(TAG, "parsing " + file);
@@ -178,9 +178,16 @@ public class SGFProvider extends ContentProvider
 							ex.printStackTrace();
 							continue;
 						}
-						long _id = db.insertWithOnConflict(SGFDBOpenHelper.SGF_TABLE_NAME, "",
-														   gameInfo.getContentValues(),
-														   SQLiteDatabase.CONFLICT_REPLACE);
+						ContentValues contentValues = gameInfo.getContentValues();
+						Log.d(TAG, "doUpdateDatabase: values=" + contentValues);
+						long rowId = db.insertWithOnConflict(SGFDBOpenHelper.SGF_TABLE_NAME, "",
+															 contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+						Log.d(TAG, "doUpdateDatabase: id=" + rowId);
+						if (rowId != 0) {
+							Uri newUri = ContentUris.withAppendedId(GameInfo.CONTENT_URI, rowId);
+							getContext().getContentResolver().notifyChange(newUri, null);
+						}
+
 					}
 				} catch (Exception ex) {
 					Log.d(TAG, "caught " + ex);
@@ -212,7 +219,6 @@ public class SGFProvider extends ContentProvider
 						String[] selectionArgs, String orderBy)
 	{
 		Log.d(TAG, String.format("query(uri=%s, projection=%s, selection=%s)", uri, projection, selection));
-		//updateDatabase();
 
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setTables(SGFDBOpenHelper.SGF_TABLE_NAME);
@@ -259,7 +265,7 @@ public class SGFProvider extends ContentProvider
 
 		long rowId = db.insertWithOnConflict(SGFDBOpenHelper.SGF_TABLE_NAME, "", values, SQLiteDatabase.CONFLICT_REPLACE);		
 
-        if (rowId > 0) {
+        if (rowId != 0) {
             Uri newUri = ContentUris.withAppendedId(GameInfo.CONTENT_URI, rowId);
 			Log.d(TAG, String.format("insert: returning %s", newUri));
             getContext().getContentResolver().notifyChange(newUri, null);
@@ -279,9 +285,45 @@ public class SGFProvider extends ContentProvider
 	}
 
 	@Override
-	public int delete(Uri uri, String selection, String[] selectionArgs)
+	public int delete(Uri uri, String where, String[] whereArgs)
 	{
-		return 0;
+		Log.d(TAG, "deleteFiles " + where);
+        int count;
+        switch (uriMatcher.match(uri)) {
+        case GAMES:
+        	deleteFiles(where, whereArgs);
+            count = db.delete(SGFDBOpenHelper.SGF_TABLE_NAME, where, whereArgs);
+            break;
+
+        case GAME_ID:
+            String id = uri.getPathSegments().get(1);
+            deleteFiles(GameInfo.KEY_ID + "=" + id
+                    + (!TextUtils.isEmpty(where) ? " AND (" + where + ')' : ""), whereArgs);
+            count = db.delete(SGFDBOpenHelper.SGF_TABLE_NAME, GameInfo.KEY_ID + "=" + id
+                    + (!TextUtils.isEmpty(where) ? " AND (" + where + ')' : ""), whereArgs);
+            break;
+
+        default:
+            throw new IllegalArgumentException("Unknown URI " + uri);
+        }
+
+        getContext().getContentResolver().notifyChange(uri, null);
+        return count;
+	}
+
+	private void deleteFiles(String where, String[] whereArgs)
+	{
+		Log.d(TAG, "deleteFiles " + where);
+		Cursor cursor = db.query(SGFDBOpenHelper.SGF_TABLE_NAME, COLUMNS_FILENAME_ONLY, 
+				                 where, whereArgs, null, null, null);
+		
+		while (cursor.moveToNext()) {
+			String fileName = cursor.getString(0);
+			File file = new File(SGF_DIRECTORY, fileName);
+			Log.d(TAG, "deleting " + file);
+			file.delete();
+		}
+		cursor.close();
 	}
 
 	@Override
@@ -318,6 +360,7 @@ public class SGFProvider extends ContentProvider
 		dbHelper = new SGFDBOpenHelper(getContext());
 		db = dbHelper.getWritableDatabase();
 		db.setLockingEnabled(true);
+		updateDatabase();
 		return true;
 	}
 

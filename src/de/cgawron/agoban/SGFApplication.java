@@ -27,11 +27,10 @@ import java.util.WeakHashMap;
 
 import android.app.AlertDialog;
 import android.app.Application;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
-import android.content.ContentValues;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -234,9 +233,9 @@ public class SGFApplication extends Application
 
 		
 		if (data == null) {
-            Uri uri = ContentUris.withAppendedId(GameInfo.CONTENT_URI, gameTree.getFile().hashCode());
-			setData(data);
-			Log.d(TAG, "save: data=" + data);
+            Uri uri = ContentUris.withAppendedId(GameInfo.CONTENT_URI, GameInfo.getId(gameTree));
+			setData(uri);
+			Log.d(TAG, "save: data=" + uri);
 		}
 		
 		GameInfo info = new GameInfo(gameTree);
@@ -263,7 +262,6 @@ public class SGFApplication extends Application
 		if (!readOnly)
 			return true;
 		else {
-			Dialog dialog;
 			OnClickListener listener = new OnClickListener() {
 				public void onClick(DialogInterface dialog, int which)
 				{
@@ -277,7 +275,7 @@ public class SGFApplication extends Application
 			builder.setMessage("Do you want to edit this file?");
 			builder.setPositiveButton("Yes", listener);
 			builder.setNegativeButton("No", listener);
-			dialog = builder.show();
+		    builder.show();
 
 			// TODO: This probably does not work!
 

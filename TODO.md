@@ -1,12 +1,14 @@
 Open
 =============
+- Improve metadata sync for local files
 - Improve GameTreeControl
 - Improve game info activity
-- Improve markup rendering
 - Optimze loading of sgf files (memory footprint). Goal: Load Kodo's joseki library
-- Improve support for google documents
 
 Done
 =============
 - Remove stack issue while saving sgf file (i.e. remove recursion).
 - SGFProvider: Delete non-existing files from DB
+- Improve support for google documents
+- Improve markup rendering
+- Bug: setCharSet() is not thread save: A connection between node and lexer is needed, or lexer needs to handle this

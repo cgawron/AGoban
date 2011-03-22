@@ -33,10 +33,12 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SyncResult;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
@@ -127,7 +129,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 			}
 
 			// check for local updates
-			Cursor cursor = provider.query(SGFProvider.CONTENT_URI, PROJECTION,
+			Cursor cursor = provider.query(GameInfo.CONTENT_URI, PROJECTION,
 										   null, null, null);
 
 			while (cursor.moveToNext()) {
@@ -138,21 +140,27 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 				GDocEntry doc = gdocMap.get(id);
 				Log.d(TAG, String.format("sync (up): local=%s, remote=%s, cloud=%s", localModification, remoteModification, doc != null ? doc.getUpdated() : "<null>"));
 				
-				if (doc == null) {
-					if (remoteModification.after(EPOCH)) {
-						// remote deletion
-						deleteLocal(provider, doc);
-						syncResult.stats.numDeletes++;
+				try {
+					if (doc == null) {
+						if (remoteModification.after(EPOCH)) {
+							// remote deletion
+							deleteLocal(provider, id);
+							syncResult.stats.numDeletes++;
+						}
+						else {
+							// not yet present in cloud
+							createRemote(provider, id, fileName);
+						}
 					}
-					else {
-						// not yet present in cloud
-						createRemote(provider, id, fileName);
+					else if (localModification.after(remoteModification)) {
+						updateRemote(provider, id, doc);
 					}
 				}
-				else if (localModification.after(remoteModification)) {
-					updateRemote(provider, id, doc);
+				catch (final Exception ex) {
+					handleException(ex, syncResult);
 				}
 			}
+			cursor.close();
 		} catch (final AuthenticatorException e) {
 			syncResult.stats.numParseExceptions++;
 			Log.e(TAG, "AuthenticatorException", e);
@@ -187,7 +195,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 		values.put(GameInfo.KEY_REMOTE_MODIFIED_DATE, doc.getUpdated().getTime());
 
 		Log.d(TAG, "values: " + values);
-		provider.update(SGFProvider.CONTENT_URI, values,  
+		provider.update(GameInfo.CONTENT_URI, values,  
 						GameInfo.KEY_ID + "=?", new String[] { Long.toString(id) });
 
 		gdocMap.put(id, doc);
@@ -203,7 +211,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 		values.put(GameInfo.KEY_REMOTE_MODIFIED_DATE, doc.getUpdated().getTime());
 
 		Log.d(TAG, "values: " + values);
-		provider.update(SGFProvider.CONTENT_URI, values,  
+		provider.update(GameInfo.CONTENT_URI, values,  
 						GameInfo.KEY_ID + "=?", new String[] { Long.toString(id) });
 
 		gdocMap.put(id, doc);
@@ -214,7 +222,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 		Log.d(TAG, "createLocal " + doc.title);
 		ContentValues values = new ContentValues();
 		File localFile = download(doc);
-		long id = localFile.hashCode();
+		long id = GameInfo.getId(localFile);
 
 		values.put(GameInfo.KEY_ID, id);
 		values.put(GameInfo.KEY_FILENAME, doc.title);
@@ -222,7 +230,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 		values.put(GameInfo.KEY_REMOTE_MODIFIED_DATE, doc.getUpdated().getTime());
 
 		Log.d(TAG, "values: " + values);
-		provider.insert(SGFProvider.CONTENT_URI, values);
+		provider.insert(GameInfo.CONTENT_URI, values);
 	}
 
 	private void  updateLocal(ContentProviderClient provider, GDocEntry doc) throws Exception
@@ -235,17 +243,16 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 		values.put(GameInfo.KEY_REMOTE_MODIFIED_DATE, doc.getUpdated().getTime());
 
 		Log.d(TAG, "values: " + values);
-		provider.update(SGFProvider.CONTENT_URI, values,  
+		provider.update(GameInfo.CONTENT_URI, values,  
 						GameInfo.KEY_FILENAME + "=?", 
 						new String[] { doc.title });
 	}
 
-	private void  deleteLocal(ContentProviderClient provider, GDocEntry doc) throws Exception
+	private void  deleteLocal(ContentProviderClient provider, long id) throws Exception
 	{
-		Log.d(TAG, "deleteLocal " + doc.title);
-		provider.delete(SGFProvider.CONTENT_URI,  
-						GameInfo.KEY_FILENAME + "=?", 
-						new String[] { doc.title });
+		Log.d(TAG, "deleteLocal " + id);
+		Uri uri = ContentUris.withAppendedId(GameInfo.CONTENT_URI, id);
+		provider.delete(uri, null, null);
 	}
 
 	private Date getLocalModification(ContentProviderClient provider, GDocEntry doc) throws RemoteException
@@ -254,7 +261,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 		Date date = null;
 		
 		final String[] PROJECTION = { GameInfo.KEY_LOCAL_MODIFIED_DATE };
-		Cursor cursor = provider.query(SGFProvider.CONTENT_URI, PROJECTION, 
+		Cursor cursor = provider.query(GameInfo.CONTENT_URI, PROJECTION, 
 									   GameInfo.KEY_FILENAME + "=?", 
 									   new String[] { doc.title }, null);
 
@@ -271,7 +278,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 		Date date = null;
 		
 		final String[] PROJECTION = { GameInfo.KEY_REMOTE_MODIFIED_DATE };
-		Cursor cursor = provider.query(SGFProvider.CONTENT_URI, PROJECTION, 
+		Cursor cursor = provider.query(GameInfo.CONTENT_URI, PROJECTION, 
 									   GameInfo.KEY_FILENAME + "=?", 
 									   new String[] { doc.title }, null);
 
@@ -289,7 +296,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 		Log.d(TAG, "getId: " + doc.title);
 			
 		final String[] PROJECTION = { GameInfo.KEY_ID };
-		Cursor cursor = provider.query(SGFProvider.CONTENT_URI, PROJECTION, 
+		Cursor cursor = provider.query(GameInfo.CONTENT_URI, PROJECTION, 
 									   GameInfo.KEY_FILENAME + "=?", 
 									   new String[] { doc.title }, null);
 
@@ -305,7 +312,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 	{
 		File destination = new File(SGFProvider.SGF_DIRECTORY, doc.title);
 		File tmp = new File(SGFProvider.SGF_DIRECTORY, "_tmp");
-		InputStream is = doc.getStream();
+		InputStream is = doc.getStream("txt");
 		OutputStream os = new FileOutputStream(tmp);
 		byte[] buffer = new byte[4*1024];
 		int size;
@@ -322,4 +329,25 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 
 		return destination;
 	}
+	
+	private void handleException(Exception e, SyncResult syncResult) throws Exception
+	{
+		Log.e(TAG, "handleException: ", e);
+		
+		if (e instanceof AuthenticatorException) {
+			syncResult.stats.numParseExceptions++;
+		}
+		else if (e instanceof HttpResponseException) {
+			int statusCode = ((HttpResponseException) e).response.statusCode;
+			if (statusCode == 401 || statusCode == 403) {
+				throw e;
+			} else {
+				syncResult.stats.numIoExceptions++;
+			}
+		} 
+		else {
+			syncResult.stats.numIoExceptions++;
+		}
+	}
+	
 }

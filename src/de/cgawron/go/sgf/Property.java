@@ -713,7 +713,7 @@ public class Property implements Cloneable
 		public void setValue(Value vl)
 		{
 			logger.info("Setting Charset to " + vl.toString());
-			Yylex.setCharset(vl.toString());
+			//gameTree.setCharset(vl.toString());
 			super.setValue(vl);
 		}
 	}

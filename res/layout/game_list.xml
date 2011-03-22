@@ -16,7 +16,7 @@
             android:layout_width="40dp"
             android:layout_height="wrap_content" 
             android:layout_weight="40" 
-	    android:padding="2dp"/>
+	        android:padding="2dp"/>
     <TextView
             android:id="@+id/player_black"
             android:layout_width="40dp"

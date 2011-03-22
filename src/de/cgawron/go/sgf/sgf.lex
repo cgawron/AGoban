@@ -78,13 +78,15 @@ import de.cgawron.util.MiscEncodingReader;
     }
 
 
-    private static Yylex theLexer = null;
+    // private static Yylex theLexer = null;
 
+	/*
     public static void setCharset(String charSetName)
     {
 	if (theLexer != null)
 	    theLexer._setCharset(charSetName);
     }
+	*/
 
     public void _setCharset(String charSetName)
     {
@@ -105,7 +107,7 @@ import de.cgawron.util.MiscEncodingReader;
 %}
 
 %init{
-    theLexer = this;
+  //    theLexer = this;
 %init}
 
 %%

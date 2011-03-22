@@ -58,6 +58,7 @@ public class GameInfo
 	public static final String KEY_ID = "_id";
 	public static final String KEY_LOCAL_MODIFIED_DATE = "MDATE";
 	public static final String KEY_REMOTE_MODIFIED_DATE = "RDATE";
+	public static final String KEY_METADATA_DATE = "METADATE";
 
 	public static final Uri     CONTENT_URI = new Uri.Builder().scheme("content").authority(GameInfo.AUTHORITY).path("games").build();
 
@@ -141,9 +142,10 @@ public class GameInfo
 			initSGFKeys();
 
 		values = new ContentValues();
-		values.put(KEY_ID, file.hashCode());
+		values.put(KEY_ID, getId(file));
 		values.put(KEY_FILENAME, file.getName());
 		values.put(KEY_LOCAL_MODIFIED_DATE, file.lastModified());
+		values.put(KEY_METADATA_DATE, file.lastModified());
 
 		for (Key key : sgfKeys) {
 			Property property = gameTree.getRoot().get(key);
@@ -176,5 +178,18 @@ public class GameInfo
 	public File getFile()
 	{
 		return file;
+	}
+	
+	public static long getId(GameTree gameTree)
+	{
+		return getId(gameTree.getFile());
+	}
+	
+	public static long getId(File file)
+	{
+		long id = file.hashCode();
+		if (id < 0) id = -id;
+		
+		return id;
 	}
 }
