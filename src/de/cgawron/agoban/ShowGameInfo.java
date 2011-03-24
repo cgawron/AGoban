@@ -22,7 +22,6 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TabHost;
-
 import de.cgawron.agoban.view.PropertyView;
 import de.cgawron.go.sgf.GameTree;
 
@@ -46,10 +45,8 @@ public class ShowGameInfo extends TabActivity
 				+ getIntent().getClass().toString());
 		Intent intent = getIntent();
 		GameTree gameTree = application.getGameTree();
-		((PropertyView) findViewById(R.id.PW)).setPropertyList(gameTree
-				.getRoot());
-		((PropertyView) findViewById(R.id.PB)).setPropertyList(gameTree
-				.getRoot());
+		((PropertyView) findViewById(R.id.PW)).setPropertyList(gameTree.getRoot());
+		((PropertyView) findViewById(R.id.PB)).setPropertyList(gameTree.getRoot());
 
 		Resources res = getResources(); // Resource object to get Drawables
 		TabHost tabHost = getTabHost(); // The activity TabHost

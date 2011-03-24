@@ -1,137 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <TabHost 
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:cgawron="http://cgawron"
-  android:id="@android:id/tabhost"
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent">
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:cgawron="http://cgawron"
+	android:id="@android:id/tabhost"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
   <LinearLayout
       android:orientation="vertical"
       android:layout_width="fill_parent"
       android:layout_height="fill_parent"
       android:padding="5dp">
     <TabWidget
-	android:id="@android:id/tabs"
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content" />
+		android:id="@android:id/tabs"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" />
     <FrameLayout
-	android:id="@android:id/tabcontent"
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	android:padding="5dp">
+		android:id="@android:id/tabcontent"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:padding="5dp">
       <TableLayout
-	  android:id="@+id/players"
-	  android:focusable="true"
-	  android:orientation="vertical"
-	  android:layout_width="fill_parent" 
-	  android:layout_height="fill_parent">
-	<TableRow
-	    android:orientation="horizontal"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:padding="1dp">
-	  <TextView
-	      style="@style/PropertyLabel"
-	      android:text="@string/PW"
-	      android:layout_column="1"/>
-	  <de.cgawron.agoban.view.PropertyView
-	      cgawron:property="PW"
-	      android:id="@+id/PW"
-	      android:focusable="true"
-	      android:layout_weight="10" /> 
-	  <de.cgawron.agoban.view.GradeView
-	      cgawron:property="WR"
-	      android:id="@+id/WR"
-	      android:focusable="true"
-	      android:layout_weight="1" /> 
-	  <Button 
-	      android:id="@+id/me_white"
-	      android:text="@string/me"
-	      android:layout_width="wrap_content" 
-	      android:layout_height="wrap_content"/>
-	</TableRow>
-	<TableRow
-	    android:orientation="horizontal"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:padding="1dp">
-	  <TextView
-	      style="@style/PropertyLabel"
-	      android:text="@string/PB"
-	      android:layout_column="1"/>
-	  <de.cgawron.agoban.view.PropertyView
-	      cgawron:property="PB"
-	      android:id="@+id/PB"
-	      android:focusable="true"
-	      android:layout_width="fill_parent" 
-	      android:layout_weight="10" /> 
-	  <de.cgawron.agoban.view.GradeView
-	      cgawron:property="BR"
-	      android:id="@+id/BR"
-	      android:focusable="true"
-	      android:layout_weight="1" /> 
-	  <Button 
-	      android:id="@+id/me_black"
-	      android:text="@string/me"
-	      android:layout_width="wrap_content" 
-	      android:layout_height="wrap_content"/>
-	</TableRow>
-	<TableRow
-	    android:orientation="horizontal"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:padding="1dp">
-	  <TextView
-	      style="@style/PropertyLabel"
-	      android:text="@string/DT"
-	      android:layout_column="1"/>
-	  <de.cgawron.agoban.view.PropertyView
-	      cgawron:property="DT"
-	      android:id="@+id/DT"
-	      android:focusable="true"
-	      android:layout_width="fill_parent" 
-	      android:layout_weight="10" /> 
-	</TableRow>
-	<TableRow
-	    android:orientation="horizontal"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:padding="1dp">
-	  <TextView
-	      style="@style/PropertyLabel"
-	      android:text="@string/EV"
-	      android:layout_column="1"/>
-	  <de.cgawron.agoban.view.PropertyView
-	      cgawron:property="EV"
-	      android:id="@+id/EV"
-	      android:focusable="true"
-	      android:layout_width="fill_parent" 
-	      android:layout_weight="10" /> 
-	</TableRow>
-	<TableRow
-	    android:orientation="horizontal"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:padding="1dp">
-	  <TextView
-	      style="@style/PropertyLabel"
-	      android:text="@string/PC"
-	      android:layout_column="1"/>
-	  <de.cgawron.agoban.view.PropertyView
-	      cgawron:property="PC"
-	      android:id="@+id/PC"
-	      android:focusable="true"
-	      android:layout_width="fill_parent" 
-	      android:layout_weight="10" /> 
-	</TableRow>
+		  android:id="@+id/players"
+		  android:focusable="true"
+		  android:orientation="vertical"
+		  android:layout_width="fill_parent" 
+		  android:layout_height="fill_parent">
+		<TableRow
+			android:orientation="horizontal"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="1dp">
+		  <TextView
+			  style="@style/PropertyLabel"
+			  android:text="@string/PW"
+			  android:layout_column="1"/>
+		  <de.cgawron.agoban.view.TextPropertyView
+			  style="@style/Property"
+			  cgawron:property="PW"
+			  android:id="@+id/PW"
+			  android:focusable="true"
+			  android:layout_weight="10" /> 
+		  <de.cgawron.agoban.view.GradeView
+			  style="@style/Property"
+			  cgawron:property="WR"
+			  android:id="@+id/WR"
+			  android:focusable="true"
+			  android:layout_weight="1" /> 
+		  <Button 
+			  android:id="@+id/me_white"
+			  android:text="@string/me"
+			  android:layout_width="wrap_content" 
+			  android:layout_height="wrap_content"/>
+		</TableRow>
+		<TableRow
+			android:orientation="horizontal"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="1dp">
+		  <TextView
+			  style="@style/PropertyLabel"
+			  android:text="@string/PB"
+			  android:layout_column="1"/>
+		  <de.cgawron.agoban.view.TextPropertyView
+			  cgawron:property="PB"
+			  android:id="@+id/PB"
+			  android:focusable="true"
+			  android:layout_width="fill_parent" 
+			  android:layout_weight="10" /> 
+		  <de.cgawron.agoban.view.GradeView
+			  style="@style/Property"
+			  cgawron:property="BR"
+			  android:id="@+id/BR"
+			  android:focusable="true"
+			  android:layout_weight="1" /> 
+		  <Button 
+			  android:id="@+id/me_black"
+			  android:text="@string/me"
+			  android:layout_width="wrap_content" 
+			  android:layout_height="wrap_content"/>
+		</TableRow>
+		<TableRow
+			android:orientation="horizontal"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="1dp">
+		  <TextView
+			  style="@style/PropertyLabel"
+			  android:text="@string/DT"
+			  android:layout_column="1"/>
+		  <de.cgawron.agoban.view.TextPropertyView
+			  style="@style/Property"
+			  cgawron:property="DT"
+			  android:id="@+id/DT"
+			  android:focusable="true"
+			  android:layout_width="fill_parent" 
+			  android:layout_weight="10" /> 
+		</TableRow>
+		<TableRow
+			android:orientation="horizontal"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="1dp">
+		  <TextView
+			  style="@style/PropertyLabel"
+			  android:text="@string/EV"
+			  android:layout_column="1"/>
+		  <de.cgawron.agoban.view.TextPropertyView
+			  style="@style/Property"
+			  cgawron:property="EV"
+			  android:id="@+id/EV"
+			  android:focusable="true"
+			  android:layout_width="fill_parent" 
+			  android:layout_weight="10" /> 
+		</TableRow>
+		<TableRow
+			android:orientation="horizontal"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="1dp">
+		  <TextView
+			  style="@style/PropertyLabel"
+			  android:text="@string/PC"
+			  android:layout_column="1"/>
+		  <de.cgawron.agoban.view.TextPropertyView
+			  style="@style/Property"
+			  cgawron:property="PC"
+			  android:id="@+id/PC"
+			  android:focusable="true"
+			  android:layout_width="fill_parent" 
+			  android:layout_weight="10" /> 
+		</TableRow>
       </TableLayout>
 
       <TextView
-	  android:text="rules" 
-	  android:id="@+id/rules"  
-	  android:layout_width="wrap_content" 
-	  android:layout_height="wrap_content"/>
+		  android:text="rules" 
+		  android:id="@+id/rules"  
+		  android:layout_width="wrap_content" 
+		  android:layout_height="wrap_content"/>
     </FrameLayout>
   </LinearLayout>
 </TabHost>

@@ -29,7 +29,7 @@ import android.view.View;
  * A {@link View} to be used for grade properties (i.e. BR[] and WR[])
  * 
  */
-public class GradeView extends PropertyView
+public class GradeView extends TextPropertyView
 {
 	private static String TAG = "GradeView";
 
@@ -106,7 +106,7 @@ public class GradeView extends PropertyView
 	{
 		super.onAttachedToWindow();
 
-		getText().setFilters(filters);
+		textView.getText().setFilters(filters);
 	}
 
 }

@@ -45,7 +45,7 @@ import android.widget.SimpleCursorAdapter.ViewBinder;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.cgawron.agoban.provider.GameInfo;
-import de.cgawron.agoban.view.PropertyView;
+import de.cgawron.agoban.view.TextPropertyView;
 
 /**
  * Shows the game info
@@ -240,7 +240,7 @@ public class ChooseSGF extends Activity implements ViewBinder
 
 		if (footerView != null)
 			for (int i = 0; i < footerView.getChildCount(); i++) {
-				PropertyView view = (PropertyView) footerView.getChildAt(i);
+				TextPropertyView view = (TextPropertyView) footerView.getChildAt(i);
 				view.setValue(cursor, position);
 			}
 	}

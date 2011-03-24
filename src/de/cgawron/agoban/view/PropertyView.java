@@ -1,48 +1,22 @@
-/*
- * Copyright (C) 2010 Christian Gawron
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package de.cgawron.agoban.view;
 
-// Need the following import to get access to the app resources, since this
-// class is in a sub-package.
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
-import de.cgawron.agoban.SGFApplication;
+import android.widget.LinearLayout;
 import de.cgawron.go.sgf.Property;
 import de.cgawron.go.sgf.Property.GameInfo;
 import de.cgawron.go.sgf.PropertyList;
-import de.cgawron.go.sgf.Value;
 
-/**
- * A {@link View} to be used for SGF properties
- * 
- */
-public class PropertyView extends EditText
+public abstract class PropertyView extends LinearLayout
 {
-	private static String TAG = "PropertyView";
-	private PropertyList properties;
-	private GameInfo property;
+	private final static String TAG = "PropertyView";
+	
+	protected PropertyList properties;
+	protected GameInfo property;
 
-	private String key;
-	private String valueText = "";
+	protected String key;
+	protected String valueText = "";
 
 	/**
 	 * Construct object, initializing with any attributes we understand from a
@@ -71,34 +45,6 @@ public class PropertyView extends EditText
 		key = attrs.getAttributeValue("http://cgawron", "property");
 	}
 
-	@Override
-	protected void onAttachedToWindow()
-	{
-		super.onAttachedToWindow();
-		Context context = getContext();
-		if (isInEditMode())
-			return;
-
-		SGFApplication application = (SGFApplication) context
-				.getApplicationContext();
-
-		// TODO: Rethink initialization
-		if (application.getGameTree() != null) {
-			setPropertyList(application.getGameTree().getRoot());
-		}
-	}
-
-	protected void initText()
-	{
-		if (property != null) {
-			Value value = property.getValue();
-			if (value != null)
-				valueText = value.toString();
-		}
-
-		setText(valueText);
-	}
-
 	/**
 	 * Sets the text to display in this label
 	 * 
@@ -112,7 +58,7 @@ public class PropertyView extends EditText
 			Property.Key key = new Property.Key(this.key);
 			property = (GameInfo) properties.get(key);
 			Log.d(TAG, "property: " + property);
-
+	
 			if (property == null) {
 				Property prop = Property.createProperty(key);
 				Log.d(TAG,
@@ -122,51 +68,10 @@ public class PropertyView extends EditText
 				properties.add(property);
 			}
 		}
-
+	
 		Log.d(TAG, "setPropertyList: " + properties);
-		initText();
+		initView();
 	}
 
-	public void setValue(String value)
-	{
-		valueText = value;
-		setText(valueText);
-	}
-
-	public void setValue(ContentValues values)
-	{
-		valueText = values.get(key).toString();
-		if (valueText == null)
-			valueText = "";
-		setText(valueText);
-	}
-
-	public void setValue(Cursor cursor, int position)
-	{
-		Log.d(TAG, String.format("setValue(%s, %d)", cursor, position));
-		int oldPosition = cursor.getPosition();
-		cursor.moveToPosition(position);
-		valueText = cursor.getString(cursor.getColumnIndex(key));
-		cursor.moveToPosition(oldPosition);
-
-		if (valueText == null)
-			valueText = "";
-		setText(valueText);
-	}
-
-	@Override
-	public void onTextChanged(CharSequence s, int start, int count, int after)
-	{
-		Log.d(TAG, "onTextChanged: " + s);
-		if (property == null) {
-		}
-
-		if (property != null) {
-			Log.d(TAG, "setting property " + key + " to " + s);
-			property.setValue(s.toString());
-		}
-
-		Log.d(TAG, "after Text: " + properties);
-
-	}
+	protected abstract void initView();
 }
