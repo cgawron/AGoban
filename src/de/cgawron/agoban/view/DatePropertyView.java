@@ -21,23 +21,21 @@ package de.cgawron.agoban.view;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.Button;
 import de.cgawron.agoban.SGFApplication;
 import de.cgawron.go.sgf.Value;
 
 /**
- * A {@link View} to be used for SGF properties
- * 
+ * A {@link View} to be used for the SGF DaTe[] property.
+ * Unlike the SGF standard, this view only supports a single date as the value.
  */
-public class TextPropertyView extends PropertyView implements TextWatcher
+public class DatePropertyView extends PropertyView 
 {
-	static String TAG = "TextPropertyView";
-	protected EditText textView;
+	static String TAG = "DatePropertyView";
+	protected Button button;
 
 	/**
 	 * Construct object, initializing with any attributes we understand from a
@@ -47,10 +45,10 @@ public class TextPropertyView extends PropertyView implements TextWatcher
 	 * @see android.view.View#View(android.content.Context,
 	 *      android.util.AttributeSet)
 	 */
-	public TextPropertyView(Context context)
+	public DatePropertyView(Context context)
 	{
 		super(context);
-		addView(textView = new EditText(context));
+		addView(button = new Button(context));
 	}
 
 	/**
@@ -61,10 +59,10 @@ public class TextPropertyView extends PropertyView implements TextWatcher
 	 * @see android.view.View#View(android.content.Context,
 	 *      android.util.AttributeSet)
 	 */
-	public TextPropertyView(Context context, AttributeSet attrs)
+	public DatePropertyView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
-		addView(textView = new EditText(context, attrs));
+		addView(button = new Button(context, attrs));
 	}
 
 	@Override
@@ -93,13 +91,13 @@ public class TextPropertyView extends PropertyView implements TextWatcher
 				valueText = value.toString();
 		}
 
-		textView.setText(valueText);
+		button.setText(valueText);
 	}
 
 	public void setValue(String value)
 	{
 		valueText = value;
-		textView.setText(valueText);
+		button.setText(valueText);
 	}
 
 	public void setValue(ContentValues values)
@@ -107,7 +105,7 @@ public class TextPropertyView extends PropertyView implements TextWatcher
 		valueText = values.get(key).toString();
 		if (valueText == null)
 			valueText = "";
-		textView.setText(valueText);
+		button.setText(valueText);
 	}
 
 	public void setValue(Cursor cursor, int position)
@@ -120,28 +118,7 @@ public class TextPropertyView extends PropertyView implements TextWatcher
 
 		if (valueText == null)
 			valueText = "";
-		textView.setText(valueText);
+		button.setText(valueText);
 	}
 
-	public void afterTextChanged(Editable s)
-	{	
-	}
-
-	public void beforeTextChanged(CharSequence s, int start, int count, int after)
-	{	
-	}
-
-	public void onTextChanged(CharSequence s, int start, int before, int count)
-	{
-		Log.d(TAG, "onTextChanged: " + s);
-		if (property == null) {
-		}
-
-		if (property != null) {
-			Log.d(TAG, "setting property " + key + " to " + s);
-			property.setValue(s.toString());
-		}
-
-		Log.d(TAG, "after Text: " + properties);
-	}
 }
