@@ -1,6 +1,6 @@
 /*
  *
- * $Id$
+ * $Id: Symmetry.java 38 2003-09-12 19:22:24Z cgawron $
  *
  * (c) 2001 Christian Gawron. All rights reserved.
  *

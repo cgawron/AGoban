@@ -21,8 +21,8 @@ import java.util.Date;
 
 import android.app.Activity;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageItemInfo;
 import android.content.pm.PackageManager;
@@ -55,11 +55,9 @@ public class ChooseSGF extends Activity implements ViewBinder
 	private static String TAG = "ChooseSGF";
 	private static DateFormat dateFormat = DateFormat.getDateInstance();
 
-	private SGFApplication application;
 	private String gitId;
 	private Intent intent;
 
-	private TextView textView;
 	private ListView listView;
 	private ViewGroup footerView;
 
@@ -70,7 +68,6 @@ public class ChooseSGF extends Activity implements ViewBinder
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		application = (SGFApplication) getApplication();
 		try {
 			PackageItemInfo info = getPackageManager().getActivityInfo(new ComponentName(this, ChooseSGF.class),
 																	   PackageManager.GET_META_DATA);
@@ -84,7 +81,6 @@ public class ChooseSGF extends Activity implements ViewBinder
 		Log.d(TAG, String.format("onCreate: intent=%s", intent));
 		setContentView(R.layout.choose_sgf_dialog);
 
-		textView = (TextView) findViewById(R.id.text);
 		listView = (ListView) findViewById(R.id.list);
 		// footerView = (ViewGroup) findViewById(R.id.footer);
 	}

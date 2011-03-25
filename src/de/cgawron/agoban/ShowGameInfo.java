@@ -17,7 +17,6 @@
 package de.cgawron.agoban;
 
 import android.app.TabActivity;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,7 +30,6 @@ import de.cgawron.go.sgf.GameTree;
 public class ShowGameInfo extends TabActivity
 {
 	private SGFApplication application;
-	private GameTree gameTree;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -43,7 +41,7 @@ public class ShowGameInfo extends TabActivity
 
 		Log.d("ShowGameInfo", "thread: " + Thread.currentThread().getId() + " "
 				+ getIntent().getClass().toString());
-		Intent intent = getIntent();
+
 		GameTree gameTree = application.getGameTree();
 		((PropertyView) findViewById(R.id.PW)).setPropertyList(gameTree.getRoot());
 		((PropertyView) findViewById(R.id.PB)).setPropertyList(gameTree.getRoot());

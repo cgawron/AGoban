@@ -26,7 +26,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
@@ -66,14 +65,12 @@ public class EditSGF extends Activity implements GobanEventListener,
 
 	private GobanView gobanView;
 	private TextView titleView;
-	private TextView commentView;
 	private GameTree gameTree;
 	private GameTreeControls gameTreeControls;
 	private Node currentNode;
 	private final Map<Point, Node> variations = new HashMap<Point, Node>();
 	private SGFApplication application;
-	private SharedPreferences settings;
-
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -82,7 +79,6 @@ public class EditSGF extends Activity implements GobanEventListener,
 		Log.d(TAG, "oncreate: " + savedInstanceState);
 		application = (SGFApplication) getApplication();
 		resources = getResources();
-		settings = getSharedPreferences(SGFApplication.PREF, 0);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.main);
 		// getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
@@ -442,7 +438,7 @@ public class EditSGF extends Activity implements GobanEventListener,
 										EditSGF.this.finish();
 									}
 								});
-				AlertDialog alert = builder.show();
+				builder.show();
 			}
 		};
 		runOnUiThread(runnable);

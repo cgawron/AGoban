@@ -16,26 +16,15 @@
 
 package de.cgawron.agoban;
 
-// Need the following import to get access to the app resources, since this
-// class is in a sub-package.
-import android.content.Context;
 import android.graphics.PointF;
-import android.graphics.Rect;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
 import android.view.MotionEvent;
-
-import de.cgawron.go.Goban;
-import de.cgawron.go.Goban.BoardType;
-import de.cgawron.go.Point;
-
-import de.cgawron.agoban.R;
 import de.cgawron.agoban.view.GobanView;
+import de.cgawron.go.Point;
 
 public class GobanEvent
 {
-	private GobanView gobanView;
+	private final GobanView gobanView;
 	private PointF pointF;
 	private Point point;
 	private MotionEvent motionEvent;

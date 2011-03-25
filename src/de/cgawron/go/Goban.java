@@ -22,7 +22,7 @@ import java.beans.PropertyChangeListener;
  * goban.
  * 
  * @author Christian Gawron
- * @version $Id$
+ * @version $Id: GobanModel.java 369 2006-04-14 17:04:02Z cgawron $
  * @see Goban
  */
 public interface Goban extends Cloneable

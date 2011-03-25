@@ -1,6 +1,6 @@
 /*
  *
- * $Id$
+ * $Id: GobanModelListener.java 15 2003-03-15 23:25:52Z cgawron $
  *
  * (c) 2001 Christian Gawron. All rights reserved.
  *
