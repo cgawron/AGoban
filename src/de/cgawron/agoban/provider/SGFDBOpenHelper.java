@@ -103,7 +103,8 @@ class SGFDBOpenHelper extends SQLiteOpenHelper
 			}
 		}
 		sb.append(GameInfo.KEY_LOCAL_MODIFIED_DATE).append(" INTEGER, ");
-		sb.append(GameInfo.KEY_REMOTE_MODIFIED_DATE).append(" INTEGER);");
+		sb.append(GameInfo.KEY_REMOTE_MODIFIED_DATE).append(" INTEGER, ");
+		sb.append(GameInfo.KEY_METADATA_DATE).append(" INTEGER);");
 		Log.d(TAG, "SQL: " + sb.toString());
 
 		return sb.toString();
