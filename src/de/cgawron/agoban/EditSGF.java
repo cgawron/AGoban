@@ -256,7 +256,11 @@ public class EditSGF extends Activity implements GobanEventListener,
 	protected void onRestart()
 	{
 		super.onRestart();
-		Log.i(TAG, "onRestart");
+		Uri data = application.getData();
+		Log.i(TAG, "onRestart: data=" + data);
+
+		Intent intent = getIntent();
+		intent.setData(data);
 	}
 
 	@Override

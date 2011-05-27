@@ -4,15 +4,16 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.LinearLayout;
+import de.cgawron.agoban.SGFApplication;
 import de.cgawron.go.sgf.Property;
 import de.cgawron.go.sgf.Property.GameInfo;
-import de.cgawron.go.sgf.PropertyList;
+import de.cgawron.go.sgf.Node;
 
 public abstract class PropertyView extends LinearLayout
 {
 	private final static String TAG = "PropertyView";
 	
-	protected PropertyList properties;
+	protected Node node;
 	protected GameInfo property;
 
 	protected String key;
@@ -45,18 +46,33 @@ public abstract class PropertyView extends LinearLayout
 		key = attrs.getAttributeValue("http://cgawron", "property");
 	}
 
+	@Override
+	protected void onAttachedToWindow()
+	{
+		super.onAttachedToWindow();
+
+		if (isInEditMode())
+			return;
+
+		Context context = getContext();
+		SGFApplication application = (SGFApplication) context.getApplicationContext();
+		if (application.getGameTree() != null) {
+			setNode(application.getGameTree().getRoot());
+		}
+	}
+
 	/**
 	 * Sets the text to display in this label
 	 * 
 	 * @param text
 	 *            The text to display. This will be drawn as one line.
 	 */
-	public void setPropertyList(PropertyList properties)
+	public void setNode(Node node)
 	{
-		this.properties = properties;
+		this.node = node;
 		if (this.key != null) {
 			Property.Key key = new Property.Key(this.key);
-			property = (GameInfo) properties.get(key);
+			property = (GameInfo) node.get(key);
 			Log.d(TAG, "property: " + property);
 	
 			if (property == null) {
@@ -65,13 +81,25 @@ public abstract class PropertyView extends LinearLayout
 						"new property for key " + this.key + ": "
 								+ prop.getClass());
 				property = (GameInfo) prop;
-				properties.add(property);
+				node.add(property);
 			}
 		}
 	
-		Log.d(TAG, "setPropertyList: " + properties);
+		Log.d(TAG, "setPropertyList: " + node);
 		initView();
 	}
 
 	protected abstract void initView();
+
+	public void setValue(String value)
+	{
+		valueText = value;
+
+		// ToDo: Delegate to parent class
+		if (property != null) {
+			Log.d(TAG, "setting property " + key + " to " + value);
+			property.setValue(value);
+			node.setProperty(property);
+		}
+	}
 }

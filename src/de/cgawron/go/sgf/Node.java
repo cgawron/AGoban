@@ -785,6 +785,19 @@ public class Node extends PropertyList implements MarkupModelListener,
 		}
 	}
 
+	public void setProperty(Property property)
+	{
+		Property oldValue = get(property.getKey());
+		Property newValue = property;
+		if (oldValue != null)
+			oldValue = oldValue.clone();
+		add(property);
+
+		logger.info("Setting " + property.getKey() + " to " + property.getValue());
+		firePropertyChange("SGFProperty", oldValue, newValue);
+	}
+
+
 	public Goban getGoban()
 	{
 		if (goban == null) {

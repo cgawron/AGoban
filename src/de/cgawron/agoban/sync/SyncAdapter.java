@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
@@ -36,6 +35,7 @@ import android.content.ContentProviderClient;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.net.Uri;
@@ -43,6 +43,7 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.google.api.client.googleapis.extensions.android2.auth.GoogleAccountManager;
 import com.google.api.client.http.HttpResponseException;
 
 import de.cgawron.agoban.provider.GameInfo;
@@ -56,20 +57,19 @@ import de.cgawron.agoban.sync.GoogleUtility.GDocEntry;
 public class SyncAdapter extends AbstractThreadedSyncAdapter
 {
 	private static final String TAG = "SyncAdapter";
-	private static final String ACCOUNT_TYPE = "com.google";
-	private static final String AUTH_TOKEN_TYPE = "writely";
 	private static final Date EPOCH = new Date(0);
 
-	private final AccountManager accountManager;
-	private final GoogleUtility googleUtility;
+	private final GoogleAccountManager accountManager;
+	private GoogleUtility googleUtility = null;
+	private final SharedPreferences settings;
 	private Date lastUpdated;
 	private final Map<Long, GDocEntry> gdocMap = new HashMap<Long, GDocEntry>();
 
 	public SyncAdapter(Context context, boolean autoInitialize)
 	{
 		super(context, autoInitialize);
-		this.accountManager = AccountManager.get(context);
-		this.googleUtility = new GoogleUtility();
+		this.accountManager = new GoogleAccountManager(context);
+		this.settings = context.getSharedPreferences(GoogleUtility.PREF, 0);
 	}
 
 	@Override
@@ -91,17 +91,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 			GameInfo.KEY_REMOTE_MODIFIED_DATE 
 		};
 
+		
 		String authtoken = null;
 		try {
-			// use the account manager to request the credentials
-			authtoken = accountManager.blockingGetAuthToken(account, AUTH_TOKEN_TYPE, true);
-
-			googleUtility.setAuthToken(authtoken);
-			// update the last synced date.
-
+			this.googleUtility = new GoogleUtility(settings, accountManager, account);
 			Log.d(TAG, "Retrieving modified games");
-			List<GDocEntry> docs = googleUtility.getDocumentList(lastUpdated);
-			lastUpdated = new Date();
+			googleUtility.updateDocumentList();
+			List<GDocEntry> docs = googleUtility.getDocs();
 			Log.d(TAG, "Modified games: " + docs);
 
 			// check for remote updates
@@ -111,6 +107,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 					Date cloudModification = doc.getUpdated();
 					Date remoteModification = getRemoteModification(provider, doc);
 					Date localModification = getLocalModification(provider, doc);
+					Log.d(TAG, String.format("remote check: cloud=%s, remote=%s, local=%s", 
+											 cloudModification, remoteModification, localModification));
 					gdocMap.put(id, doc);
 	
 					if (localModification == null) {
@@ -118,7 +116,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 						syncResult.stats.numInserts++;
 					}
 					else if (remoteModification == null) {
-						// File exists locally, but is not from cloud - conflict!
+						// File already exists locally, but is not from cloud - conflict!
 						syncResult.stats.numConflictDetectedExceptions++;
 					}
 					else if (remoteModification.before(cloudModification)) {
@@ -170,7 +168,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 			Log.e(TAG, "HttpResponseException", e);
 			int statusCode = e.response.statusCode;
 			if (statusCode == 401 || statusCode == 403) {
-				accountManager.invalidateAuthToken(ACCOUNT_TYPE, authtoken);
+				accountManager.invalidateAuthToken(authtoken);
 				syncResult.stats.numAuthExceptions++;
 			} else {
 				syncResult.stats.numIoExceptions++;
@@ -201,7 +199,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 		gdocMap.put(id, doc);
 	}
 
-	private void createRemote(ContentProviderClient provider, long id, String fileName) throws RemoteException
+	private void createRemote(ContentProviderClient provider, long id, String fileName) throws RemoteException, IOException
 	{
 		Log.d(TAG, "createRemote " + fileName);
 		File sgfFile = new File(SGFProvider.SGF_DIRECTORY, fileName);
@@ -242,7 +240,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 		values.put(GameInfo.KEY_LOCAL_MODIFIED_DATE, localFile.lastModified());
 		values.put(GameInfo.KEY_REMOTE_MODIFIED_DATE, doc.getUpdated().getTime());
 
-		Log.d(TAG, "values: " + values);
+		Log.d(TAG, String.format("file: %s, values: %s", localFile, values));
 		provider.update(GameInfo.CONTENT_URI, values,  
 						GameInfo.KEY_FILENAME + "=?", 
 						new String[] { doc.title });
@@ -267,6 +265,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 
 		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
+			Log.d(TAG, "getLocalModification: " + cursor.getInt(0));
 			date = new Date(cursor.getInt(0));
 		}
 		cursor.close();
@@ -284,6 +283,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 
 		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
+			Log.d(TAG, "getRemoteModification: " + cursor.getInt(0));
 			date = new Date(cursor.getInt(0));
 		}
 		cursor.close();
@@ -312,7 +312,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 	{
 		File destination = new File(SGFProvider.SGF_DIRECTORY, doc.title);
 		File tmp = new File(SGFProvider.SGF_DIRECTORY, "_tmp");
-		InputStream is = doc.getStream("txt");
+		InputStream is = googleUtility.getStream(doc, "txt");
 		OutputStream os = new FileOutputStream(tmp);
 		byte[] buffer = new byte[4*1024];
 		int size;

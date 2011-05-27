@@ -228,15 +228,15 @@ public class SGFApplication extends Application
 
 		if (gameTree.getFile() == null) {
 			gameTree.setFile(getNewFile());
-			Log.d(TAG, "save: file=" + gameTree.getFile());
 		}
+		Log.d(TAG, "save: file=" + gameTree.getFile());
 
 		
 		if (data == null) {
             Uri uri = ContentUris.withAppendedId(GameInfo.CONTENT_URI, GameInfo.getId(gameTree));
 			setData(uri);
-			Log.d(TAG, "save: data=" + uri);
 		}
+		Log.d(TAG, "save: data=" + data);
 		
 		GameInfo info = new GameInfo(gameTree);
 		ContentValues values = info.getContentValues();

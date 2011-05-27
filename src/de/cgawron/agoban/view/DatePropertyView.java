@@ -18,23 +18,31 @@ package de.cgawron.agoban.view;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import android.R;
+import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import de.cgawron.agoban.SGFApplication;
+import android.widget.DatePicker;
 import de.cgawron.go.sgf.Value;
 
 /**
  * A {@link View} to be used for the SGF DaTe[] property.
  * Unlike the SGF standard, this view only supports a single date as the value.
  */
-public class DatePropertyView extends PropertyView 
+public class DatePropertyView extends PropertyView implements View.OnClickListener, DatePickerDialog.OnDateSetListener
 {
-	static String TAG = "DatePropertyView";
+	private static final String TAG = "DatePropertyView";
+
 	protected Button button;
 
 	/**
@@ -62,24 +70,15 @@ public class DatePropertyView extends PropertyView
 	public DatePropertyView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
-		addView(button = new Button(context, attrs));
+		addView(button = new Button(context, attrs, R.attr.buttonStyle));
 	}
 
 	@Override
 	protected void onAttachedToWindow()
 	{
 		super.onAttachedToWindow();
-		Context context = getContext();
-		if (isInEditMode())
-			return;
-
-		SGFApplication application = (SGFApplication) context
-				.getApplicationContext();
-
-		// TODO: Rethink initialization
-		if (application.getGameTree() != null) {
-			setPropertyList(application.getGameTree().getRoot());
-		}
+		button.setRawInputType(InputType.TYPE_CLASS_DATETIME);
+		button.setOnClickListener(this);
 	}
 
 	@Override
@@ -96,8 +95,15 @@ public class DatePropertyView extends PropertyView
 
 	public void setValue(String value)
 	{
-		valueText = value;
-		button.setText(valueText);
+		super.setValue(value);
+		button.setText(value);
+	}
+
+	public void setValue(int year, int monthOfYear, int dayOfMonth)
+	{
+		String date = String.format("%04d-%02d-%02d", year, monthOfYear+1, dayOfMonth); 
+		Log.d(TAG, "Date set to " + date);
+		setValue(date);
 	}
 
 	public void setValue(ContentValues values)
@@ -121,4 +127,28 @@ public class DatePropertyView extends PropertyView
 		button.setText(valueText);
 	}
 
+	public void onClick(View v) 
+	{
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		Date date = null;
+		try {
+			date = format.parse(valueText);
+		}
+		catch (ParseException ex) {
+			Log.e(TAG, "Error parsing " + valueText, ex);
+		}
+	
+		Log.d(TAG, String.format("onclick: date=%04d-%02d-%02d", 1900 + date.getYear(), date.getMonth(), date.getDate()));
+		DatePickerDialog dialog = new DatePickerDialog(getContext(), this, 1900 + date.getYear(), date.getMonth(), date.getDate());
+		// DatePicker datePicker = dialog.getDatePicker();
+		// ToDo: Only available in API-Level 11 
+		//datePicker.setCalendarViewShown(true);
+		dialog.show();
+	}
+
+	public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) 
+	{
+		setValue(year, monthOfYear, dayOfMonth);
+	}
+	
 }

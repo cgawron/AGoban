@@ -27,6 +27,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import de.cgawron.agoban.SGFApplication;
 import de.cgawron.go.sgf.Value;
 
@@ -50,7 +51,9 @@ public class TextPropertyView extends PropertyView implements TextWatcher
 	public TextPropertyView(Context context)
 	{
 		super(context);
-		addView(textView = new EditText(context));
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+																		 LinearLayout.LayoutParams.MATCH_PARENT);
+		addView(textView = new EditText(context), params);
 	}
 
 	/**
@@ -64,24 +67,15 @@ public class TextPropertyView extends PropertyView implements TextWatcher
 	public TextPropertyView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
-		addView(textView = new EditText(context, attrs));
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 
+																		 LinearLayout.LayoutParams.MATCH_PARENT);
+		addView(textView = new EditText(context, attrs), params);
 	}
 
 	@Override
 	protected void onAttachedToWindow()
 	{
 		super.onAttachedToWindow();
-		Context context = getContext();
-		if (isInEditMode())
-			return;
-
-		SGFApplication application = (SGFApplication) context
-				.getApplicationContext();
-
-		// TODO: Rethink initialization
-		if (application.getGameTree() != null) {
-			setPropertyList(application.getGameTree().getRoot());
-		}
 	}
 
 	@Override
@@ -94,12 +88,7 @@ public class TextPropertyView extends PropertyView implements TextWatcher
 		}
 
 		textView.setText(valueText);
-	}
-
-	public void setValue(String value)
-	{
-		valueText = value;
-		textView.setText(valueText);
+		textView.addTextChangedListener(this);
 	}
 
 	public void setValue(ContentValues values)
@@ -134,14 +123,6 @@ public class TextPropertyView extends PropertyView implements TextWatcher
 	public void onTextChanged(CharSequence s, int start, int before, int count)
 	{
 		Log.d(TAG, "onTextChanged: " + s);
-		if (property == null) {
-		}
-
-		if (property != null) {
-			Log.d(TAG, "setting property " + key + " to " + s);
-			property.setValue(s.toString());
-		}
-
-		Log.d(TAG, "after Text: " + properties);
+		setValue(s.toString());
 	}
 }

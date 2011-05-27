@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
+
 import de.cgawron.go.sgf.GameTree;
 import de.cgawron.go.sgf.Property;
 import de.cgawron.go.sgf.Property.Key;
@@ -51,6 +53,7 @@ public class GameInfo
 	public @interface SGFProperty {
 	}
 
+	public static final String TAG = "GameInfo";
 	public static final String AUTHORITY = "de.cgawron.agoban";
 	public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.cgawron.sgf";
 	public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.cgawron.sgf";
@@ -149,8 +152,13 @@ public class GameInfo
 
 		for (Key key : sgfKeys) {
 			Property property = gameTree.getRoot().get(key);
-			if (property != null)
-				values.put(key.toString(), property.getValue().toString());
+			if (property != null) {
+				Log.d(TAG, "property=" + property);
+				if (property.getValue() != null)
+					values.put(key.toString(), property.getValue().toString());
+				else
+					values.put(key.toString(), "");
+			}
 		}
 	}
 

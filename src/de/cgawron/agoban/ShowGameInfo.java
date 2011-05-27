@@ -43,8 +43,8 @@ public class ShowGameInfo extends TabActivity
 				+ getIntent().getClass().toString());
 
 		GameTree gameTree = application.getGameTree();
-		((PropertyView) findViewById(R.id.PW)).setPropertyList(gameTree.getRoot());
-		((PropertyView) findViewById(R.id.PB)).setPropertyList(gameTree.getRoot());
+		((PropertyView) findViewById(R.id.PW)).setNode(gameTree.getRoot());
+		((PropertyView) findViewById(R.id.PB)).setNode(gameTree.getRoot());
 
 		Resources res = getResources(); // Resource object to get Drawables
 		TabHost tabHost = getTabHost(); // The activity TabHost

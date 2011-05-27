@@ -172,7 +172,6 @@ public class Property implements Cloneable
 
 	static class PropertyDescriptor
 	{
-
 		Class myClass;
 		Constructor myConstructor;
 		int priority = 0;

@@ -28,7 +28,7 @@
 		  android:layout_height="fill_parent">
 		<TableRow
 			android:orientation="horizontal"
-			android:layout_width="wrap_content"
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:padding="1dp">
 		  <TextView
@@ -40,22 +40,28 @@
 			  cgawron:property="PW"
 			  android:id="@+id/PW"
 			  android:focusable="true"
-			  android:layout_weight="10" /> 
+			  android:hint="@string/white_player" 
+			  android:layout_gravity="right"
+			  android:layout_width="match_parent" 
+			  android:layout_column="2"
+			  android:layout_weight="10" />
 		  <de.cgawron.agoban.view.GradeView
 			  style="@style/Property"
 			  cgawron:property="WR"
 			  android:id="@+id/WR"
-			  android:focusable="true"
-			  android:layout_weight="1" /> 
+			  android:focusable="true" 
+			  android:layout_column="3"
+			  /> 
 		  <Button 
+			  style="@style/Property"
 			  android:id="@+id/me_white"
 			  android:text="@string/me"
-			  android:layout_width="wrap_content" 
+			  android:layout_width="match_parent" 
 			  android:layout_height="wrap_content"/>
 		</TableRow>
 		<TableRow
 			android:orientation="horizontal"
-			android:layout_width="wrap_content"
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:padding="1dp">
 		  <TextView
@@ -63,18 +69,23 @@
 			  android:text="@string/PB"
 			  android:layout_column="1"/>
 		  <de.cgawron.agoban.view.TextPropertyView
+			  style="@style/Property"
 			  cgawron:property="PB"
 			  android:id="@+id/PB"
 			  android:focusable="true"
+			  android:hint="@string/black_player" 
 			  android:layout_width="fill_parent" 
+			  android:layout_column="2"
 			  android:layout_weight="10" /> 
 		  <de.cgawron.agoban.view.GradeView
 			  style="@style/Property"
 			  cgawron:property="BR"
 			  android:id="@+id/BR"
 			  android:focusable="true"
+			  android:layout_width="fill_parent" 
 			  android:layout_weight="1" /> 
 		  <Button 
+			  style="@style/Property"
 			  android:id="@+id/me_black"
 			  android:text="@string/me"
 			  android:layout_width="wrap_content" 
@@ -89,7 +100,7 @@
 			  style="@style/PropertyLabel"
 			  android:text="@string/DT"
 			  android:layout_column="1"/>
-		  <de.cgawron.agoban.view.TextPropertyView
+		  <de.cgawron.agoban.view.DatePropertyView
 			  style="@style/Property"
 			  cgawron:property="DT"
 			  android:id="@+id/DT"
@@ -110,6 +121,7 @@
 			  style="@style/Property"
 			  cgawron:property="EV"
 			  android:id="@+id/EV"
+			  android:hint="@string/event_name" 
 			  android:focusable="true"
 			  android:layout_width="fill_parent" 
 			  android:layout_weight="10" /> 
@@ -127,6 +139,7 @@
 			  style="@style/Property"
 			  cgawron:property="PC"
 			  android:id="@+id/PC"
+			  android:hint="@string/place" 
 			  android:focusable="true"
 			  android:layout_width="fill_parent" 
 			  android:layout_weight="10" /> 

@@ -163,31 +163,21 @@ public class SGFProvider extends ContentProvider
 					Log.d(TAG, "checking if information for " + file + " is available");
 					cursor = queryDB(getColumns(), QUERY_STRING, args);
 					cursor.moveToFirst();
+					int indexMetadata = cursor.getColumnIndex(KEY_METADATA_DATE);
 					Log.d(TAG, "getCount(): " + cursor.getCount());
-
-					if (cursor.getCount() > 0 && 
-						cursor.getLong(cursor.getColumnIndex(KEY_METADATA_DATE)) == lastModified) {
-						Log.d(TAG, "found entry");
+					
+					
+					if (cursor.getCount() > 0) {
+						Log.d(TAG, String.format("METADATA: db=%d file=%d", cursor.getLong(indexMetadata), lastModified));
+	                     			
+						if (cursor.getLong(indexMetadata) == lastModified) {
+							Log.d(TAG, "found entry");
+						}
+						else {
+							updateFile(file, false);
+						}
 					} else {
-						Log.d(TAG, "parsing " + file);
-						GameInfo gameInfo;
-						try {
-							gameInfo = new GameInfo(file);
-						} catch (Exception ex) {
-							Log.e(TAG, "parse error: " + ex);
-							ex.printStackTrace();
-							continue;
-						}
-						ContentValues contentValues = gameInfo.getContentValues();
-						Log.d(TAG, "doUpdateDatabase: values=" + contentValues);
-						long rowId = db.insertWithOnConflict(SGFDBOpenHelper.SGF_TABLE_NAME, "",
-															 contentValues, SQLiteDatabase.CONFLICT_REPLACE);
-						Log.d(TAG, "doUpdateDatabase: id=" + rowId);
-						if (rowId != 0) {
-							Uri newUri = ContentUris.withAppendedId(GameInfo.CONTENT_URI, rowId);
-							getContext().getContentResolver().notifyChange(newUri, null);
-						}
-
+						updateFile(file, true);
 					}
 				} catch (Exception ex) {
 					Log.d(TAG, "caught " + ex);
@@ -212,6 +202,36 @@ public class SGFProvider extends ContentProvider
 		}
 		lastChecked = System.currentTimeMillis();
 		updateThread = null;
+	}
+
+	private void updateFile(File file, boolean insert)
+	{
+		Log.d(TAG, "updateFile file=" + file + ", insert=" + insert);
+		GameInfo gameInfo;
+		try {
+			gameInfo = new GameInfo(file);
+		} catch (Exception ex) {
+			Log.e(TAG, "parse error: " + ex);
+			ex.printStackTrace();
+			return;
+		}
+		ContentValues contentValues = gameInfo.getContentValues();
+		Log.d(TAG, "updateFile: values=" + contentValues);
+		long rowId = 0;
+		if (insert) {
+			rowId = db.insertWithOnConflict(SGFDBOpenHelper.SGF_TABLE_NAME, "",
+					                        contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+			Log.d(TAG, "updateFile: new rowId=" + rowId);	
+			if (rowId != 0) {
+				Uri newUri = ContentUris.withAppendedId(GameInfo.CONTENT_URI, rowId);
+				getContext().getContentResolver().notifyChange(newUri, null);
+			}
+		}
+		else {
+			update(GameInfo.CONTENT_URI, contentValues, GameInfo.KEY_ID + "=?", 
+				   new String[] { Long.toString(GameInfo.getId(file)) });
+		}
+		
 	}
 
 	@Override
