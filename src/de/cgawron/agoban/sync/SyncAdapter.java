@@ -265,8 +265,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 
 		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
-			Log.d(TAG, "getLocalModification: " + cursor.getInt(0));
-			date = new Date(cursor.getInt(0));
+			Log.d(TAG, "getLocalModification: " + cursor.getLong(0));
+			date = new Date(cursor.getLong(0));
 		}
 		cursor.close();
 		return date;
@@ -283,8 +283,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 
 		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
-			Log.d(TAG, "getRemoteModification: " + cursor.getInt(0));
-			date = new Date(cursor.getInt(0));
+			Log.d(TAG, "getRemoteModification: " + cursor.getLong(0));
+			date = new Date(cursor.getLong(0));
 		}
 		cursor.close();
 		return date;
