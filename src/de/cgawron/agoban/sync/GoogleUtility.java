@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import android.accounts.Account;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.util.Log;
@@ -88,6 +89,7 @@ public final class GoogleUtility
 	static final String PREF_AUTH_TOKEN = "authToken";
 	static final String PREF_GSESSIONID = "gsessionid";
 	private final SharedPreferences settings;
+	private final Context context;
 	private final GoogleAccountManager accountManager;
 	private String gsessionid;
 	private String authToken;
@@ -385,11 +387,12 @@ public final class GoogleUtility
 		}
 	}
 
-	public GoogleUtility(SharedPreferences settings, GoogleAccountManager accountManager, Account account)
+	public GoogleUtility(Context context, GoogleAccountManager accountManager, Account account)
 	{
 		// transport = new NetHttpTransport();
 		Logger.getLogger("com.google.api.client").setLevel(LOGGING_LEVEL);
-		this.settings = settings;
+		this.context = context;
+		this.settings = context.getSharedPreferences(GoogleUtility.PREF, 0);
 		this.accountManager = accountManager;
 		this.account = account;
 		authToken = settings.getString(PREF_AUTH_TOKEN, null);
@@ -431,13 +434,6 @@ public final class GoogleUtility
 	*/
 	}
 	
-	private GDocUrl getDocUrl()
-	{
-		GDocUrl url = new GDocUrl("https://docs.google.com/feeds/default/private/full");
-
-		return url;
-	}
-
 	private GDocUrl getFolderUrl()
 	{
 		GDocUrl url = new GDocUrl("https://docs.google.com/feeds/default/private/full/");

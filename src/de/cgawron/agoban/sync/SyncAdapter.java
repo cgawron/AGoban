@@ -62,7 +62,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 	private final GoogleAccountManager accountManager;
 	private GoogleUtility googleUtility = null;
 	private final SharedPreferences settings;
-	private Date lastUpdated;
+	//private Date lastUpdated;
 	private final Map<Long, GDocEntry> gdocMap = new HashMap<Long, GDocEntry>();
 
 	public SyncAdapter(Context context, boolean autoInitialize)
@@ -77,6 +77,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 							  ContentProviderClient provider, SyncResult syncResult)
 	{
 		// TODO: Take remote trash into account!
+		// TODO: Select/Create folder
 		/* TODO: Check for conflicts
 		 * A Conflict is an entry where 
 		 * - the local modification date is after remote modification (according DB)
@@ -94,7 +95,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 		
 		String authtoken = null;
 		try {
-			this.googleUtility = new GoogleUtility(settings, accountManager, account);
+			this.googleUtility = new GoogleUtility(getContext(), accountManager, account);
 			Log.d(TAG, "Retrieving modified games");
 			googleUtility.updateDocumentList();
 			List<GDocEntry> docs = googleUtility.getDocs();

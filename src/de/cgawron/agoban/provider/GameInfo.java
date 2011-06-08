@@ -29,7 +29,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
-
 import de.cgawron.go.sgf.GameTree;
 import de.cgawron.go.sgf.Property;
 import de.cgawron.go.sgf.Property.Key;
@@ -76,10 +75,12 @@ public class GameInfo
 	public static final @Column @SGFProperty String KEY_BLACK_RANK = "BR";
 
 	private static Key[] sgfKeys;
+	/*
 	private static String[] displayColumns = { 
 		KEY_ID, KEY_FILENAME,
 		KEY_LOCAL_MODIFIED_DATE 
 	};
+	*/
 	private final File file;
 	private ContentValues values;
 
