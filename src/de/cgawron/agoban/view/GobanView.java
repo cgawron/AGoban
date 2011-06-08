@@ -51,8 +51,8 @@ import demo.MultiTouchController.PositionAndScale;
  * A {@link View} to be used for {@link de.cgawron.go.Goban}
  * 
  */
-public class GobanView extends View implements
-		demo.MultiTouchController.MultiTouchObjectCanvas<Object>
+public class GobanView extends View //implements
+		//demo.MultiTouchController.MultiTouchObjectCanvas<Object>
 {
 	private static String TAG = "GobanView";
 

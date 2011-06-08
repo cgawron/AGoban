@@ -85,20 +85,22 @@ public final class GoogleUtility
 	private static final int REQUEST_AUTHENTICATE = 0;
 	private static final int DIALOG_ACCOUNTS = 0;
 	static final String PREF = TAG;
-	static final String PREF_ACCOUNT_NAME = "accountName";
-	static final String PREF_AUTH_TOKEN = "authToken";
-	static final String PREF_GSESSIONID = "gsessionid";
+	private static final String PREF_ACCOUNT_NAME = "accountName";
+	private static final String PREF_AUTH_TOKEN = "authToken";
+	private static final String PREF_GSESSIONID = "gsessionid";
+	private static final String PREF_SGF_FOLDER = "sgfFolder";
 	private final SharedPreferences settings;
 	private final Context context;
 	private final GoogleAccountManager accountManager;
 	private String gsessionid;
 	private String authToken;
 	private String accountName;
-	private String sgfFolder;
+	//private String sgfFolder;
 
 	private final HttpRequestFactory requestFactory;
 	private final Account account;
 	private GDocFeed folderFeed;
+	private GDocEntry sgfFolder;
 
 	private static DateFormat utcFormatter = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 	static {
@@ -409,13 +411,14 @@ public final class GoogleUtility
 
 	private void initFolder() throws IOException
 	{
+		/*
 		GDocUrl url = new GDocUrl("https://docs.google.com/feeds/metadata/default");
 		HttpRequest request = requestFactory.buildGetRequest(url);
 		Log.d(TAG, "retrieving " + url);
-
 		request.execute().ignore();
-	
-    	/*
+		*/
+		
+		String sgfFolderName = settings.getString(PREF_SGF_FOLDER, "SGF");
 		GDocUrl url = new GDocUrl("https://docs.google.com/feeds/default/private/full/-/folder");
 		HttpRequest request = requestFactory.buildGetRequest(url);
 		Log.d(TAG, "retrieving " + url);
@@ -425,19 +428,20 @@ public final class GoogleUtility
 		for (GDocEntry entry : feed.entries)
 		{
 			Log.d(TAG, "initFolder: entry=" + entry);
-			if (entry.links != null) {
-				for (Link link : entry.links) {
-					Log.d(TAG, "link=" + link);
+			if (entry.title.equals(sgfFolderName)) {
+				sgfFolder = entry;
+				if (entry.links != null) {
+					for (Link link : entry.links) {
+						Log.d(TAG, "link=" + link);
+					}
 				}
-			}
+			}	
 		}
-	*/
 	}
 	
 	private GDocUrl getFolderUrl()
 	{
-		GDocUrl url = new GDocUrl("https://docs.google.com/feeds/default/private/full/");
-		url.appendRawPath("folder%3A0B2zBOoPdAGqnN2RiMzQ5YjQtMjE0ZS00OGIyLTg3ZjktZWZjMTgwNTk3NTQ2");
+		GDocUrl url = new GDocUrl(Link.find(sgfFolder.links, "self"));
 		url.appendRawPath("/contents");
 		url.convert = false;
 		return url;

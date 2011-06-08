@@ -21,30 +21,27 @@ import android.graphics.PointF;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-
-import de.cgawron.go.Point;
 import de.cgawron.agoban.GobanEvent;
+import de.cgawron.go.Point;
 
-import demo.MultiTouchController;
-
-public class GobanEventHandler extends MultiTouchController<Object> implements
+public class GobanEventHandler /*extends MultiTouchController<Object> */ implements
 		View.OnLongClickListener, View.OnTouchListener
 {
 	private static int MIN_STILL_TIME = 10;
 
-	private GobanView gobanView;
+	private final GobanView gobanView;
 	private long time;
 	private boolean armed;
 
 	public GobanEventHandler(GobanView gobanView, Resources res)
 	{
-		super(gobanView, res, false);
+		//super(gobanView, res, false);
 		this.gobanView = gobanView;
 	}
 
 	public boolean onTouch(View view, MotionEvent event)
 	{
-		if (!super.onTouchEvent(event)) {
+		if (true /*!super.onTouchEvent(event)*/) {
 			Log.d("GobanEventHandler",
 					String.format("onTouchEvent: %s %d", event,
 							event.getEventTime() - time));
