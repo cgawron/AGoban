@@ -35,7 +35,6 @@ import android.content.ContentProviderClient;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.net.Uri;
@@ -61,15 +60,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 
 	private final GoogleAccountManager accountManager;
 	private GoogleUtility googleUtility = null;
-	private final SharedPreferences settings;
-	//private Date lastUpdated;
 	private final Map<Long, GDocEntry> gdocMap = new HashMap<Long, GDocEntry>();
 
 	public SyncAdapter(Context context, boolean autoInitialize)
 	{
 		super(context, autoInitialize);
-		this.accountManager = new GoogleAccountManager(context);
-		this.settings = context.getSharedPreferences(GoogleUtility.PREF, 0);
+		this.accountManager = new GoogleAccountManager(context);	
 	}
 
 	@Override
