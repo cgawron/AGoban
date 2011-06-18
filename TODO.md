@@ -1,7 +1,7 @@
 Open
 =============
 - Improve metadata sync for local files
-- Improve Google Sync (choose folder, create folder)
+- Improve Google Sync (choose folder, create folder, add resource id to provider db)
 - Improve GameTreeControl
 - Improve game info activity
 - Optimze loading of sgf files (memory footprint). Goal: Load Kodo's joseki library

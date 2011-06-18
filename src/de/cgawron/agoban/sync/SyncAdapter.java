@@ -99,30 +99,34 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 			Log.d(TAG, "Retrieving modified games");
 			googleUtility.updateDocumentList();
 			List<GDocEntry> docs = googleUtility.getDocs();
-			Log.d(TAG, "Modified games: " + docs);
 
 			// check for remote updates
 			if (docs != null) {
 				for (GDocEntry doc : docs) {
-					long id = getId(provider, doc);
-					Date cloudModification = doc.getUpdated();
-					Date remoteModification = getRemoteModification(provider, doc);
-					Date localModification = getLocalModification(provider, doc);
-					Log.d(TAG, String.format("remote check: cloud=%s, remote=%s, local=%s", 
-											 cloudModification, remoteModification, localModification));
-					gdocMap.put(id, doc);
+					if (GoogleUtility.CATEGORY_FILE.equals(doc.getKind().term)) {
+						Log.d(TAG, "Modified: " + doc);
+						long id = getId(provider, doc);
+						Date cloudModification = doc.getUpdated();
+						Date remoteModification = getRemoteModification(provider, doc);
+						Date localModification = getLocalModification(provider, doc);
+						Log.d(TAG, String.format("remote check: cloud=%s, remote=%s, local=%s", 
+												 cloudModification, remoteModification, localModification));
+						
+						Log.d(TAG, String.format("put: %d->%s", id, doc));
+						gdocMap.put(id, doc);
 	
-					if (localModification == null) {
-						createLocal(provider, doc);
-						syncResult.stats.numInserts++;
-					}
-					else if (remoteModification == null) {
-						// File already exists locally, but is not from cloud - conflict!
-						syncResult.stats.numConflictDetectedExceptions++;
-					}
-					else if (remoteModification.before(cloudModification)) {
-						updateLocal(provider, doc);
-						syncResult.stats.numUpdates++;
+						if (localModification == null) {
+							createLocal(provider, doc);
+							syncResult.stats.numInserts++;
+						}
+						else if (remoteModification == null) {
+							// File already exists locally, but is not from cloud - conflict!
+							syncResult.stats.numConflictDetectedExceptions++;
+						}
+						else if (remoteModification.before(cloudModification)) {
+							updateLocal(provider, doc);
+							syncResult.stats.numUpdates++;
+						}
 					}
 				}
 			}
@@ -137,6 +141,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 				Date localModification = new Date(cursor.getLong(2));
 				Date remoteModification = new Date(cursor.getLong(3));
 				GDocEntry doc = gdocMap.get(id);
+				Log.d(TAG, String.format("get: %d->%s", id, doc));
 				Log.d(TAG, String.format("sync (up): local=%s, remote=%s, cloud=%s", localModification, remoteModification, doc != null ? doc.getUpdated() : "<null>"));
 				
 				try {
@@ -225,6 +230,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 
 		values.put(GameInfo.KEY_ID, id);
 		values.put(GameInfo.KEY_FILENAME, doc.title);
+		values.put(GameInfo.KEY_REMOTE_ID, doc.resourceId);
 		values.put(GameInfo.KEY_LOCAL_MODIFIED_DATE, localFile.lastModified());
 		values.put(GameInfo.KEY_REMOTE_MODIFIED_DATE, doc.getUpdated().getTime());
 
@@ -240,7 +246,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 		
 		values.put(GameInfo.KEY_LOCAL_MODIFIED_DATE, localFile.lastModified());
 		values.put(GameInfo.KEY_REMOTE_MODIFIED_DATE, doc.getUpdated().getTime());
-
+		values.put(GameInfo.KEY_REMOTE_ID, doc.resourceId);
+		
 		Log.d(TAG, String.format("file: %s, values: %s", localFile, values));
 		provider.update(GameInfo.CONTENT_URI, values,  
 						GameInfo.KEY_FILENAME + "=?", 
@@ -293,7 +300,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 
 	private long getId(ContentProviderClient provider, GDocEntry doc) throws RemoteException
 	{
-		long id = 0;
+		long id = GameInfo.getId(doc.title);
 		Log.d(TAG, "getId: " + doc.title);
 			
 		final String[] PROJECTION = { GameInfo.KEY_ID };
@@ -313,7 +320,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 	{
 		File destination = new File(SGFProvider.SGF_DIRECTORY, doc.title);
 		File tmp = new File(SGFProvider.SGF_DIRECTORY, "_tmp");
-		InputStream is = googleUtility.getStream(doc, "txt");
+		InputStream is = googleUtility.getStream(doc);
 		OutputStream os = new FileOutputStream(tmp);
 		byte[] buffer = new byte[4*1024];
 		int size;

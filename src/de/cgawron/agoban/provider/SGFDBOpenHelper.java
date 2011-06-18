@@ -16,17 +16,17 @@
 
 package de.cgawron.agoban.provider;
 
+import java.lang.reflect.Field;
+
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import java.lang.reflect.Field;
-
 class SGFDBOpenHelper extends SQLiteOpenHelper
 {
 	private static final String TAG = "SGFDBOpenHelper";
-	private static final int DATABASE_VERSION = 3;
+	private static final int DATABASE_VERSION = 4;
 	private static final String DATABASE_NAME = "AGoban";
 	static final String SGF_TABLE_NAME = "sgf";
 
@@ -47,43 +47,33 @@ class SGFDBOpenHelper extends SQLiteOpenHelper
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
 	{
 		String upgradeStatement = null;
-		if (oldVersion == 1 && newVersion == 2) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("ALTER TABLE ").append(SGF_TABLE_NAME)
-					.append(" ADD COLUMN ")
-					.append(GameInfo.KEY_REMOTE_MODIFIED_DATE)
-					.append(" INTEGER;");
-			upgradeStatement = sb.toString();
+		if (oldVersion >= newVersion) return;
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("ALTER TABLE ").append(SGF_TABLE_NAME).append(" ADD COLUMN ");
+		for (int version = oldVersion+1; version <= newVersion; version++) {
+			switch (version) {
+			case 2:
+				sb.append(GameInfo.KEY_REMOTE_MODIFIED_DATE).append(" INTEGER");
+				break;
+			case 3:
+				sb.append(GameInfo.KEY_METADATA_DATE).append(" INTEGER");
+				break;
+			case 4:
+				sb.append(GameInfo.KEY_REMOTE_ID).append(" TEXT UNIQUE");
+				break;
+			default:
+				throw new RuntimeException(String.format("Unknow DB version: %d", newVersion));
+			}
+			if (version == newVersion)
+				sb.append(";");
+			else
+				sb.append(", ");
 		}
-		else if (oldVersion == 1 && newVersion == 3) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("ALTER TABLE ").append(SGF_TABLE_NAME)
-					.append(" ADD COLUMN ")
-					.append(GameInfo.KEY_REMOTE_MODIFIED_DATE)
-					.append(" INTEGER ")
-					.append(", ")
-					.append(GameInfo.KEY_METADATA_DATE)
-					.append(" INTEGER;");
-			upgradeStatement = sb.toString();
-		}
-		else if (oldVersion == 2 && newVersion == 3) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("ALTER TABLE ").append(SGF_TABLE_NAME)
-					.append(" ADD COLUMN ")
-					.append(GameInfo.KEY_METADATA_DATE)
-					.append(" INTEGER;");
-			upgradeStatement = sb.toString();
-		}
-
-		if (upgradeStatement != null) {
-			Log.d(TAG, "upgrade: " + upgradeStatement);
-			db.execSQL(upgradeStatement);
-		} else {
-			Log.e(TAG, String.format(
-					"upgrade from version %d to %d not possible", oldVersion,
-					newVersion));
-			throw new RuntimeException("upgrade not possible");
-		}
+		upgradeStatement = sb.toString();
+		
+		Log.d(TAG, "upgrade: " + upgradeStatement);
+		db.execSQL(upgradeStatement);
 	}
 
 	public String getCreateStatement()
@@ -104,7 +94,8 @@ class SGFDBOpenHelper extends SQLiteOpenHelper
 		}
 		sb.append(GameInfo.KEY_LOCAL_MODIFIED_DATE).append(" INTEGER, ");
 		sb.append(GameInfo.KEY_REMOTE_MODIFIED_DATE).append(" INTEGER, ");
-		sb.append(GameInfo.KEY_METADATA_DATE).append(" INTEGER);");
+		sb.append(GameInfo.KEY_METADATA_DATE).append(" INTEGER, ");
+		sb.append(GameInfo.KEY_REMOTE_ID).append(" TEXT UNIQUE);");
 		Log.d(TAG, "SQL: " + sb.toString());
 
 		return sb.toString();

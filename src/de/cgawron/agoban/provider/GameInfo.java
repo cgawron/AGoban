@@ -61,7 +61,8 @@ public class GameInfo
 	public static final String KEY_LOCAL_MODIFIED_DATE = "MDATE";
 	public static final String KEY_REMOTE_MODIFIED_DATE = "RDATE";
 	public static final String KEY_METADATA_DATE = "METADATE";
-
+	public static final String KEY_REMOTE_ID = "REMOTEID";
+	
 	public static final Uri     CONTENT_URI = new Uri.Builder().scheme("content").authority(GameInfo.AUTHORITY).path("games").build();
 
 	public static final @Column String KEY_URI = "URI";
@@ -196,7 +197,12 @@ public class GameInfo
 	
 	public static long getId(File file)
 	{
-		long id = file.hashCode();
+		return getId(file.getName());
+	}
+	
+	public static long getId(String fileName)
+	{
+		long id = fileName.hashCode();
 		if (id < 0) id = -id;
 		
 		return id;

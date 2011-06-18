@@ -41,39 +41,36 @@ public class GobanEventHandler /*extends MultiTouchController<Object> */ impleme
 
 	public boolean onTouch(View view, MotionEvent event)
 	{
-		if (true /*!super.onTouchEvent(event)*/) {
-			Log.d("GobanEventHandler",
-					String.format("onTouchEvent: %s %d", event,
-							event.getEventTime() - time));
-			GobanEvent gobanEvent = new GobanEvent(gobanView, event);
-			Log.d("GobanEventHandler", "gobanEvent: " + gobanEvent);
+		Log.d("GobanEventHandler",
+				String.format("onTouchEvent: %s %d", event,
+						event.getEventTime() - time));
+		GobanEvent gobanEvent = new GobanEvent(gobanView, event);
+		Log.d("GobanEventHandler", "gobanEvent: " + gobanEvent);
 
-			switch (event.getAction()) {
-			case MotionEvent.ACTION_UP:
-				gobanView.setBlowup(gobanEvent);
-				gobanView.setCursorPosition(null);
-				if (armed && event.getEventTime() - time > MIN_STILL_TIME) {
-					gobanView.fireGobanEvent(gobanEvent);
-				}
-				break;
-
-			case MotionEvent.ACTION_DOWN:
-				time = event.getEventTime();
-				armed = true;
-				gobanView.setBlowup(gobanEvent);
-				gobanView.setCursorPosition(gobanEvent.getPointF());
-				return true;
-
-			case MotionEvent.ACTION_MOVE:
-				gobanView.setBlowup(gobanEvent);
-			default:
-				time = event.getEventTime();
-				gobanView.setCursorPosition(gobanEvent.getPointF());
-				break;
+		switch (event.getAction()) {
+		case MotionEvent.ACTION_UP:
+			gobanView.setBlowup(gobanEvent);
+			gobanView.setCursorPosition(null);
+			if (armed && event.getEventTime() - time > MIN_STILL_TIME) {
+				gobanView.fireGobanEvent(gobanEvent);
 			}
+			break;
+
+		case MotionEvent.ACTION_DOWN:
+			time = event.getEventTime();
+			armed = true;
+			gobanView.setBlowup(gobanEvent);
+			gobanView.setCursorPosition(gobanEvent.getPointF());
 			return true;
-		} else
-			return true;
+
+		case MotionEvent.ACTION_MOVE:
+			gobanView.setBlowup(gobanEvent);
+		default:
+			time = event.getEventTime();
+			gobanView.setCursorPosition(gobanEvent.getPointF());
+			break;
+		}
+		return true;
 	}
 
 	public boolean onTrackballEvent(MotionEvent event)

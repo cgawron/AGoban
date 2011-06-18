@@ -44,15 +44,12 @@ import de.cgawron.go.Point;
 import de.cgawron.go.sgf.Property;
 import de.cgawron.go.sgf.Property.Markup;
 import de.cgawron.go.sgf.Value;
-import demo.MultiTouchController.PointInfo;
-import demo.MultiTouchController.PositionAndScale;
 
 /**
  * A {@link View} to be used for {@link de.cgawron.go.Goban}
  * 
  */
-public class GobanView extends View //implements
-		//demo.MultiTouchController.MultiTouchObjectCanvas<Object>
+public class GobanView extends View 
 {
 	private static String TAG = "GobanView";
 
@@ -331,6 +328,7 @@ public class GobanView extends View //implements
 			return true;
 	}
 
+	/*
 	public Object getDraggableObjectAtPoint(PointInfo pt)
 	{
 		// We do not support dragging on a goban
@@ -362,16 +360,7 @@ public class GobanView extends View //implements
 		// invalidate(bx, by, bx+1, by+1);
 		invalidate();
 	}
-
-	public boolean setPositionAndScale(Object obj, PositionAndScale update,
-			PointInfo touchPoint)
-	{
-		// Get new offsets and coords
-		float newRelativeScale = update.getScale();
-		Log.d("Goban", "multitouch: " + newRelativeScale);
-
-		return true;
-	}
+    */
 
 	public int getBoardSize()
 	{

@@ -77,11 +77,11 @@ public final class GoogleUtility
 	private static final String PREFS = "SyncPrefs";
 	private static final String TAG = "GoogleUtility";
 	private static final String FOLDER_SGF = "SGF";
-	private static final String CATEGORY_KIND = "http://schemas.google.com/g/2005#kind";
-	private static final String CATEGORY_DOCUMENT = "http://schemas.google.com/docs/2007#document";
-	private static final String CATEGORY_FILE = "http://schemas.google.com/docs/2007#file";
-	private static final String LINK_PARENT = "http://schemas.google.com/docs/2007#parent";
-	private static final String LINK_RESUMABLE_CREATE = "http://schemas.google.com/g/2005#resumable-create-media";
+	static final String CATEGORY_KIND = "http://schemas.google.com/g/2005#kind";
+	static final String CATEGORY_DOCUMENT = "http://schemas.google.com/docs/2007#document";
+	static final String CATEGORY_FILE = "http://schemas.google.com/docs/2007#file";
+	static final String LINK_PARENT = "http://schemas.google.com/docs/2007#parent";
+	static final String LINK_RESUMABLE_CREATE = "http://schemas.google.com/g/2005#resumable-create-media";
 	private static final int REQUEST_AUTHENTICATE = 0;
 	private static final int DIALOG_ACCOUNTS = 0;
 	static final String PREF = TAG;
@@ -208,6 +208,9 @@ public final class GoogleUtility
 		@Key("@gd:etag")
 		public String etag;
 
+		@Key("gd:resourceId")
+		public String resourceId;
+
 		@Key
 		public String title;
 
@@ -225,6 +228,19 @@ public final class GoogleUtility
 
 		@Key("category")
 		public List<Category> categories;
+
+		public Category getCategory(String scheme)
+		{
+			for (Category category : categories) {
+				if (scheme.equals(category.scheme)) return category;
+			}
+			return null;
+		}
+
+		public Category getKind()
+		{
+			return getCategory(CATEGORY_KIND);
+		}
 
 		public Date getUpdated()
 		{
@@ -265,7 +281,7 @@ public final class GoogleUtility
 		@Override
 		public String toString()
 		{
-			return "DocEntry: " + title;
+			return "DocEntry: [" + getKind() + "] " + resourceId + " \"" + title + "\"";
 		}
 	}
 
@@ -589,9 +605,9 @@ public final class GoogleUtility
 		return entry;
 	}
 
-	public InputStream getStream(GDocEntry doc, String type) throws IOException
+	public InputStream getStream(GDocEntry doc) throws IOException
 	{
-		return doc.getStream(requestFactory, type);
+		return doc.getStream(requestFactory);
 	}
 
 	public List<GDocEntry> getDocs()
