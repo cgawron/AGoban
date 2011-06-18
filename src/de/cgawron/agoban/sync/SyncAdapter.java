@@ -72,7 +72,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 	public void onPerformSync(Account account, Bundle extras, String authority,
 							  ContentProviderClient provider, SyncResult syncResult)
 	{
-		// TODO: Take remote trash into account!
 		// TODO: Select/Create folder
 		/* TODO: Check for conflicts
 		 * A Conflict is an entry where 
@@ -111,7 +110,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 						Log.d(TAG, String.format("put: %d->%s", id, doc));
 						gdocMap.put(id, doc);
 	
-						if (localModification == null) {
+						if (doc.isTrashed()) {
+							// remote deletion
+							deleteLocal(provider, id);
+							syncResult.stats.numDeletes++;
+						}
+						else if (localModification == null) {
 							createLocal(provider, doc);
 							syncResult.stats.numInserts++;
 						}

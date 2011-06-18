@@ -19,7 +19,6 @@ package de.cgawron.agoban.view.tool;
 import java.util.Map;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -151,7 +150,6 @@ public class MoveTool extends Drawable implements GobanView.Tool
 	public boolean askReplaceMove(final Node currentNode, final Point point)
 	{
 		Context context = editor;
-		Dialog dialog;
 		replace = true;
 		OnClickListener listener = new OnClickListener() {
 			public void onClick(DialogInterface dialog, int which)
@@ -169,7 +167,7 @@ public class MoveTool extends Drawable implements GobanView.Tool
 		builder.setMessage("Do you want to replace the last move or to add a variaton?");
 		builder.setPositiveButton("Add", listener);
 		builder.setNegativeButton("Replace", listener);
-		dialog = builder.show();
+		builder.show();
 
 		return replace;
 	}

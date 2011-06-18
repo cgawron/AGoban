@@ -26,9 +26,6 @@ import de.cgawron.go.Goban;
 import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.Point;
 import de.cgawron.go.sgf.MarkupModel;
-import de.cgawron.go.sgf.MarkupModel.Type;
-import de.cgawron.go.sgf.Property;
-import de.cgawron.go.sgf.Value;
 
 /**
  * A {@code GobanRenderer} can render a {@link Goban} on a {@link Canvas}.
@@ -51,7 +48,7 @@ public class GobanRenderer
 	private static float COS30 = (float) Math.sqrt(0.75);
 	private static float SIN30 = 0.5f;
 	private static float SIN45 = (float) Math.sqrt(0.5);
-	private static int SELECTION_COLOR = Color.RED;
+	//private static int SELECTION_COLOR = Color.RED;
 	private static int VARIATION_COLOR = Color.argb(128, 128, 128, 128);
 
 	private final GobanView view;
@@ -63,13 +60,14 @@ public class GobanRenderer
 
 	public class VariationMark extends Markup
 	{
-		private Point point;
+		private final Point point;
 
 		public VariationMark(Point point)
 		{
 			this.point = point;
 		}
 
+		@Override
 		public void draw(Canvas canvas, Goban goban)
 		{
 			Log.d(TAG, "VariationMark: draw@" + point);
@@ -86,13 +84,14 @@ public class GobanRenderer
 
 	public class LastMoveMark extends Markup
 	{
-		private Point point;
+		private final Point point;
 
 		public LastMoveMark(Point point)
 		{
 			this.point = point;
 		}
 
+		@Override
 		public void draw(Canvas canvas, Goban goban)
 		{
 			BoardType stone = goban.getStone(point);
@@ -122,9 +121,9 @@ public class GobanRenderer
 
 	public class SGFMarkup extends Markup
 	{
-		private Point point;
-		private BoardType stone;
-		private MarkupModel.Type type;
+		private final Point point;
+		private final BoardType stone;
+		private final MarkupModel.Type type;
 
 		public SGFMarkup(Point point, BoardType stone, MarkupModel.Type type)
 		{
@@ -133,6 +132,7 @@ public class GobanRenderer
 			this.type = type;
 		}
 
+		@Override
 		public void draw(Canvas canvas, Goban goban)
 		{
 			Path path = null;
@@ -222,8 +222,8 @@ public class GobanRenderer
 
 	public class Label extends Markup
 	{
-		private Point point;
-		private String text;
+		private final Point point;
+		private final String text;
 
 		public Label(Point point, String text)
 		{
@@ -231,6 +231,7 @@ public class GobanRenderer
 			this.text = text;
 		}
 
+		@Override
 		public void draw(Canvas canvas, Goban goban)
 		{
 			Log.d(TAG, "VariationMark: draw@" + point);
@@ -300,10 +301,6 @@ public class GobanRenderer
 			for (short i = 0; i < size; i++) {
 				for (short j = 0; j < size; j++) {
 					BoardType stone = goban.getStone(i, j);
-					MarkupModel.Markup markup = null;
-					if (goban instanceof MarkupModel) {
-						markup = ((MarkupModel) goban).getMarkup(i, j);
-					}
 					switch (stone) {
 					case BLACK:
 					case WHITE:

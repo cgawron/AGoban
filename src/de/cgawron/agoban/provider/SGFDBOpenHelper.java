@@ -33,7 +33,6 @@ class SGFDBOpenHelper extends SQLiteOpenHelper
 	SGFDBOpenHelper(Context context)
 	{
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		String cs = getCreateStatement();
 	}
 
 	@Override

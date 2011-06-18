@@ -62,7 +62,6 @@ public class GobanView extends View
 	private Tool tool;
 	private final List<GobanRenderer.Markup> markupList = new ArrayList<GobanRenderer.Markup>();
 
-	private final float xOff = 0.0f, yOff = 0.0f, relativeScale = 1.0f;
 	private RectF blowup;
 	private float blowupScale;
 	private float blowupWidth;

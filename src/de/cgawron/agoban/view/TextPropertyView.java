@@ -28,7 +28,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import de.cgawron.agoban.SGFApplication;
 import de.cgawron.go.sgf.Value;
 
 /**

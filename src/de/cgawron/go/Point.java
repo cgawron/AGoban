@@ -1,6 +1,6 @@
 /*
  *
- * $Id: Point.java 289 2005-08-15 09:44:31Z cgawron $
+ * $Id$
  *
  * (c) 2001 Christian Gawron. All rights reserved.
  *

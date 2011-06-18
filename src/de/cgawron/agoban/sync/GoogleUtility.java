@@ -74,19 +74,17 @@ public final class GoogleUtility
 	/** The token type for authentication */
 	private static final String AUTH_TOKEN_TYPE = "writely";
 	private static Level LOGGING_LEVEL = Level.ALL;
-	private static final String PREFS = "SyncPrefs";
 	private static final String TAG = "GoogleUtility";
 	private static final String FOLDER_SGF = "SGF";
 	static final String CATEGORY_KIND = "http://schemas.google.com/g/2005#kind";
+	static final String CATEGORY_LABELS = "http://schemas.google.com/g/2005/labels";
 	static final String CATEGORY_DOCUMENT = "http://schemas.google.com/docs/2007#document";
 	static final String CATEGORY_FILE = "http://schemas.google.com/docs/2007#file";
+	static final String LABEL_TRASHED = "http://schemas.google.com/g/2005/labels#trashed";
 	static final String LINK_PARENT = "http://schemas.google.com/docs/2007#parent";
 	static final String LINK_RESUMABLE_CREATE = "http://schemas.google.com/g/2005#resumable-create-media";
-	private static final int REQUEST_AUTHENTICATE = 0;
-	private static final int DIALOG_ACCOUNTS = 0;
 	static final String PREF = TAG;
-	private static final String PREF_ACCOUNT_NAME = "accountName";
-	private static final String PREF_AUTH_TOKEN = "authToken";
+		private static final String PREF_AUTH_TOKEN = "authToken";
 	private static final String PREF_GSESSIONID = "gsessionid";
 	private static final String PREF_SGF_FOLDER = "sgfFolder";
 	private final SharedPreferences settings;
@@ -94,9 +92,7 @@ public final class GoogleUtility
 	private final GoogleAccountManager accountManager;
 	private String gsessionid;
 	private String authToken;
-	private String accountName;
-	//private String sgfFolder;
-
+	
 	private final HttpRequestFactory requestFactory;
 	private final Account account;
 	private GDocFeed folderFeed;
@@ -106,13 +102,6 @@ public final class GoogleUtility
 	static {
 		utcFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
-
-	private static final String[] PROJECTION = new String[] { 
-		GameInfo.KEY_ID,
-		GameInfo.KEY_FILENAME, 
-		GameInfo.KEY_LOCAL_MODIFIED_DATE,
-		GameInfo.KEY_REMOTE_MODIFIED_DATE 
-	};
 
 	private static final XmlNamespaceDictionary DICTIONARY = new XmlNamespaceDictionary()
 		.set("", "http://www.w3.org/2005/Atom")
@@ -278,10 +267,15 @@ public final class GoogleUtility
 			return request.execute().getContent();
 		}
 		
+		public boolean isTrashed() 
+		{
+			return Category.hasCategory(categories, CATEGORY_LABELS, LABEL_TRASHED);
+		}
+
 		@Override
 		public String toString()
 		{
-			return "DocEntry: [" + getKind() + "] " + resourceId + " \"" + title + "\"";
+			return "DocEntry: [" + categories + "]/* {" + links + "}*/ " + resourceId + " \"" + title + "\"";
 		}
 	}
 
@@ -305,6 +299,14 @@ public final class GoogleUtility
 			this.scheme = scheme;
 			this.term = term;
 			this.label = label;
+		}
+		
+		public static boolean hasCategory(List<Category> categories, String scheme, String term)
+		{
+			for (Category category : categories) {
+				if (scheme.equals(category.scheme) && term.equals(category.term)) return true;
+			}
+			return false;
 		}
 
 		@Override
@@ -370,6 +372,9 @@ public final class GoogleUtility
 		@Key
 		Boolean convert;
 		
+		@Key("showdeleted")
+		Boolean showDeleted;
+
 		GDocUrl(String url)
 		{
 			super(url);
@@ -410,7 +415,7 @@ public final class GoogleUtility
 		// transport = new NetHttpTransport();
 		Logger.getLogger("com.google.api.client").setLevel(LOGGING_LEVEL);
 		this.context = context;
-		this.settings = context.getSharedPreferences(GoogleUtility.PREF, 0);
+		this.settings = this.context.getSharedPreferences(GoogleUtility.PREF, 0);
 		this.accountManager = accountManager;
 		this.account = account;
 		authToken = settings.getString(PREF_AUTH_TOKEN, null);
@@ -434,7 +439,7 @@ public final class GoogleUtility
 		request.execute().ignore();
 		*/
 		
-		String sgfFolderName = settings.getString(PREF_SGF_FOLDER, "SGF");
+		String sgfFolderName = settings.getString(PREF_SGF_FOLDER, FOLDER_SGF);
 		GDocUrl url = new GDocUrl("https://docs.google.com/feeds/default/private/full/-/folder");
 		HttpRequest request = requestFactory.buildGetRequest(url);
 		Log.d(TAG, "retrieving " + url);
@@ -469,6 +474,7 @@ public final class GoogleUtility
 		if (folderFeed != null) {
 		    url.updatedMin = utcFormatter.format(folderFeed.updated);
 		}
+		url.showDeleted = true;
 		HttpRequest request = requestFactory.buildGetRequest(url);
 		Log.d(TAG, "retrieving " + url);
 
@@ -526,8 +532,6 @@ public final class GoogleUtility
 			//HttpContent mpContent = MultipartRelatedContent.forRequest(request);
 			content.inputStream = sendData.getInputStream();
 			content.type = "application/x-go-sgf";
-			//content.type = "application/ms-word";
-			//content.type = "text/plain";
 			// content.length = sendData.contentLength;
 			//mpContent.parts.add(content);
 			//mpContent.parts.add(atom);
@@ -578,8 +582,6 @@ public final class GoogleUtility
 			((GoogleHeaders) request.headers).setSlugFromFileName(sendData.getTitle());
 
 			content.inputStream = sendData.getInputStream();
-			//content.type = "text/plain";
-			// content.length = sendData.contentLength;
 			mpContent.parts.add(content);
 			mpContent.parts.add(atom);
 			request.content = mpContent;
