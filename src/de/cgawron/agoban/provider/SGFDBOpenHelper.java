@@ -22,6 +22,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import de.cgawron.agoban.provider.GameInfo.Column;
 
 class SGFDBOpenHelper extends SQLiteOpenHelper
 {
@@ -82,10 +83,14 @@ class SGFDBOpenHelper extends SQLiteOpenHelper
 				.append(GameInfo.KEY_ID).append(" INTEGER PRIMARY KEY, ");
 		Field[] fields = GameInfo.class.getFields();
 		for (Field field : fields) {
-			if (field.getAnnotation(GameInfo.Column.class) != null) {
+			Column column = field.getAnnotation(Column.class);
+			if (column != null) {
 				try {
 					Log.d(TAG, "Key: " + field.getName() + " " + field.get(null));
-					sb.append(field.get(null)).append(" TEXT, ");
+					if (column.unique())
+						sb.append(field.get(null)).append(" TEXT UNIQUE, ");
+					else
+						sb.append(field.get(null)).append(" TEXT, ");
 				} catch (IllegalAccessException ex) {
 					throw new RuntimeException(ex);
 				}

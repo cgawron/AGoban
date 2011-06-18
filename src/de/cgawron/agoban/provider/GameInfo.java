@@ -45,6 +45,7 @@ public class GameInfo
 	@Retention(value = RUNTIME)
 	@Target(value = ElementType.FIELD)
 	public @interface Column {
+		boolean unique() default false;
 	}
 
 	@Retention(value = RUNTIME)
@@ -65,15 +66,15 @@ public class GameInfo
 	
 	public static final Uri     CONTENT_URI = new Uri.Builder().scheme("content").authority(GameInfo.AUTHORITY).path("games").build();
 
-	public static final @Column String KEY_URI = "URI";
-	public static final @Column String KEY_FILENAME = "FILENAME";
-	public static final @Column @SGFProperty String KEY_GAMENAME = "GN";
-	public static final @Column @SGFProperty String KEY_DATE = "DT";
-	public static final @Column @SGFProperty String KEY_RESULT = "RE";
-	public static final @Column @SGFProperty String KEY_PLAYER_WHITE = "PW";
-	public static final @Column @SGFProperty String KEY_PLAYER_BLACK = "PB";
-	public static final @Column @SGFProperty String KEY_WHITE_RANK = "WR";
-	public static final @Column @SGFProperty String KEY_BLACK_RANK = "BR";
+	public static final @Column                String KEY_URI = "URI";
+	public static final @Column(unique = true) String KEY_FILENAME = "FILENAME";
+	public static final @Column @SGFProperty   String KEY_GAMENAME = "GN";
+	public static final @Column @SGFProperty   String KEY_DATE = "DT";
+	public static final @Column @SGFProperty   String KEY_RESULT = "RE";
+	public static final @Column @SGFProperty   String KEY_PLAYER_WHITE = "PW";
+	public static final @Column @SGFProperty   String KEY_PLAYER_BLACK = "PB";
+	public static final @Column @SGFProperty   String KEY_WHITE_RANK = "WR";
+	public static final @Column @SGFProperty   String KEY_BLACK_RANK = "BR";
 
 	private static Key[] sgfKeys;
 	/*
