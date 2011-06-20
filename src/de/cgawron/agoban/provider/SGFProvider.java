@@ -48,7 +48,8 @@ public class SGFProvider extends ContentProvider
 	private static String TAG = "SGFProvider";
 	final public static String SGF_TYPE = "application/x-go-sgf";
 
-	public final static String QUERY_STRING = "_id=?";
+	public final static String QUERY_STRING = "_id = ?";
+	public final static String FILE_QUERY_STRING = GameInfo.KEY_FILENAME + " = ?";
 	final static String[] COLUMNS_FILENAME_ONLY = { GameInfo.KEY_FILENAME };
 	final static String[] COLUMNS_ID_FILENAME = { KEY_ID, KEY_FILENAME };
 	public final static File SGF_DIRECTORY;
@@ -153,15 +154,15 @@ public class SGFProvider extends ContentProvider
 			for (File file : files) {
 				Cursor cursor = null;
 				try {
-					long id = GameInfo.getId(file);
+					//XXX long id = GameInfo.getId(file);
 					long lastModified = file.lastModified();
 					if (lastModified <= lastChecked)
 						continue;
 
 					String[] args = new String[1];
-					args[0] = Long.toString(id);
+					args[0] = file.getName();
 					Log.d(TAG, "checking if information for " + file + " is available");
-					cursor = queryDB(getColumns(), QUERY_STRING, args);
+					cursor = queryDB(getColumns(), FILE_QUERY_STRING, args);
 					cursor.moveToFirst();
 					int indexMetadata = cursor.getColumnIndex(KEY_METADATA_DATE);
 					Log.d(TAG, "getCount(): " + cursor.getCount());
@@ -228,8 +229,8 @@ public class SGFProvider extends ContentProvider
 			}
 		}
 		else {
-			update(GameInfo.CONTENT_URI, contentValues, GameInfo.KEY_ID + "=?", 
-				   new String[] { Long.toString(GameInfo.getId(file)) });
+			update(GameInfo.CONTENT_URI, contentValues, GameInfo.KEY_FILENAME + "=?", 
+				   new String[] { file.getName() });
 		}
 		
 	}
@@ -340,8 +341,10 @@ public class SGFProvider extends ContentProvider
 		while (cursor.moveToNext()) {
 			String fileName = cursor.getString(0);
 			File file = new File(SGF_DIRECTORY, fileName);
-			Log.d(TAG, "deleting " + file);
-			file.delete();
+			boolean success = file.delete();
+			Log.d(TAG, String.format("deleting %s: %b", file, success));
+			if (!success)
+				Log.e(TAG, "could not delete " + file);
 		}
 		cursor.close();
 	}

@@ -148,7 +148,7 @@ public class GameInfo
 			initSGFKeys();
 
 		values = new ContentValues();
-		values.put(KEY_ID, getId(file));
+		//XXX values.put(KEY_ID, getId(file));
 		values.put(KEY_FILENAME, file.getName());
 		values.put(KEY_LOCAL_MODIFIED_DATE, file.lastModified());
 		values.put(KEY_METADATA_DATE, file.lastModified());
@@ -191,6 +191,7 @@ public class GameInfo
 		return file;
 	}
 	
+	/* Bad idea - prevents renaming of files!
 	public static long getId(GameTree gameTree)
 	{
 		return getId(gameTree.getFile());
@@ -208,4 +209,5 @@ public class GameInfo
 		
 		return id;
 	}
+	*/
 }

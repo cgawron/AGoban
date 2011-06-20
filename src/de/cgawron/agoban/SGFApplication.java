@@ -29,7 +29,6 @@ import android.app.AlertDialog;
 import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -233,14 +232,14 @@ public class SGFApplication extends Application
 
 		
 		if (data == null) {
-            Uri uri = ContentUris.withAppendedId(GameInfo.CONTENT_URI, GameInfo.getId(gameTree));
+            Uri uri = GameInfo.CONTENT_URI;
 			setData(uri);
 		}
 		Log.d(TAG, "save: data=" + data);
 		
 		GameInfo info = new GameInfo(gameTree);
 		ContentValues values = info.getContentValues();
-		getContentResolver().insert(data, values);
+		data = getContentResolver().insert(data, values);
 
 		try {
 			OutputStream os = getContentResolver().openOutputStream(data, "rwt");

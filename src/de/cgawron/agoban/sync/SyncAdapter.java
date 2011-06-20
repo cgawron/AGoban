@@ -101,31 +101,41 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 					if (GoogleUtility.CATEGORY_FILE.equals(doc.getKind().term)) {
 						Log.d(TAG, "Modified: " + doc);
 						long id = getId(provider, doc);
-						Date cloudModification = doc.getUpdated();
-						Date remoteModification = getRemoteModification(provider, doc);
-						Date localModification = getLocalModification(provider, doc);
-						Log.d(TAG, String.format("remote check: cloud=%s, remote=%s, local=%s", 
-												 cloudModification, remoteModification, localModification));
-						
-						Log.d(TAG, String.format("put: %d->%s", id, doc));
-						gdocMap.put(id, doc);
-	
-						if (doc.isTrashed()) {
-							// remote deletion
-							deleteLocal(provider, id);
-							syncResult.stats.numDeletes++;
+
+						if (id == 0) {
+							// not in DB
+							if (!doc.isTrashed()) {
+								createLocal(provider, doc);
+								syncResult.stats.numInserts++;
+							}						
 						}
-						else if (localModification == null) {
-							createLocal(provider, doc);
-							syncResult.stats.numInserts++;
-						}
-						else if (remoteModification == null) {
-							// File already exists locally, but is not from cloud - conflict!
-							syncResult.stats.numConflictDetectedExceptions++;
-						}
-						else if (remoteModification.before(cloudModification)) {
-							updateLocal(provider, doc);
-							syncResult.stats.numUpdates++;
+						else {
+							Date cloudModification = doc.getUpdated();
+							Date remoteModification = getRemoteModification(provider, doc);
+							Date localModification = getLocalModification(provider, doc);
+							Log.d(TAG, String.format("remote check: cloud=%s, remote=%s, local=%s", 
+									cloudModification, remoteModification, localModification));
+
+							Log.d(TAG, String.format("put: %d->%s", id, doc));
+							gdocMap.put(id, doc);
+
+							if (doc.isTrashed()) {
+								// remote deletion
+								deleteLocal(provider, id);
+								syncResult.stats.numDeletes++;
+							}
+							else if (localModification == null) {
+								createLocal(provider, doc);
+								syncResult.stats.numInserts++;
+							}
+							else if (remoteModification == null) {
+								// File already exists locally, but is not from cloud - conflict!
+								syncResult.stats.numConflictDetectedExceptions++;
+							}
+							else if (remoteModification.before(cloudModification)) {
+								updateLocal(provider, doc);
+								syncResult.stats.numUpdates++;
+							}
 						}
 					}
 				}
@@ -226,9 +236,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 		Log.d(TAG, "createLocal " + doc.title);
 		ContentValues values = new ContentValues();
 		File localFile = download(doc);
-		long id = GameInfo.getId(localFile);
 
-		values.put(GameInfo.KEY_ID, id);
 		values.put(GameInfo.KEY_FILENAME, doc.title);
 		values.put(GameInfo.KEY_REMOTE_ID, doc.resourceId);
 		values.put(GameInfo.KEY_LOCAL_MODIFIED_DATE, localFile.lastModified());
@@ -244,14 +252,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 		ContentValues values = new ContentValues();
 		File localFile = download(doc);
 		
+		values.put(GameInfo.KEY_FILENAME, localFile.getName());
 		values.put(GameInfo.KEY_LOCAL_MODIFIED_DATE, localFile.lastModified());
 		values.put(GameInfo.KEY_REMOTE_MODIFIED_DATE, doc.getUpdated().getTime());
-		values.put(GameInfo.KEY_REMOTE_ID, doc.resourceId);
 		
 		Log.d(TAG, String.format("file: %s, values: %s", localFile, values));
 		provider.update(GameInfo.CONTENT_URI, values,  
-						GameInfo.KEY_FILENAME + "=?", 
-						new String[] { doc.title });
+						GameInfo.KEY_REMOTE_ID + "=?", 
+						new String[] { doc.resourceId });
 	}
 
 	private void  deleteLocal(ContentProviderClient provider, long id) throws Exception
@@ -268,8 +276,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 		
 		final String[] PROJECTION = { GameInfo.KEY_LOCAL_MODIFIED_DATE };
 		Cursor cursor = provider.query(GameInfo.CONTENT_URI, PROJECTION, 
-									   GameInfo.KEY_FILENAME + "=?", 
-									   new String[] { doc.title }, null);
+	                     			   GameInfo.KEY_REMOTE_ID + "=?", 
+	                     			   new String[] { doc.resourceId }, null);
 
 		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
@@ -286,8 +294,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 		
 		final String[] PROJECTION = { GameInfo.KEY_REMOTE_MODIFIED_DATE };
 		Cursor cursor = provider.query(GameInfo.CONTENT_URI, PROJECTION, 
-									   GameInfo.KEY_FILENAME + "=?", 
-									   new String[] { doc.title }, null);
+									   GameInfo.KEY_REMOTE_ID + "=?", 
+									   new String[] { doc.resourceId }, null);
 
 		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();
@@ -300,13 +308,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 
 	private long getId(ContentProviderClient provider, GDocEntry doc) throws RemoteException
 	{
-		long id = GameInfo.getId(doc.title);
+		long id = 0;
 		Log.d(TAG, "getId: " + doc.title);
 			
 		final String[] PROJECTION = { GameInfo.KEY_ID };
 		Cursor cursor = provider.query(GameInfo.CONTENT_URI, PROJECTION, 
-									   GameInfo.KEY_FILENAME + "=?", 
-									   new String[] { doc.title }, null);
+				                       GameInfo.KEY_REMOTE_ID + "=?", 
+				                       new String[] { doc.resourceId }, null);
 
 		if (cursor.getCount() > 0) {
 			cursor.moveToFirst();

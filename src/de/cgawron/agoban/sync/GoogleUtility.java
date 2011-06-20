@@ -84,7 +84,7 @@ public final class GoogleUtility
 	static final String LINK_PARENT = "http://schemas.google.com/docs/2007#parent";
 	static final String LINK_RESUMABLE_CREATE = "http://schemas.google.com/g/2005#resumable-create-media";
 	static final String PREF = TAG;
-		private static final String PREF_AUTH_TOKEN = "authToken";
+	private static final String PREF_AUTH_TOKEN = "authToken";
 	private static final String PREF_GSESSIONID = "gsessionid";
 	private static final String PREF_SGF_FOLDER = "sgfFolder";
 	private final SharedPreferences settings;
@@ -96,7 +96,7 @@ public final class GoogleUtility
 	private final HttpRequestFactory requestFactory;
 	private final Account account;
 	private GDocFeed folderFeed;
-	private GDocEntry sgfFolder;
+	private static GDocEntry sgfFolder;
 
 	private static DateFormat utcFormatter = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 	static {
@@ -423,22 +423,15 @@ public final class GoogleUtility
 		HttpTransport transport = new ApacheHttpTransport();
 		requestFactory = transport.createRequestFactory(new MyHttpRequestInitializer());
 		try {
-			if (true) initFolder();
+			if (sgfFolder == null) initFolder();
 		} 
 		catch (IOException ex) {
 			Log.e(TAG, "initFolder() failed", ex);
 		}
 	}
 
-	private void initFolder() throws IOException
-	{
-		/*
-		GDocUrl url = new GDocUrl("https://docs.google.com/feeds/metadata/default");
-		HttpRequest request = requestFactory.buildGetRequest(url);
-		Log.d(TAG, "retrieving " + url);
-		request.execute().ignore();
-		*/
-		
+	private synchronized void initFolder() throws IOException
+	{		
 		String sgfFolderName = settings.getString(PREF_SGF_FOLDER, FOLDER_SGF);
 		GDocUrl url = new GDocUrl("https://docs.google.com/feeds/default/private/full/-/folder");
 		HttpRequest request = requestFactory.buildGetRequest(url);
