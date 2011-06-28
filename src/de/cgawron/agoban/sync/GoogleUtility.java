@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -37,10 +38,8 @@ import android.util.Log;
 
 import com.google.api.client.googleapis.GoogleHeaders;
 import com.google.api.client.googleapis.GoogleUrl;
-import com.google.api.client.googleapis.extensions.android2.auth.GoogleAccountManager;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpExecuteInterceptor;
-import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpRequestInitializer;
@@ -71,10 +70,7 @@ import de.cgawron.agoban.provider.SGFProvider;
  */
 public final class GoogleUtility
 {
-	/** The token type for authentication */
 	private static final String AUTH_TOKEN_TYPE = "writely";
-	private static Level LOGGING_LEVEL = Level.ALL;
-	private static final String TAG = "GoogleUtility";
 	private static final String FOLDER_SGF = "SGF";
 	static final String CATEGORY_KIND = "http://schemas.google.com/g/2005#kind";
 	static final String CATEGORY_LABELS = "http://schemas.google.com/g/2005/labels";
@@ -83,18 +79,24 @@ public final class GoogleUtility
 	static final String LABEL_TRASHED = "http://schemas.google.com/g/2005/labels#trashed";
 	static final String LINK_PARENT = "http://schemas.google.com/docs/2007#parent";
 	static final String LINK_RESUMABLE_CREATE = "http://schemas.google.com/g/2005#resumable-create-media";
-	static final String PREF = TAG;
+	static final String PREF = "GoogleUtility";
+	static final String TAG = PREF;
+	private static final Logger logger = Logger.getLogger(TAG);
 	private static final String PREF_AUTH_TOKEN = "authToken";
 	private static final String PREF_GSESSIONID = "gsessionid";
 	private static final String PREF_SGF_FOLDER = "sgfFolder";
+	private static final String PREF_FOLDER_URL = "folderURL";
+	private static final String PREF_LAST_ETAG = "lastETag";
 	private final SharedPreferences settings;
+	private final SharedPreferences.Editor editor;
 	private final Context context;
-	private final GoogleAccountManager accountManager;
+	private final AccountManager accountManager;
 	private String gsessionid;
 	private String authToken;
+	private String lastETag;
+	private String folderURL;
 	
 	private final HttpRequestFactory requestFactory;
-	private final Account account;
 	private GDocFeed folderFeed;
 	private static GDocEntry sgfFolder;
 
@@ -116,17 +118,7 @@ public final class GoogleUtility
 	private class MyHttpRequestInitializer implements HttpRequestInitializer 
 	{
 		public void initialize(HttpRequest request) {
-			if (authToken == null) {
-				// use the account manager to request the credentials
-				try {
-					authToken = accountManager.manager.blockingGetAuthToken(account, AUTH_TOKEN_TYPE, true);
-					SharedPreferences.Editor editor = settings.edit();
-					editor.putString(GoogleUtility.PREF_AUTH_TOKEN, authToken);
-				}
-				catch (Exception ex) {
-					Log.e(TAG, "Could not get authToken", ex);
-				}
-			}
+
 			GoogleHeaders headers = new GoogleHeaders();
 			headers.setApplicationName("AGoban/1.0");
 			headers.gdataVersion = "3.0";
@@ -149,16 +141,14 @@ public final class GoogleUtility
 					case 302:
 						GoogleUrl url = new GoogleUrl(response.headers.location);
 						gsessionid = (String) url.getFirst("gsessionid");
-						SharedPreferences.Editor editor = settings.edit();
 						editor.putString(PREF_GSESSIONID, gsessionid);
 						editor.commit();
 						return true;
 					case 401:
-						accountManager.invalidateAuthToken(authToken);
+						accountManager.invalidateAuthToken(AUTH_TOKEN_TYPE,authToken);
 						authToken = null;
-						SharedPreferences.Editor editor2 = settings.edit();
-						editor2.remove(PREF_AUTH_TOKEN);
-						editor2.commit();
+						editor.remove(PREF_AUTH_TOKEN);
+						editor.commit();
 						return false;
 					}
 					return false;
@@ -169,6 +159,9 @@ public final class GoogleUtility
 
 	public static class GDocFeed
 	{
+		@Key("@gd:etag")
+		public String etag;
+		
 		@Key("openSearch:totalResults")
 		public int totalResults;
 
@@ -188,7 +181,6 @@ public final class GoogleUtility
 		
 		public GDocFeed()
 		{
-			Log.d(TAG, "GDocFeed()");
 		}
 	}
 
@@ -275,7 +267,7 @@ public final class GoogleUtility
 		@Override
 		public String toString()
 		{
-			return "DocEntry: [" + categories + "]/* {" + links + "}*/ " + resourceId + " \"" + title + "\"";
+			return "DocEntry: " + resourceId + " \"" + title + "\"";
 		}
 	}
 
@@ -389,7 +381,7 @@ public final class GoogleUtility
 
 		SendData(Cursor cursor)
 		{
-			Log.d(TAG, "SendData: " + cursor.getString(1));
+			logger.fine("SendData: " + cursor.getString(1));
 			String fileName = cursor.getString(cursor.getColumnIndexOrThrow(GameInfo.KEY_FILENAME));
 			file = new File(SGFProvider.SGF_DIRECTORY, fileName);
 		}
@@ -410,23 +402,38 @@ public final class GoogleUtility
 		}
 	}
 
-	public GoogleUtility(Context context, GoogleAccountManager accountManager, Account account)
+	public GoogleUtility(Context context, AccountManager accountManager, Account account)
 	{
-		// transport = new NetHttpTransport();
-		Logger.getLogger("com.google.api.client").setLevel(LOGGING_LEVEL);
 		this.context = context;
 		this.settings = this.context.getSharedPreferences(GoogleUtility.PREF, 0);
+		this.editor = settings.edit();
 		this.accountManager = accountManager;
-		this.account = account;
 		authToken = settings.getString(PREF_AUTH_TOKEN, null);
 	    gsessionid = settings.getString(PREF_GSESSIONID, null);
+		lastETag = settings.getString(PREF_LAST_ETAG, null);
+		folderURL = settings.getString(PREF_FOLDER_URL, null);
+		Log.d(TAG, "authToken: " + authToken);
+		if (authToken == null) {
+			// use the account manager to request the credentials
+			try {
+				authToken = accountManager.blockingGetAuthToken(account, AUTH_TOKEN_TYPE, false);
+				Log.d(TAG, "authToken after blockingGetAuthToken: " + authToken);
+				editor.putString(GoogleUtility.PREF_AUTH_TOKEN, authToken);
+				editor.commit();
+			}
+			catch (Exception ex) {
+				logger.log(Level.SEVERE, "Could not get authToken", ex);
+			}
+			// if (authToken == null)
+			//	throw new RuntimeException("Failed to obtain authToken");
+		}
 		HttpTransport transport = new ApacheHttpTransport();
 		requestFactory = transport.createRequestFactory(new MyHttpRequestInitializer());
 		try {
-			if (sgfFolder == null) initFolder();
+			if (folderURL == null) initFolder();
 		} 
 		catch (IOException ex) {
-			Log.e(TAG, "initFolder() failed", ex);
+			logger.log(Level.SEVERE, "initFolder() failed", ex);
 		}
 	}
 
@@ -435,49 +442,53 @@ public final class GoogleUtility
 		String sgfFolderName = settings.getString(PREF_SGF_FOLDER, FOLDER_SGF);
 		GDocUrl url = new GDocUrl("https://docs.google.com/feeds/default/private/full/-/folder");
 		HttpRequest request = requestFactory.buildGetRequest(url);
-		Log.d(TAG, "retrieving " + url);
+		logger.config("retrieving " + url);
 
 		HttpResponse response = request.execute();
 		GDocFeed feed = response.parseAs(GDocFeed.class);
 		for (GDocEntry entry : feed.entries)
 		{
-			Log.d(TAG, "initFolder: entry=" + entry);
+			logger.config("initFolder: entry=" + entry);
 			if (entry.title.equals(sgfFolderName)) {
 				sgfFolder = entry;
-				if (entry.links != null) {
-					for (Link link : entry.links) {
-						Log.d(TAG, "link=" + link);
-					}
-				}
+				folderURL = Link.find(sgfFolder.links, "self");
+				editor.putString(GoogleUtility.PREF_FOLDER_URL, folderURL);
+				editor.commit();
 			}	
 		}
 	}
 	
 	private GDocUrl getFolderUrl()
 	{
-		GDocUrl url = new GDocUrl(Link.find(sgfFolder.links, "self"));
+		GDocUrl url = new GDocUrl(folderURL);
 		url.appendRawPath("/contents");
 		url.convert = false;
 		return url;
 	}
 
-	public void updateDocumentList() throws IOException
+	public boolean updateDocumentList() throws IOException
 	{
+		//TODO: Handle continuation
+		logger.info("updateDocumentList: lastUpdate=" + (lastETag != null ? lastETag : "null"));
+		logger.config("TEST1");
+		if (Log.isLoggable(TAG, Log.DEBUG))
+			Log.d(TAG, "Test2");
 		GDocUrl url = getFolderUrl();
-		if (folderFeed != null) {
-		    url.updatedMin = utcFormatter.format(folderFeed.updated);
-		}
 		url.showDeleted = true;
 		HttpRequest request = requestFactory.buildGetRequest(url);
+		GoogleHeaders headers = (GoogleHeaders) request.headers;
+		headers.ifNoneMatch = lastETag; 
 		Log.d(TAG, "retrieving " + url);
 
 		HttpResponse response = request.execute();
-		folderFeed = response.parseAs(GDocFeed.class);
-		if (folderFeed.links != null) {
-			for (Link link : folderFeed.links) {
-				Log.d(TAG, "link: " + link);
-			}
+		boolean modified = response.statusCode != 304;
+		if (modified) {
+			folderFeed = response.parseAs(GDocFeed.class);
+			lastETag = folderFeed.etag;
+			editor.putString(GoogleUtility.PREF_LAST_ETAG, lastETag);
+			editor.commit();
 		}
+		return modified;
 	}
 
 	public GenericUrl getUploadUrl(File file) throws IOException
@@ -485,17 +496,17 @@ public final class GoogleUtility
 		GDocUrl url = new GDocUrl(folderFeed.getLink(LINK_RESUMABLE_CREATE));
 		url.convert = false;
 		HttpRequest request = requestFactory.buildPostRequest(url, null);
-		HttpHeaders headers = request.headers;
-		((GoogleHeaders) headers).setSlugFromFileName(file.getName());
+		GoogleHeaders headers = (GoogleHeaders) request.headers;
+		headers.setSlugFromFileName(file.getName());
 		headers.set("Content-Type", "application/x-go-sgf");
 		headers.set("X-Upload-Content-Type", "application/x-go-sgf");
 		headers.set("X-Upload-Content-Length", file.length());
 
-		Log.d(TAG, "request: " + request);
+		logger.config("request: " + request);
 		HttpResponse response = request.execute();
-		headers = response.headers;
-		Log.d(TAG, "status is " + response.statusMessage);
-		Log.d(TAG, "location is " + headers.location);
+		headers = (GoogleHeaders) response.headers;
+		logger.config("status is " + response.statusMessage);
+		logger.config("location is " + headers.location);
 
 		return new GDocUrl(headers.location);
 	}
@@ -507,7 +518,7 @@ public final class GoogleUtility
 		Date newModification = null;
 		SendData sendData = new SendData(file);
 		
-		Log.d(TAG, "createGoogleDoc: url=" + targetUrl + ", data=" + sendData);
+		logger.config("createGoogleDoc: url=" + targetUrl + ", data=" + sendData);
 		InputStreamContent content = new InputStreamContent();
 		//AtomContent atom = new AtomContent();
 		GDocEntry entry = null;// = new GDocEntry();
@@ -517,7 +528,7 @@ public final class GoogleUtility
 		//entry.categories = new ArrayList<Category>();
 		//Category category = new Category(CATEGORY_KIND, CATEGORY_FILE, "file");
 		//entry.categories.add(category);
-		//Log.d(TAG, "category: " + category);
+		//logger.config("category: " + category);
 
 		try {
 			HttpRequest request = requestFactory.buildPostRequest(targetUrl, content);
@@ -530,22 +541,22 @@ public final class GoogleUtility
 			//mpContent.parts.add(atom);
 			//request.content = mpContent;
 
-			Log.d(TAG, "content: " + content);
-			Log.d(TAG, "request: " + request);
+			logger.config("content: " + content);
+			logger.config("request: " + request);
 			HttpResponse response = request.execute();
-			Log.d(TAG, "status was " + response.statusMessage);
+			logger.config("status was " + response.statusMessage);
 			entry = response.parseAs(GDocEntry.class);
-			Log.d(TAG, "new entry: " + entry);
+			logger.config("new entry: " + entry);
 			newModification = entry.getUpdated();
-			Log.d(TAG, "newModification: " + newModification);
+			logger.config("newModification: " + newModification);
 		} catch (Exception e) {
-			Log.e(TAG, "exception in createDoc: " + e);
+			logger.log(Level.SEVERE, "exception in createGoogleDoc: " + e);
 			e.printStackTrace();
 		} finally {
 			try {
 				content.inputStream.close();
 			} catch (Exception e) {
-				Log.e(TAG, "exception in createDoc: " + e);
+				logger.log(Level.SEVERE, "exception in createGoogleDoc: " + e);
 			}
 		}
 		return entry;
@@ -556,7 +567,7 @@ public final class GoogleUtility
 		Date newModification = null;
 		SendData sendData = new SendData(file);
 		GenericUrl targetUrl = doc.getUpdateUrl();
-		Log.d(TAG, "updateGoogleDoc: url=" + targetUrl + ", etag=" + doc.etag + ", data=" + sendData);
+		logger.config("updateGoogleDoc: url=" + targetUrl + ", etag=" + doc.etag + ", data=" + sendData);
 		InputStreamContent content = new InputStreamContent();
 		AtomContent atom = new AtomContent();
 		GDocEntry entry = new GDocEntry();
@@ -579,22 +590,21 @@ public final class GoogleUtility
 			mpContent.parts.add(atom);
 			request.content = mpContent;
 
-			Log.d(TAG, "content: " + content);
-			Log.d(TAG, "request: " + request);
+			logger.config("request: " + request);
 			HttpResponse response = request.execute();
-			Log.d(TAG, "status was " + response.statusMessage);
+			logger.config("status was " + response.statusMessage);
 			entry = response.parseAs(GDocEntry.class);
-			Log.d(TAG, "new entry: " + entry);
+			logger.config("new entry: " + entry);
 			newModification = entry.getUpdated();
-			Log.d(TAG, "newModification: " + newModification);
+			logger.config("newModification: " + newModification);
 		} catch (Exception e) {
-			Log.e(TAG, "exception in createDoc: " + e);
+			logger.log(Level.SEVERE, "exception in updateGoogleDoc: " + e);
 			e.printStackTrace();
 		} finally {
 			try {
 				content.inputStream.close();
 			} catch (Exception e) {
-				Log.e(TAG, "exception in createDoc: " + e);
+				logger.log(Level.SEVERE, "exception in updateGoogleDoc: " + e);
 			}
 		}
 		return entry;

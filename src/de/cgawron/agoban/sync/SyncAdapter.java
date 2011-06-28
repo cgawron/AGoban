@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentUris;
@@ -37,14 +37,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SyncResult;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
-
-import com.google.api.client.googleapis.extensions.android2.auth.GoogleAccountManager;
-import com.google.api.client.http.HttpResponseException;
-
 import de.cgawron.agoban.provider.GameInfo;
 import de.cgawron.agoban.provider.SGFProvider;
 import de.cgawron.agoban.sync.GoogleUtility.GDocEntry;
@@ -58,20 +56,32 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 	private static final String TAG = "SyncAdapter";
 	private static final Date EPOCH = new Date(0);
 
-	private final GoogleAccountManager accountManager;
+	private final AccountManager accountManager;
 	private GoogleUtility googleUtility = null;
 	private final Map<Long, GDocEntry> gdocMap = new HashMap<Long, GDocEntry>();
+	private long lastSyncTime = 0;
 
 	public SyncAdapter(Context context, boolean autoInitialize)
 	{
 		super(context, autoInitialize);
-		this.accountManager = new GoogleAccountManager(context);	
+		Log.d(TAG, "Constructor");
+		this.accountManager = AccountManager.get(context);	
 	}
 
 	@Override
 	public void onPerformSync(Account account, Bundle extras, String authority,
 							  ContentProviderClient provider, SyncResult syncResult)
 	{
+		ConnectivityManager connectivity = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+		// Skip if no connection, or background data disabled
+		NetworkInfo info = connectivity.getActiveNetworkInfo();
+		if (info == null || !connectivity.getBackgroundDataSetting()) {
+			return;
+		}
+		
+		lastSyncTime = System.currentTimeMillis();
+		
 		// TODO: Select/Create folder
 		/* TODO: Check for conflicts
 		 * A Conflict is an entry where 
@@ -86,20 +96,89 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 			GameInfo.KEY_LOCAL_MODIFIED_DATE,
 			GameInfo.KEY_REMOTE_MODIFIED_DATE 
 		};
-
+	
+		this.googleUtility = new GoogleUtility(getContext(), accountManager, account);
+		Log.d(TAG, "Retrieving modified games");
 		
-		String authtoken = null;
 		try {
-			this.googleUtility = new GoogleUtility(getContext(), accountManager, account);
-			Log.d(TAG, "Retrieving modified games");
-			googleUtility.updateDocumentList();
-			List<GDocEntry> docs = googleUtility.getDocs();
+			if (googleUtility.updateDocumentList()) {
+				checkRemoteUpdates(provider, syncResult);
+			}
+		}
+		catch (final Exception ex)
+		{
+			handleException(ex, syncResult);
+		}
+		
+		try {
+			// check for local updates
+			Cursor cursor = provider.query(GameInfo.CONTENT_URI, PROJECTION,
+					                       GameInfo.KEY_LOCAL_MODIFIED_DATE + " > " + lastSyncTime, null, null);
 
-			// check for remote updates
-			if (docs != null) {
-				for (GDocEntry doc : docs) {
-					if (GoogleUtility.CATEGORY_FILE.equals(doc.getKind().term)) {
-						Log.d(TAG, "Modified: " + doc);
+			checkLocalUpdates(cursor, provider, syncResult);
+		}
+		catch (final Exception ex)
+		{
+			handleException(ex, syncResult);
+		}
+		
+		Log.d(TAG, "onperformSync: " + syncResult);
+	}
+
+	private void checkLocalUpdates(Cursor cursor,
+			                       ContentProviderClient provider, SyncResult syncResult)
+	{
+		while (cursor.moveToNext()) {
+			long id = cursor.getLong(0);
+			String fileName = cursor.getString(1);
+			Date localModification = new Date(cursor.getLong(2));
+			Date remoteModification = new Date(cursor.getLong(3));
+			GDocEntry doc = gdocMap.get(id);
+			Log.d(TAG, String.format("get: %d->%s", id, doc));
+			Log.d(TAG, String.format("sync (up): local=%s, remote=%s, cloud=%s", localModification, remoteModification, doc != null ? doc.getUpdated() : "<null>"));
+			
+			try {
+				syncResult.stats.numEntries++;
+				if (doc == null) {
+					if (remoteModification.after(EPOCH)) {
+						//TODO: remote deletion?
+						// deleteLocal(provider, id);
+						// syncResult.stats.numDeletes++;
+						syncResult.stats.numSkippedEntries++;
+					}
+					else {
+						// not yet present in cloud
+						createRemote(provider, id, fileName);
+						syncResult.stats.numInserts++;
+					}
+				}
+				else if (localModification.after(remoteModification)) {
+					updateRemote(provider, id, doc);
+					syncResult.stats.numUpdates++;
+				}
+				else {
+					syncResult.stats.numSkippedEntries++;
+				}
+			}
+			catch (final Exception ex) {
+				handleException(ex, syncResult);
+			}
+		}
+		cursor.close();
+	}
+
+	private void checkRemoteUpdates(ContentProviderClient provider, SyncResult syncResult)
+	{
+		List<GDocEntry> docs = googleUtility.getDocs();
+
+		// check for remote updates
+		if (docs != null) {
+			for (GDocEntry doc : docs) {
+				if (GoogleUtility.CATEGORY_FILE.equals(doc.getKind().term)) {
+					syncResult.stats.numEntries++;
+					
+					Log.d(TAG, "Modified: " + doc);
+					try {
 						long id = getId(provider, doc);
 
 						if (id == 0) {
@@ -107,14 +186,17 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 							if (!doc.isTrashed()) {
 								createLocal(provider, doc);
 								syncResult.stats.numInserts++;
-							}						
+							}
+							else {
+								syncResult.stats.numSkippedEntries++;
+							}
 						}
 						else {
 							Date cloudModification = doc.getUpdated();
 							Date remoteModification = getRemoteModification(provider, doc);
 							Date localModification = getLocalModification(provider, doc);
 							Log.d(TAG, String.format("remote check: cloud=%s, remote=%s, local=%s", 
-									cloudModification, remoteModification, localModification));
+									                 cloudModification, remoteModification, localModification));
 
 							Log.d(TAG, String.format("put: %d->%s", id, doc));
 							gdocMap.put(id, doc);
@@ -136,65 +218,15 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 								updateLocal(provider, doc);
 								syncResult.stats.numUpdates++;
 							}
-						}
+							else {
+								syncResult.stats.numSkippedEntries++;
+							}
+						} 
+					} catch(final Exception ex) {
+						handleException(ex, syncResult);
 					}
 				}
 			}
-
-			// check for local updates
-			Cursor cursor = provider.query(GameInfo.CONTENT_URI, PROJECTION,
-										   null, null, null);
-
-			while (cursor.moveToNext()) {
-				long id = cursor.getLong(0);
-				String fileName = cursor.getString(1);
-				Date localModification = new Date(cursor.getLong(2));
-				Date remoteModification = new Date(cursor.getLong(3));
-				GDocEntry doc = gdocMap.get(id);
-				Log.d(TAG, String.format("get: %d->%s", id, doc));
-				Log.d(TAG, String.format("sync (up): local=%s, remote=%s, cloud=%s", localModification, remoteModification, doc != null ? doc.getUpdated() : "<null>"));
-				
-				try {
-					if (doc == null) {
-						if (remoteModification.after(EPOCH)) {
-							// remote deletion
-							deleteLocal(provider, id);
-							syncResult.stats.numDeletes++;
-						}
-						else {
-							// not yet present in cloud
-							createRemote(provider, id, fileName);
-						}
-					}
-					else if (localModification.after(remoteModification)) {
-						updateRemote(provider, id, doc);
-					}
-				}
-				catch (final Exception ex) {
-					handleException(ex, syncResult);
-				}
-			}
-			cursor.close();
-		} catch (final AuthenticatorException e) {
-			syncResult.stats.numParseExceptions++;
-			Log.e(TAG, "AuthenticatorException", e);
-		} catch (final OperationCanceledException e) {
-			Log.e(TAG, "OperationCanceledExcetpion", e);
-		} catch (final HttpResponseException e) {
-			Log.e(TAG, "HttpResponseException", e);
-			int statusCode = e.response.statusCode;
-			if (statusCode == 401 || statusCode == 403) {
-				accountManager.invalidateAuthToken(authtoken);
-				syncResult.stats.numAuthExceptions++;
-			} else {
-				syncResult.stats.numIoExceptions++;
-			}
-		} catch (final IOException e) {
-			Log.e(TAG, "IOException", e);
-			syncResult.stats.numIoExceptions++;
-		} catch (final Exception e) {
-			Log.e(TAG, "Exception", e);
-			syncResult.stats.numIoExceptions++;
 		}
 	}
 
@@ -234,9 +266,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 	private void createLocal(ContentProviderClient provider, GDocEntry doc) throws Exception
 	{
 		Log.d(TAG, "createLocal " + doc.title);
-		ContentValues values = new ContentValues();
 		File localFile = download(doc);
-
+		GameInfo info = new GameInfo(localFile);
+		ContentValues values = info.getContentValues();
+		
 		values.put(GameInfo.KEY_FILENAME, doc.title);
 		values.put(GameInfo.KEY_REMOTE_ID, doc.resourceId);
 		values.put(GameInfo.KEY_LOCAL_MODIFIED_DATE, localFile.lastModified());
@@ -249,8 +282,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 	private void  updateLocal(ContentProviderClient provider, GDocEntry doc) throws Exception
 	{
 		Log.d(TAG, "updateLocal " + doc.title);
-		ContentValues values = new ContentValues();
 		File localFile = download(doc);
+		GameInfo info = new GameInfo(localFile);
+		ContentValues values = info.getContentValues();
 		
 		values.put(GameInfo.KEY_FILENAME, localFile.getName());
 		values.put(GameInfo.KEY_LOCAL_MODIFIED_DATE, localFile.lastModified());
@@ -346,21 +380,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
 		return destination;
 	}
 	
-	private void handleException(Exception e, SyncResult syncResult) throws Exception
+	private void handleException(Exception e, SyncResult syncResult)
 	{
 		Log.e(TAG, "handleException: ", e);
 		
 		if (e instanceof AuthenticatorException) {
 			syncResult.stats.numParseExceptions++;
 		}
-		else if (e instanceof HttpResponseException) {
-			int statusCode = ((HttpResponseException) e).response.statusCode;
-			if (statusCode == 401 || statusCode == 403) {
-				throw e;
-			} else {
-				syncResult.stats.numIoExceptions++;
-			}
-		} 
 		else {
 			syncResult.stats.numIoExceptions++;
 		}
