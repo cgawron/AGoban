@@ -24,6 +24,8 @@
 		  android:id="@+id/players"
 		  android:focusable="true"
 		  android:orientation="vertical"
+		  android:stretchColumns="2"
+		  android:shrinkColumns="2"
 		  android:layout_width="fill_parent" 
 		  android:layout_height="fill_parent">
 		<TableRow
@@ -41,22 +43,18 @@
 			  android:id="@+id/PW"
 			  android:focusable="true"
 			  android:hint="@string/white_player" 
-			  android:layout_gravity="right"
-			  android:layout_width="match_parent" 
-			  android:layout_column="2"
-			  android:layout_weight="10" />
+			  android:layout_column="2" />
 		  <de.cgawron.agoban.view.GradeView
 			  style="@style/Property"
 			  cgawron:property="WR"
 			  android:id="@+id/WR"
-			  android:focusable="true" 
 			  android:layout_column="3"
-			  /> 
+			  android:focusable="true" /> 
 		  <Button 
 			  style="@style/Property"
 			  android:id="@+id/me_white"
 			  android:text="@string/me"
-			  android:layout_width="match_parent" 
+			  android:layout_column="4"
 			  android:layout_height="wrap_content"/>
 		</TableRow>
 		<TableRow
@@ -74,21 +72,18 @@
 			  android:id="@+id/PB"
 			  android:focusable="true"
 			  android:hint="@string/black_player" 
-			  android:layout_width="fill_parent" 
-			  android:layout_column="2"
-			  android:layout_weight="10" /> 
+			  android:layout_column="2" /> 
 		  <de.cgawron.agoban.view.GradeView
 			  style="@style/Property"
 			  cgawron:property="BR"
 			  android:id="@+id/BR"
 			  android:focusable="true"
-			  android:layout_width="fill_parent" 
-			  android:layout_weight="1" /> 
+			  android:layout_column="3" /> 
 		  <Button 
 			  style="@style/Property"
 			  android:id="@+id/me_black"
 			  android:text="@string/me"
-			  android:layout_width="wrap_content" 
+			  android:layout_column="4"
 			  android:layout_height="wrap_content"/>
 		</TableRow>
 		<TableRow
@@ -105,8 +100,27 @@
 			  cgawron:property="DT"
 			  android:id="@+id/DT"
 			  android:focusable="true"
-			  android:layout_width="fill_parent" 
-			  android:layout_weight="10" /> 
+			  android:layout_column="2"
+			  android:layout_span="3" 
+			  /> 
+		</TableRow>
+		<TableRow
+			android:orientation="horizontal"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="1dp">
+		  <TextView
+			  style="@style/PropertyLabel"
+			  android:text="@string/RE"
+			  android:layout_column="1"/>
+		  <de.cgawron.agoban.view.TextPropertyView
+			  style="@style/Property"
+			  cgawron:property="RE"
+			  android:id="@+id/RE"
+			  android:focusable="true"
+			  android:layout_column="2"
+			  android:layout_span="3" 
+			  /> 
 		</TableRow>
 		<TableRow
 			android:orientation="horizontal"
@@ -123,8 +137,8 @@
 			  android:id="@+id/EV"
 			  android:hint="@string/event_name" 
 			  android:focusable="true"
-			  android:layout_width="fill_parent" 
-			  android:layout_weight="10" /> 
+			  android:layout_column="2"
+			  android:layout_span="3" /> 
 		</TableRow>
 		<TableRow
 			android:orientation="horizontal"
@@ -141,16 +155,66 @@
 			  android:id="@+id/PC"
 			  android:hint="@string/place" 
 			  android:focusable="true"
-			  android:layout_width="fill_parent" 
-			  android:layout_weight="10" /> 
+			  android:layout_column="2"
+			  android:layout_span="3" /> 
 		</TableRow>
       </TableLayout>
 
-      <TextView
+      <TableLayout
 		  android:text="rules" 
 		  android:id="@+id/rules"  
 		  android:layout_width="wrap_content" 
-		  android:layout_height="wrap_content"/>
+		  android:layout_height="wrap_content">
+		<TableRow
+			android:orientation="horizontal"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="1dp">
+		  <TextView
+			  style="@style/PropertyLabel"
+			  android:text="@string/TM"
+			  android:layout_column="1"/>
+		  <de.cgawron.agoban.view.RealPropertyView
+			  style="@style/Property"
+			  cgawron:property="TN"
+			  android:focusable="true"
+			  android:layout_column="2"
+			  android:layout_span="1" /> 
+		</TableRow>
+		<TableRow
+			android:orientation="horizontal"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="1dp">
+		  <TextView
+			  style="@style/PropertyLabel"
+			  android:text="@string/HA"
+			  android:layout_column="1"/>
+		  <de.cgawron.agoban.view.NumberPropertyView
+			  style="@style/Property"
+			  cgawron:property="HA"
+			  android:focusable="true"
+			  android:layout_column="2"
+			  android:layout_span="1" /> 
+		</TableRow>
+		<TableRow
+			android:orientation="horizontal"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="1dp">
+		  <TextView
+			  style="@style/PropertyLabel"
+			  android:text="@string/KM"
+			  android:layout_column="1"/>
+		  <de.cgawron.agoban.view.RealPropertyView
+			  style="@style/Property"
+			  cgawron:property="KM"
+			  android:id="@+id/KM"
+			  android:focusable="true"
+			  android:layout_column="2"
+			  android:layout_span="1" /> 
+		</TableRow>
+      </TableLayout>
     </FrameLayout>
   </LinearLayout>
 </TabHost>

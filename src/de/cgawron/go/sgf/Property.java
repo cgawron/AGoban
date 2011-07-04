@@ -884,8 +884,12 @@ public class Property implements Cloneable
 	public final static Key PLAYER_WHITE = new Key("PW");
 
 	/** The SGF Property REsult. */
-	@SGFProperty(propertyClass = GameInfo.class)
+	@SGFProperty(propertyClass = GameInfo.class, priority=75)
 	public final static Key RESULT = new Key("RE");
+
+	/** The SGF Property KoMi. */
+	@SGFProperty(propertyClass = GameInfo.class, priority=78)
+	public final static Key KOMI = new Key("KM");
 
 	/** The SGF Property SiZe. */
 	@SGFProperty(propertyClass = RootNumber.class)

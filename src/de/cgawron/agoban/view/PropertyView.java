@@ -5,9 +5,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.LinearLayout;
 import de.cgawron.agoban.SGFApplication;
+import de.cgawron.go.sgf.Node;
 import de.cgawron.go.sgf.Property;
 import de.cgawron.go.sgf.Property.GameInfo;
-import de.cgawron.go.sgf.Node;
 
 public abstract class PropertyView extends LinearLayout
 {
@@ -30,6 +30,7 @@ public abstract class PropertyView extends LinearLayout
 	public PropertyView(Context context)
 	{
 		super(context);
+		createView(context);
 	}
 
 	/**
@@ -44,8 +45,17 @@ public abstract class PropertyView extends LinearLayout
 	{
 		super(context, attrs);
 		key = attrs.getAttributeValue("http://cgawron", "property");
+		createView(context, attrs);
 	}
 
+	public void createView(Context context)
+	{
+	}
+
+	public void createView(Context context, AttributeSet attrs)
+	{
+	}
+	
 	@Override
 	protected void onAttachedToWindow()
 	{

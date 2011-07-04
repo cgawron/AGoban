@@ -5,8 +5,10 @@
     <string name="PW">White</string>
     <string name="PB">Black</string>
     <string name="DT">Date</string>
+    <string name="RE">Result</string>
     <string name="EV">Event</string>
     <string name="PC">Place</string>
+    <string name="KM">Komi</string>
     <string name="me">me</string>
     <string name="player">Player</string>
     <string name="choose_file">Choose file</string>

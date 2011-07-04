@@ -56,7 +56,6 @@ public class DatePropertyView extends PropertyView implements View.OnClickListen
 	public DatePropertyView(Context context)
 	{
 		super(context);
-		addView(button = new Button(context));
 	}
 
 	/**
@@ -70,6 +69,17 @@ public class DatePropertyView extends PropertyView implements View.OnClickListen
 	public DatePropertyView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
+	}
+
+	@Override
+	public void createView(Context context)
+	{
+		addView(button = new Button(context));
+	}
+
+	@Override
+	public void createView(Context context, AttributeSet attrs)
+	{
 		addView(button = new Button(context, attrs, R.attr.buttonStyle));
 	}
 
@@ -93,6 +103,7 @@ public class DatePropertyView extends PropertyView implements View.OnClickListen
 		button.setText(valueText);
 	}
 
+	@Override
 	public void setValue(String value)
 	{
 		super.setValue(value);

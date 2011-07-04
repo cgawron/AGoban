@@ -22,6 +22,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -29,6 +30,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import de.cgawron.go.sgf.Value;
+
+// TODO: Subclass for Result
+// TODO: Subclass for Komi
+// TODO: Subclass for Rules
+// TODO: Subclass for Time & Byoyomi
 
 /**
  * A {@link View} to be used for SGF properties
@@ -50,9 +56,6 @@ public class TextPropertyView extends PropertyView implements TextWatcher
 	public TextPropertyView(Context context)
 	{
 		super(context);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-																		 LinearLayout.LayoutParams.MATCH_PARENT);
-		addView(textView = new EditText(context), params);
 	}
 
 	/**
@@ -66,6 +69,19 @@ public class TextPropertyView extends PropertyView implements TextWatcher
 	public TextPropertyView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
+	}
+	
+	@Override
+	public void createView(Context context)
+	{
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+																		 LinearLayout.LayoutParams.MATCH_PARENT);
+		addView(textView = new EditText(context), params);
+	}
+
+	@Override
+	public void createView(Context context, AttributeSet attrs)
+	{
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 
 																		 LinearLayout.LayoutParams.MATCH_PARENT);
 		addView(textView = new EditText(context, attrs), params);
@@ -75,6 +91,7 @@ public class TextPropertyView extends PropertyView implements TextWatcher
 	protected void onAttachedToWindow()
 	{
 		super.onAttachedToWindow();
+		textView.setEllipsize(TextUtils.TruncateAt.END);
 	}
 
 	@Override
