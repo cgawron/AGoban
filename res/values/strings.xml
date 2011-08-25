@@ -25,4 +25,6 @@
     <string name="black_player">black player</string>
     <string name="event_name">event name</string>
     <string name="place">place</string>
+    <string name="HA">Handicap</string>
+    <string name="TM">Time</string>
 </resources>

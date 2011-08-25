@@ -22,7 +22,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import android.R;
 import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -33,6 +32,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import de.cgawron.go.sgf.Value;
 
 /**
@@ -43,7 +44,7 @@ public class DatePropertyView extends PropertyView implements View.OnClickListen
 {
 	private static final String TAG = "DatePropertyView";
 
-	protected Button button;
+	protected TextView text;
 
 	/**
 	 * Construct object, initializing with any attributes we understand from a
@@ -74,21 +75,27 @@ public class DatePropertyView extends PropertyView implements View.OnClickListen
 	@Override
 	public void createView(Context context)
 	{
-		addView(button = new Button(context));
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+				 														 LinearLayout.LayoutParams.MATCH_PARENT);
+		addView(text = new Button(context), params);
+		text.setRawInputType(InputType.TYPE_CLASS_DATETIME);
+		text.setOnClickListener(this);
 	}
 
 	@Override
 	public void createView(Context context, AttributeSet attrs)
 	{
-		addView(button = new Button(context, attrs, R.attr.buttonStyle));
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+				                                                         LinearLayout.LayoutParams.MATCH_PARENT);
+		addView(text = new Button(context, attrs), params);
+		text.setRawInputType(InputType.TYPE_CLASS_DATETIME);
+		text.setOnClickListener(this);
 	}
 
 	@Override
 	protected void onAttachedToWindow()
 	{
 		super.onAttachedToWindow();
-		button.setRawInputType(InputType.TYPE_CLASS_DATETIME);
-		button.setOnClickListener(this);
 	}
 
 	@Override
@@ -100,14 +107,14 @@ public class DatePropertyView extends PropertyView implements View.OnClickListen
 				valueText = value.toString();
 		}
 
-		button.setText(valueText);
+		text.setText(valueText);
 	}
 
 	@Override
 	public void setValue(String value)
 	{
 		super.setValue(value);
-		button.setText(value);
+		text.setText(value);
 	}
 
 	public void setValue(int year, int monthOfYear, int dayOfMonth)
@@ -122,7 +129,7 @@ public class DatePropertyView extends PropertyView implements View.OnClickListen
 		valueText = values.get(key).toString();
 		if (valueText == null)
 			valueText = "";
-		button.setText(valueText);
+		text.setText(valueText);
 	}
 
 	public void setValue(Cursor cursor, int position)
@@ -135,11 +142,12 @@ public class DatePropertyView extends PropertyView implements View.OnClickListen
 
 		if (valueText == null)
 			valueText = "";
-		button.setText(valueText);
+		text.setText(valueText);
 	}
 
 	public void onClick(View v) 
 	{
+		Log.d(TAG, "onClick");
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = null;
 		try {

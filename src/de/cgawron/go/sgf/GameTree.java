@@ -16,9 +16,6 @@
 
 package de.cgawron.go.sgf;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -33,7 +30,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.io.Reader;
-import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,11 +42,7 @@ import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import de.cgawron.go.Goban;
-import de.cgawron.go.Goban.BoardType;
 import de.cgawron.go.SimpleGoban;
 import de.cgawron.go.Symmetry;
 import de.cgawron.go.sgf.TreeIterator.PreorderIterator;
@@ -1116,6 +1108,7 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 		visitor.visit();
 	}
 
+	/*
 	public static class GameTreeTest
 	{
 		MarkupModel.Stone blackStone;
@@ -1222,7 +1215,8 @@ public class GameTree implements TreeModel, PropertyChangeListener,
 					blackStone, goban.getMarkup((short) 2, (short) 2));
 		}
 	}
-
+	 */
+	
 	/*
 	 * public static junit.framework.Test suite() { return new
 	 * JUnit4TestAdapter(GameTreeTest.class); }

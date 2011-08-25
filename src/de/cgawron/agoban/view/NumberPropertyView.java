@@ -1,14 +1,12 @@
 package de.cgawron.agoban.view;
 
-import android.R;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.Button;
-import de.cgawron.go.sgf.Value;
+import android.widget.TextView;
 
-public class NumberPropertyView extends PropertyView
+public class NumberPropertyView extends TextPropertyView
 {
-	private Button button;
+	private TextView text;
 	
 	public NumberPropertyView(Context context)
 	{
@@ -20,16 +18,21 @@ public class NumberPropertyView extends PropertyView
 		super(context, attrs);
 	}
 
+	/*
 	@Override
 	public void createView(Context context)
 	{
-		addView(button = new Button(context));
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+				                                                         LinearLayout.LayoutParams.MATCH_PARENT);
+		addView(text = new Button(context), params);
 	}
 
 	@Override
 	public void createView(Context context, AttributeSet attrs)
 	{
-		addView(button = new Button(context, attrs, R.attr.buttonStyle));
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+				                                                         LinearLayout.LayoutParams.MATCH_PARENT);
+		addView(text = new Button(context, attrs), params);
 	}
 	
 	@Override
@@ -41,7 +44,7 @@ public class NumberPropertyView extends PropertyView
 				valueText = value.toString();
 		}
 
-		button.setText(valueText);
+		text.setText(valueText);
 	}
-
+    */
 }

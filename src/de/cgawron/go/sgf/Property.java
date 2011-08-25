@@ -883,6 +883,10 @@ public class Property implements Cloneable
 	@SGFProperty(propertyClass = GameInfo.class)
 	public final static Key PLAYER_WHITE = new Key("PW");
 
+	/** The SGF Property TiMe. */
+	@SGFProperty(propertyClass = GameInfo.class, priority=74)
+	public final static Key TIME = new Key("TM");
+
 	/** The SGF Property REsult. */
 	@SGFProperty(propertyClass = GameInfo.class, priority=75)
 	public final static Key RESULT = new Key("RE");
@@ -890,6 +894,10 @@ public class Property implements Cloneable
 	/** The SGF Property KoMi. */
 	@SGFProperty(propertyClass = GameInfo.class, priority=78)
 	public final static Key KOMI = new Key("KM");
+
+	/** The SGF Property HAndicap. */
+	@SGFProperty(propertyClass = GameInfo.class, priority=83)
+	public final static Key HANDICAP = new Key("HA");
 
 	/** The SGF Property SiZe. */
 	@SGFProperty(propertyClass = RootNumber.class)

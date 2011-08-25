@@ -98,7 +98,7 @@
 		  <de.cgawron.agoban.view.DatePropertyView
 			  style="@style/Property"
 			  cgawron:property="DT"
-			  android:id="@+id/DT"
+			  android:layout_width="fill_parent"
 			  android:focusable="true"
 			  android:layout_column="2"
 			  android:layout_span="3" 
@@ -116,7 +116,6 @@
 		  <de.cgawron.agoban.view.TextPropertyView
 			  style="@style/Property"
 			  cgawron:property="RE"
-			  android:id="@+id/RE"
 			  android:focusable="true"
 			  android:layout_column="2"
 			  android:layout_span="3" 
@@ -134,7 +133,6 @@
 		  <de.cgawron.agoban.view.TextPropertyView
 			  style="@style/Property"
 			  cgawron:property="EV"
-			  android:id="@+id/EV"
 			  android:hint="@string/event_name" 
 			  android:focusable="true"
 			  android:layout_column="2"
@@ -152,7 +150,6 @@
 		  <de.cgawron.agoban.view.TextPropertyView
 			  style="@style/Property"
 			  cgawron:property="PC"
-			  android:id="@+id/PC"
 			  android:hint="@string/place" 
 			  android:focusable="true"
 			  android:layout_column="2"
@@ -163,27 +160,29 @@
       <TableLayout
 		  android:text="rules" 
 		  android:id="@+id/rules"  
-		  android:layout_width="wrap_content" 
-		  android:layout_height="wrap_content">
+		  android:stretchColumns="2"
+		  android:shrinkColumns="2"
+		  android:layout_width="fill_parent" 
+		  android:layout_height="fill_parent">
 		<TableRow
 			android:orientation="horizontal"
-			android:layout_width="wrap_content"
+			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:padding="1dp">
 		  <TextView
 			  style="@style/PropertyLabel"
 			  android:text="@string/TM"
 			  android:layout_column="1"/>
-		  <de.cgawron.agoban.view.RealPropertyView
+		  <de.cgawron.agoban.view.NumberPropertyView
 			  style="@style/Property"
-			  cgawron:property="TN"
+			  cgawron:property="TM"
 			  android:focusable="true"
 			  android:layout_column="2"
 			  android:layout_span="1" /> 
 		</TableRow>
 		<TableRow
 			android:orientation="horizontal"
-			android:layout_width="wrap_content"
+			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:padding="1dp">
 		  <TextView
@@ -206,10 +205,9 @@
 			  style="@style/PropertyLabel"
 			  android:text="@string/KM"
 			  android:layout_column="1"/>
-		  <de.cgawron.agoban.view.RealPropertyView
+		  <de.cgawron.agoban.view.NumberPropertyView
 			  style="@style/Property"
 			  cgawron:property="KM"
-			  android:id="@+id/KM"
 			  android:focusable="true"
 			  android:layout_column="2"
 			  android:layout_span="1" /> 

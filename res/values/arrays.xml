@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="winner">
+        <item>black wins</item>
+        <item>white wins</item>
+        <item>jigo</item>
+        <item>no result</item>
+        <item>both players loose</item>
+    </string-array>
+    
+</resources>

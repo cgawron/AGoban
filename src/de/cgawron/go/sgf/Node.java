@@ -20,13 +20,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
+import java.util.AbstractList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.AbstractList;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -142,16 +140,19 @@ public class Node extends PropertyList implements MarkupModelListener,
 
 	public class SiblingsList extends AbstractList<Node>
 	{
+		@Override
 		public Iterator<Node> iterator()
 		{
 			return new SiblingsIterator();
 		}
 
+		@Override
 		public int size()
 		{
 			return parent.children.size() - 1;
 		}
 
+		@Override
 		public Node get(int index)
 		{
 			Iterator<Node> it = iterator();
